@@ -30,6 +30,7 @@
 
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 
@@ -190,6 +191,12 @@ bool cw_is_pa_possible(const char * device_name)
 			      MSG_PREFIX "is possible: can't connect to PulseAudio server: %s", g_cw_pa_lib_handle.pa_strerror(error));
 		if (g_cw_pa_lib_handle.lib_handle) { /* FIXME: this closing of global handle won't work well for multi-generator library. */
 			dlclose(g_cw_pa_lib_handle.lib_handle);
+		}
+		/* Without this env an attempt to connect to PulseAudio
+		   server may end with "Connection refused". */
+		if (NULL == getenv("XDG_RUNTIME_DIR")) {
+			cw_debug_msg (&cw_debug_object, CW_DEBUG_SOUND_SYSTEM, CW_DEBUG_WARNING,
+				      MSG_PREFIX "is possible: XDG_RUNTIME_DIR is empty");
 		}
 		return false;
 	} else {

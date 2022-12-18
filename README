@@ -236,6 +236,12 @@ Build-time requirements for unixcw:
 
 
 
+Some run-time requirements for unixcw:
+- XDG_RUNTIME_DIR env variable must be set when PulseAudio sound system is
+  used. Be careful when running programs using libcw through execve().
+
+
+
 
 unixcw 3.4.2 (or at least parts of it) was successfully compiled on
 following platforms:
