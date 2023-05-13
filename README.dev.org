@@ -309,6 +309,27 @@ libtoolize
       message. 15GB or even 20GB would be more adequate.
 
 
+
+
+* Bugs, Features
+** TODO Bug: -lintl on Alpine is not added to linker flags
+
+Compilation of cw on Alpine 1.17.3 is failing because linker can't find intl function:
+   /usr/lib/gcc/x86_64-alpine-linux-musl/12.2.1/../../../../x86_64-alpine-linux-musl/bin/ld: /home/acerion/unixcw/unixcw/src/cwutils/i18n.c:63: undefined reference to `libintl_gettext'
+
+Manually adding -lintl to linker's command line fixes the problem, so
+it's a matter of getting linker flags on Alpine right.
+
+See 'AC_CHECK_LIB(intl, textdomain)' in configure.ac - we probably already do
+something to address this on for FreeBSD.
+
+** TODO Feature: allow disabling cw and cwgen through ./configure
+A problem with -lintl on Alpine shows that even such simple
+application as cw can fail to build. To allow a quick workaround for
+users, add "--disable-cw" to configure script.
+
+While you are at it, add similar flag for cwgen.
+
 * TODO
 ** code
 *** Use suseconds_t for duration variables?
