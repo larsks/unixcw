@@ -311,7 +311,7 @@ libtoolize
 
 
 
-* Bugs, Features
+* Bugs, feature requests
 ** TODO Bug: -lintl on Alpine is not added to linker flags
 
 Compilation of cw on Alpine 1.17.3 is failing because linker can't find intl function:
