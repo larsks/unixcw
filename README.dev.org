@@ -144,10 +144,75 @@ Then restart devfs to load the new rules:
 https://alsa.opensrc.org/Proc_asound_documentation
 echo 32 > /proc/asound/card0/pcm0p/sub0/prealloc
 
-modprobe snd_hda_intel
+
+
+
+
+
+
+Use 'lspci' to see if you have a sound card.
+
+
+
+Use 'lsmod | grep snd' to see if you have kernel modules for sound loaded.
+
+
+
+Use modprobe (e.g. 'modprobe snd_hda_intel') to load appropriate kernel
+module if necessary.
+
+
+
+Check which groups do /dev/snd/* devices belong to, and make sure that your
+user belongs to that group.
+
+
+
+amixer -c <card no>
+amixer -c <card no> set <name (e.g. Master)> unmute
+
+
+
+Use 'aplay -l' to list playback devices. Example:
+ aplay -l
+ **** List of PLAYBACK Hardware Devices ****
+ card 0: Intel [HDA Intel], device 0: VT1708B 8-Ch Analog [VT1708B 8-Ch Analog]
+   Subdevices: 0/1
+   Subdevice #0: subdevice #0
+ card 0: Intel [HDA Intel], device 1: VT1708B 8-Ch Digital [VT1708B 8-Ch Digital]
+   Subdevices: 1/1
+   Subdevice #0: subdevice #0
+
+
+
+Use 'alsamixer' to select correct device. Oftentimes the initial device
+presented by alsamixer shows only one "slider". The correct device will
+present multiple "sliders" for input, output, etc.
+Make sure that appropriate items (siders) are not muted (use 'm' key to
+toggle).
+
+
+
+See if ALSA playback works (you should hear a sound):
+   aplay /usr/share/sounds/alsa/<file>
+There is also 'paplay' tool for PulseAudio that does the same.
+
 
 
 ** PulseAudio
+
+*** General comments
+PA relies on ALSA.
+Make sure that appropriate ALSA packages are installed.
+Make sure that ALSA works correctly, refer to ALSA chapter in this file.
+
+
+*** Useful commands
+pamixer --list-sinks
+ncpamixer
+pactl list cards
+pactl list sinks
+
 
 *** Sinks
 
