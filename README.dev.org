@@ -58,6 +58,44 @@ mc git
 Systems with X windows: xterm meld
 Debian: debhelper
 
+*** Alpine Linux
+
+**** Installation
+
+Instructions for installation for dual-boot scenarios:
+https://wiki.alpinelinux.org/wiki/Dualbooting
+
+In a nutshell:
+ 1. Prepare target partition with ext4 file system and with desired size. You
+    can do it in another distro, or probably you can do it from Alpine's
+    installer.
+ 2. In Alpine installer, mount the partition to e.g. /mnt.
+ 3. In Alpine installer, run specified setup-* tools.
+ 4. In Alpine installer, install Alpine to the partition with 'setup-disk -m
+    sys /mnt' command.
+
+
+**** grub entry
+
+Put this in /etc/grub.d/40_custom and run 'update-grub2':
+
+For Alpine installed on /dev/sda8:
+'a' in "sda8" translates to '0' in "hd0,8"
+'8' in "sda8" translates to '8' in "hd0,8"
+
+IIRC, UUID was probably obtained with 'blkid /dev/sda8'.
+
+menuentry "Alpine Linux 1.17.3" {
+	set root=(hd0,8)
+	insmod ext2
+	linux /boot/vmlinuz-lts root=UUID=f9f73a1c-4cc7-4aa2-b952-38735d2d0f61 modules=usb-storage,ext4
+	initrd /boot/initramfs-lts
+}
+
+
+
+
+
 ** FreeBSD
 
 *** Generic tips
@@ -100,6 +138,31 @@ make install clean
 portmaster -a
 or in case of errors:
 portmaster -af
+
+
+*** grub entry
+
+Put this in /etc/grub.d/40_custom and run 'update-grub2':
+
+For FreeBSD installed on /dev/sda9:
+'a' in "sda9" translates to '0' in "hd0,9"
+'9' in "sda9" translates to '9' "hd0,9"
+
+"\/dev/ada0s9a" - this you probably have to learn during installation of
+FreeBSD. IIRC, this was the main slice in which root ('/') and swap
+partitions were created by FreeBSD installer.
+
+menuentry "FreeBSD 13.2" --class freebsd --class bsd --class os {
+	insmod bsd
+	insmod ufs2
+	set root=(hd0,9)
+	kfreebsd /boot/kernel/kernel
+	kfreebsd_loadenv /boot/device.hints
+	set kFreeBSD.vfs.root.mountfrom=ufs:/dev/ada0s9a
+	set kFreeBSD.vfs.root.mountfrom.options=rw
+}
+
+
 
 * Sound systems
 
@@ -160,6 +223,10 @@ Use 'lsmod | grep snd' to see if you have kernel modules for sound loaded.
 
 Use modprobe (e.g. 'modprobe snd_hda_intel') to load appropriate kernel
 module if necessary.
+
+Sometimes unloading a module and loading it again helps:
+modprobe -r snd_hda_intel
+modprobe snd_hda_intel
 
 
 
