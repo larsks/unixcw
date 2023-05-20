@@ -1,4 +1,4 @@
-* Terminology and conventions for code
+* Terminology and conventions for code and documentation
 
  - Use "duration" when describing how long (in microseconds or seconds) a
    tone will last. Don't use length when speaking about how long (in
@@ -85,7 +85,7 @@ For Alpine installed on /dev/sda8:
 
 IIRC, UUID was probably obtained with 'blkid /dev/sda8'.
 
-menuentry "Alpine Linux 1.17.3" {
+menuentry "Alpine Linux 3.17" {
 	set root=(hd0,8)
 	insmod ext2
 	linux /boot/vmlinuz-lts root=UUID=f9f73a1c-4cc7-4aa2-b952-38735d2d0f61 modules=usb-storage,ext4
