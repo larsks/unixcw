@@ -37,6 +37,7 @@
 #include "config.h"
 #include "libcw_console.h"
 #include "libcw_debug.h"
+#include "libcw_debug_internal.h"
 
 
 
@@ -236,6 +237,10 @@ static cw_ret_t cw_console_open_and_configure_sound_device_internal(cw_gen_t * g
 	   on non-zero value of sample rate. */
 	gen->sample_rate = 44100;
 
+#if CW_DEV_RAW_SINK
+	cw_dev_debug_raw_sink_open_internal(gen);
+#endif
+
 	gen->sound_device_is_open = true;
 
 	return CW_SUCCESS;
@@ -293,6 +298,10 @@ static void cw_console_close_sound_device_internal(cw_gen_t * gen)
 
 	cw_debug_msg (&cw_debug_object, CW_DEBUG_SOUND_SYSTEM, CW_DEBUG_INFO,
 		      MSG_PREFIX "console closed");
+
+#if CW_DEV_RAW_SINK
+	cw_dev_debug_raw_sink_close_internal(gen);
+#endif
 
 	return;
 }

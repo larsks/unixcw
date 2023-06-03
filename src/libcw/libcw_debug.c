@@ -46,6 +46,7 @@
 
 #include "libcw.h"
 #include "libcw_debug.h"
+#include "libcw_debug_internal.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
 
@@ -476,4 +477,39 @@ void cw_debug_event_internal(cw_debug_t * debug_object, uint32_t flag, uint32_t 
 
 
 
+void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen)
+{
+	char path[256] = { 0 };
+
+	/* TODO: this may not be true if int16_t integer is represented by e.g.
+	   32-bit integer on given platform. */
+	const size_t sample_size = sizeof (cw_sample_t) * CHAR_BIT;
+
+	snprintf(path, sizeof (path), "/tmp/cw_file_%s_%uHz_mono_signed_%zdbit_pcm.raw",
+	         cw_get_audio_system_label(gen->sound_system),
+	         gen->sample_rate,
+	         sample_size);
+	gen->dev_raw_sink = open(path,
+	                         O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK,
+	                         S_IRUSR | S_IWUSR);
+	if (gen->dev_raw_sink == -1) {
+		fprintf(stderr, MSG_PREFIX "open: failed to open dev raw sink file with path '%s': '%s'\n", path, strerror(errno));
+	}
+}
+
+
+
+
+void cw_dev_debug_raw_sink_close_internal(cw_gen_t * gen)
+{
+	if (gen->dev_raw_sink != -1) {
+		close(gen->dev_raw_sink);
+		gen->dev_raw_sink = -1;
+	}
+}
+
+
+
+
 #endif /* #ifdef LIBCW_WITH_DEV */
+

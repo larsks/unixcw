@@ -450,6 +450,7 @@ if test "$enable_dev" = "yes" ; then
    AC_DEFINE([LIBCW_WITH_DEV], [1], [Define as 1 if you want to enable development support.])
 else
    WITH_DEV='no'
+   AC_DEFINE([LIBCW_WITH_DEV], [0], [Define as 1 if you want to enable development support.])
 fi
 
 

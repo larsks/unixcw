@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "libcw_debug.h"
+#include "libcw_debug_internal.h"
 #include "libcw_pa.h"
 
 
@@ -417,7 +418,7 @@ static cw_ret_t cw_pa_open_and_configure_sound_device_internal(cw_gen_t * gen, c
 	}
 
 #if CW_DEV_RAW_SINK
-	gen->dev_raw_sink = open("/tmp/cw_file.pa.raw", O_WRONLY | O_TRUNC | O_NONBLOCK);
+	cw_dev_debug_raw_sink_open_internal(gen);
 #endif
 	assert (gen && gen->pa_data.simple);
 
@@ -459,10 +460,7 @@ static void cw_pa_close_sound_device_internal(cw_gen_t * gen)
 	gen->sound_device_is_open = false;
 
 #if CW_DEV_RAW_SINK
-	if (gen->dev_raw_sink != -1) {
-		close(gen->dev_raw_sink);
-		gen->dev_raw_sink = -1;
-	}
+	cw_dev_debug_raw_sink_close_internal(gen);
 #endif
 	return;
 }

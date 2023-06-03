@@ -17993,6 +17993,9 @@ $as_echo "#define LIBCW_WITH_DEV 1" >>confdefs.h
 
 else
    WITH_DEV='no'
+
+$as_echo "#define LIBCW_WITH_DEV 0" >>confdefs.h
+
 fi
 
 
