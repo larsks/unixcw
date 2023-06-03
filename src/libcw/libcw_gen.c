@@ -2349,7 +2349,7 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 	enqueued++;
 
 	cw_debug_msg (&cw_debug_object, CW_DEBUG_GENERATOR, CW_DEBUG_DEBUG,
-		      MSG_PREFIX "enqueued %d tones per iw space, tq len = %zu",
+		      MSG_PREFIX "enqueued %d tones per iws, tq len = %zu",
 		      enqueued, cw_tq_length_internal(gen->tq));
 
 	return CW_SUCCESS;
@@ -2519,7 +2519,7 @@ cw_ret_t cw_gen_enqueue_valid_character_no_ics_internal(cw_gen_t * gen, char cha
 */
 cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character)
 {
-	/* This function will add 1 Unit of inter-mark-space at the end. */
+	/* This function is adding 1 Unit of inter-mark-space at the end. */
 	if (CW_SUCCESS != cw_gen_enqueue_valid_character_no_ics_internal(gen, character)) {
 		return CW_FAILURE;
 	}

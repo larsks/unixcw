@@ -408,8 +408,10 @@ int cw_timestamp_compare_internal(const struct timeval * earlier, const struct t
 {
 	/* Compare the timestamps, taking care on overflows.
 
-	   At 4 WPM, the dash length is 3*(1200000/4)=900,000 usecs, and
-	   the word gap is 2,100,000 usecs.  With the maximum Farnsworth
+	   At 4 WPM, the dash duration is 3*(1200000/4)=900,000 usecs, and
+	   the inter-word-space is 2,100,000 usecs.
+
+	   With the maximum Farnsworth
 	   additional delay, the word gap extends to 20,100,000 usecs.
 	   This fits into an int with a lot of room to spare, in fact, an
 	   int can represent 2,147,483,647 usecs, or around 33 minutes.

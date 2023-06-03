@@ -1,7 +1,7 @@
 * Terminology and conventions for code and documentation
 
  - Use "duration" when describing how long (in microseconds or seconds) a
-   tone will last. Don't use length when speaking about how long (in
+   tone will last. Don't use "length" when speaking about how long (in
    microseconds or seconds) a tone will last.
 
  - Use "sound" when referring to sound devices, sounds systems

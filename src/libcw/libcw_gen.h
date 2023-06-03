@@ -107,14 +107,14 @@ struct cw_gen_struct {
 
 	   Be sure to read comment in cw_gen_sync_parameters_internal() on
 	   calculation of values of these parameters. */
-	int dot_duration;   /* Duration of a dot Mark. [us] */
-	int dash_duration;  /* Duration of a dash Mark. [us] */
-	int ims_duration;   /* Duration of inter-mark-space (i.e. the Space). [us] */
-	int ics_duration;   /* Duration of *additional* inter-character-space. [us] */
-	int iws_duration;   /* Duration of *additional* inter-word-space. [us] */
+	int dot_duration;   /* Duration of a dot Mark. [microseconds] */
+	int dash_duration;  /* Duration of a dash Mark. [microseconds] */
+	int ims_duration;   /* Duration of inter-mark-space (i.e. the Space). [microseconds] */
+	int ics_duration;   /* Duration of inter-character-space. [microseconds] */
+	int iws_duration;   /* Duration of inter-word-space. [microseconds] */
 
-	int additional_space_duration; /* Duration of additional space at the end of a character. [us] */
-	int adjustment_space_duration; /* Duration of adjustment space at the end of a word. [us] */
+	int additional_space_duration; /* Duration of additional space at the end of a character. [microseconds] */
+	int adjustment_space_duration; /* Duration of adjustment space at the end of a word. [microseconds] */
 
 
 
