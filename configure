@@ -794,6 +794,8 @@ enable_console
 enable_oss
 enable_alsa
 enable_pulseaudio
+enable_cwgen
+enable_cw
 enable_cwcp
 enable_xcwcp
 enable_xcwcp_rec_test
@@ -1462,6 +1464,9 @@ Optional Features:
   --disable-oss           disable support for OSS sound system output
   --disable-alsa          disable support for ALSA sound system output
   --disable-pulseaudio    disable support for PulseAudio sound system output
+  --disable-cwgen         do not build cwgen
+  --disable-cw            do not build cw (application with command line user
+                          interface)
   --disable-cwcp          do not build cwcp (application with curses user
                           interface)
   --disable-xcwcp         do not build xcwcp (application with Qt5 user
@@ -17267,6 +17272,46 @@ $as_echo "no" >&6; }
 fi
 
 
+# Build cwgen? Yes by default.
+# Check whether --enable-cwgen was given.
+if test "${enable_cwgen+set}" = set; then :
+  enableval=$enable_cwgen;
+else
+  enable_cwgen=yes
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build cwgen" >&5
+$as_echo_n "checking whether to build cwgen... " >&6; }
+if test "$enable_cwgen" = "yes" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+# Build cw? Yes by default.
+# Check whether --enable-cw was given.
+if test "${enable_cw+set}" = set; then :
+  enableval=$enable_cw;
+else
+  enable_cw=yes
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build cw" >&5
+$as_echo_n "checking whether to build cw... " >&6; }
+if test "$enable_cw" = "yes" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
 # Build cwcp? Yes by default.
 # Check whether --enable-cwcp was given.
 if test "${enable_cwcp+set}" = set; then :
@@ -17590,6 +17635,9 @@ $as_echo "#define LIBCW_WITH_PULSEAUDIO 1" >>confdefs.h
 
 fi
 
+
+WITH_CWGEN=$enable_cwgen
+WITH_CW=$enable_cw
 
 
 if test "$enable_cwcp" = "no" ; then
@@ -18434,7 +18482,15 @@ done
 # Decide on which subdirectories to build; substitute into SRC_SUBDIRS.
 # Build cwcp if curses is available, and xcwcp if Qt is available.
 # libcw tests depend on static library from cwutils, so cwutils goes first.
-SRC_SUBDIRS="cwutils libcw cw cwgen"
+SRC_SUBDIRS="cwutils libcw"
+
+if test "$WITH_CWGEN" = 'yes' ; then
+    SRC_SUBDIRS="$SRC_SUBDIRS cwgen"
+fi
+
+if test "$WITH_CW" = 'yes' ; then
+    SRC_SUBDIRS="$SRC_SUBDIRS cw"
+fi
 
 if test "$WITH_CWCP" = 'yes' ; then
     SRC_SUBDIRS="$SRC_SUBDIRS cwcp"
@@ -18630,9 +18686,17 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile src/cw/Makefile src/cwgen/Makefile"
+ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile"
 
 
+if test "$WITH_CWGEN" = 'yes' ; then
+   ac_config_files="$ac_config_files src/cwgen/Makefile"
+
+fi
+if test "$WITH_CW" = 'yes' ; then
+   ac_config_files="$ac_config_files src/cw/Makefile"
+
+fi
 if test "$WITH_CWCP" = 'yes' ; then
    ac_config_files="$ac_config_files src/cwcp/Makefile"
 
@@ -19782,8 +19846,8 @@ do
     "src/libcw/Makefile") CONFIG_FILES="$CONFIG_FILES src/libcw/Makefile" ;;
     "src/libcw/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/libcw/tests/Makefile" ;;
     "src/cwutils/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/Makefile" ;;
-    "src/cw/Makefile") CONFIG_FILES="$CONFIG_FILES src/cw/Makefile" ;;
     "src/cwgen/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwgen/Makefile" ;;
+    "src/cw/Makefile") CONFIG_FILES="$CONFIG_FILES src/cw/Makefile" ;;
     "src/cwcp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwcp/Makefile" ;;
     "src/xcwcp/Makefile") CONFIG_FILES="$CONFIG_FILES src/xcwcp/Makefile" ;;
 
@@ -21249,10 +21313,10 @@ $as_echo "$as_me:       include OSS support:  ...............  $WITH_OSS" >&6;}
 $as_echo "$as_me:       include ALSA support:  ..............  $WITH_ALSA" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:       include PulseAudio support:  ........  $WITH_PULSEAUDIO" >&5
 $as_echo "$as_me:       include PulseAudio support:  ........  $WITH_PULSEAUDIO" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cw:  ..............................  yes" >&5
-$as_echo "$as_me:   build cw:  ..............................  yes" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwgen:  ...........................  yes" >&5
-$as_echo "$as_me:   build cwgen:  ...........................  yes" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cw:  ..............................  $WITH_CW" >&5
+$as_echo "$as_me:   build cw:  ..............................  $WITH_CW" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwgen:  ...........................  $WITH_CWGEN" >&5
+$as_echo "$as_me:   build cwgen:  ...........................  $WITH_CWGEN" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:   build cwcp:  ............................  $WITH_CWCP" >&5
 $as_echo "$as_me:   build cwcp:  ............................  $WITH_CWCP" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:   build xcwcp:  ...........................  $WITH_XCWCP" >&5

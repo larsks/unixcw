@@ -206,6 +206,34 @@ else
 fi
 
 
+# Build cwgen? Yes by default.
+AC_ARG_ENABLE(cwgen,
+    AS_HELP_STRING([--disable-cwgen], [do not build cwgen]),
+    [],
+    [enable_cwgen=yes])
+
+AC_MSG_CHECKING([whether to build cwgen])
+if test "$enable_cwgen" = "yes" ; then
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+
+
+# Build cw? Yes by default.
+AC_ARG_ENABLE(cw,
+    AS_HELP_STRING([--disable-cw], [do not build cw (application with command line user interface)]),
+    [],
+    [enable_cw=yes])
+
+AC_MSG_CHECKING([whether to build cw])
+if test "$enable_cw" = "yes" ; then
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+
+
 # Build cwcp? Yes by default.
 AC_ARG_ENABLE(cwcp,
     AS_HELP_STRING([--disable-cwcp], [do not build cwcp (application with curses user interface)]),
@@ -364,6 +392,9 @@ if test "$WITH_PULSEAUDIO" = 'yes' ; then
 fi
 
 
+WITH_CWGEN=$enable_cwgen
+WITH_CW=$enable_cw
+
 
 if test "$enable_cwcp" = "no" ; then
    WITH_CWCP='no'
@@ -481,7 +512,15 @@ AC_CHECK_FUNCS([gettimeofday setlocale select strerror], [], [AC_MSG_ERROR([a fu
 # Decide on which subdirectories to build; substitute into SRC_SUBDIRS.
 # Build cwcp if curses is available, and xcwcp if Qt is available.
 # libcw tests depend on static library from cwutils, so cwutils goes first.
-SRC_SUBDIRS="cwutils libcw cw cwgen"
+SRC_SUBDIRS="cwutils libcw"
+
+if test "$WITH_CWGEN" = 'yes' ; then
+    SRC_SUBDIRS="$SRC_SUBDIRS cwgen"
+fi
+
+if test "$WITH_CW" = 'yes' ; then
+    SRC_SUBDIRS="$SRC_SUBDIRS cw"
+fi
 
 if test "$WITH_CWCP" = 'yes' ; then
     SRC_SUBDIRS="$SRC_SUBDIRS cwcp"
@@ -634,10 +673,14 @@ AC_CONFIG_FILES([Makefile.inc
 	src/Makefile
 	src/libcw/Makefile
 	src/libcw/tests/Makefile
-	src/cwutils/Makefile
-	src/cw/Makefile
-	src/cwgen/Makefile])
+	src/cwutils/Makefile])
 
+if test "$WITH_CWGEN" = 'yes' ; then
+   AC_CONFIG_FILES([src/cwgen/Makefile])
+fi
+if test "$WITH_CW" = 'yes' ; then
+   AC_CONFIG_FILES([src/cw/Makefile])
+fi
 if test "$WITH_CWCP" = 'yes' ; then
    AC_CONFIG_FILES([src/cwcp/Makefile])
 fi
@@ -666,8 +709,8 @@ AC_MSG_NOTICE([      include console buzzer support:  ....  $WITH_CONSOLE])
 AC_MSG_NOTICE([      include OSS support:  ...............  $WITH_OSS])
 AC_MSG_NOTICE([      include ALSA support:  ..............  $WITH_ALSA])
 AC_MSG_NOTICE([      include PulseAudio support:  ........  $WITH_PULSEAUDIO])
-AC_MSG_NOTICE([  build cw:  ..............................  yes])
-AC_MSG_NOTICE([  build cwgen:  ...........................  yes])
+AC_MSG_NOTICE([  build cw:  ..............................  $WITH_CW])
+AC_MSG_NOTICE([  build cwgen:  ...........................  $WITH_CWGEN])
 AC_MSG_NOTICE([  build cwcp:  ............................  $WITH_CWCP])
 AC_MSG_NOTICE([  build xcwcp:  ...........................  $WITH_XCWCP])
 if test "$enable_xcwcp_rec_test" = 'yes' ; then

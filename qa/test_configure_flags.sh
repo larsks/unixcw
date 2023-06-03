@@ -13,7 +13,7 @@
 # range from 2^N to 1) to the script.
 
 
-let N=7
+let N=9
 
 
 # cd "../"
@@ -24,9 +24,11 @@ options[0]="--disable-console"
 options[1]="--disable-oss"
 options[2]="--disable-alsa"
 options[3]="--disable-pulseaudio"
-options[4]="--disable-cwcp"
-options[5]="--disable-xcwcp"
-options[6]="--enable-dev"
+options[4]="--disable-cwgen"
+options[5]="--disable-cw"
+options[6]="--disable-cwcp"
+options[7]="--disable-xcwcp"
+options[8]="--enable-dev"
 
 #options[0]="1"
 #options[1]="2"
