@@ -1,4 +1,25 @@
-#include <math.h> /* fabsf() */
+/*
+  Copyright (C) 2022-2023  Kamil Ignacak (acerion@wp.pl)
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+
+
+
+#include <math.h> /* fabs() */
+#include <stdlib.h> /* exit() */
 
 
 
@@ -8,6 +29,7 @@
 
 
 
+#include "libcw_data.h"
 #include "libcw_gen_tests_state_callback.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
@@ -56,28 +78,54 @@
 
 
 /*
-  With this input string we expect:
-  6*3 letters, each with 3 marks and 3 inter-mark-spaces = 108.
+  Custom type for dots, dashes and spaces just for the purpose of this test.
+  The enum members are also visual representations of the dots, dashes and
+  spaces.
 */
-static const char * input_string = "ooo""ooo""ooo""sss""sss""sss";
-#define INPUT_ELEMENTS_COUNT 108
+typedef enum {
+	dot  = '.',
+	dash = '-',
+	ims  = 'M',
+	ics  = 'C',
+	iws  = 'W'
+} element_type_t;
 
-#define CW_EOE_REPRESENTATION '^'
+
+
+
+typedef struct {
+	int dot_usecs;
+	int dash_usecs;
+	int ims_usecs;
+	int ics_usecs;
+	int iws_usecs;
+	int additional_usecs;
+	int adjustment_usecs;
+} durations_t;
 
 
 
 
+/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
+   wpm speed [microseconds]. */
+static durations_t g_durations;
+
+
+
+
+/* How much durations of real dots, dashes and spaces diverge from ideal
+   ones? */
 typedef struct divergence_t {
-	float min;
-	float avg;
-	float max;
+	double min; /* [percentages] */
+	double avg; /* [percentages] */
+	double max; /* [percentages] */
 } divergence_t;
 
 
 
 
 typedef struct cw_element_t {
-	char representation;
+	element_type_t type;
 	int duration; /* microseconds */
 } cw_element_t;
 
@@ -100,7 +148,7 @@ typedef struct cw_element_stats_t {
    We need to store a persistent state of some data between callback calls. */
 typedef struct callback_data_t {
 	struct timeval prev_timestamp; /* Timestamp at which previous callback was made. */
-	int counter;
+	int element_idx; /* Index to g_test_input_elements[]. */
 } callback_data_t;
 
 
@@ -119,10 +167,16 @@ typedef struct test_data_t {
 	/* Reference values from tests in post_3.5.1 branch. */
 	struct divergence_t reference_div_dots;
 	struct divergence_t reference_div_dashes;
+	struct divergence_t reference_div_ims;
+	struct divergence_t reference_div_ics;
+	struct divergence_t reference_div_iws;
 
 	/* Values obtained in current test run. */
 	struct divergence_t current_div_dots;
 	struct divergence_t current_div_dashes;
+	struct divergence_t current_div_ims;
+	struct divergence_t current_div_ics;
+	struct divergence_t current_div_iws;
 } test_data_t;
 
 
@@ -132,11 +186,15 @@ static void gen_callback_fn(void * callback_arg, int state);
 static void update_element_stats(cw_element_stats_t * stats, int element_duration);
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const divergence_t * divergences, const char * name, int duration_expected);
 static void calculate_divergences_from_stats(const cw_element_stats_t * stats, divergence_t * divergences, int duration_expected);
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device);
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, durations_t * durations);
 
-static void calculate_test_results(const cw_element_t * test_input_elements, test_data_t * test_data, int dot_usecs, int dash_usecs);
+static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const durations_t * durations);
 static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_data);
-static void clear_data(cw_element_t * test_input_elements);
+
+static int ideal_duration_of_element(element_type_t type, durations_t * durations);
+
+static int initialize_elements(const char * string, cw_element_t * elements);
+static void clear_data(cw_element_t * elements);
 
 
 
@@ -153,283 +211,151 @@ static void clear_data(cw_element_t * test_input_elements);
   For Console sound system I'm copying results for Null sound system
   (both systems simulate a blocking write with sleep function).
 
-Null sound system, 4 WMP
-[II] duration of  dashes: min/avg/max = 900130/900208/900239, expected = 900000, divergence min/avg/max =    0.014%/   0.023%/   0.027%
-[II] duration of    dots: min/avg/max = 300123/300204/300225, expected = 300000, divergence min/avg/max =    0.041%/   0.068%/   0.075%
-ALSA sound system, 4 WPM
-[II] duration of  dashes: min/avg/max = 892462/895727/898281, expected = 900000, divergence min/avg/max =   -0.838%/  -0.475%/  -0.191%
-[II] duration of    dots: min/avg/max = 293087/296211/299484, expected = 300000, divergence min/avg/max =   -2.304%/  -1.263%/  -0.172%
-PulseAudio sound system, 4 WPM
-[II] duration of  dashes: min/avg/max = 897406/900200/906788, expected = 900000, divergence min/avg/max =   -0.288%/   0.022%/   0.754%
-[II] duration of    dots: min/avg/max = 294511/299532/303330, expected = 300000, divergence min/avg/max =   -1.830%/  -0.156%/   1.110%
-
-
-Null sound system, 12 WPM
-[II] duration of  dashes: min/avg/max = 300102/300192/300238, expected = 300000, divergence min/avg/max =    0.034%/   0.064%/   0.079%
-[II] duration of    dots: min/avg/max = 100113/100189/100241, expected = 100000, divergence min/avg/max =    0.113%/   0.189%/   0.241%
-ALSA sound system, 12 WPM
-[II] duration of  dashes: min/avg/max = 292760/295770/299096, expected = 300000, divergence min/avg/max =   -2.413%/  -1.410%/  -0.301%
-[II] duration of    dots: min/avg/max =  93308/ 96458/ 98940, expected = 100000, divergence min/avg/max =   -6.692%/  -3.542%/  -1.060%
-PulseAudio sound system, 12 WPM
-[II] duration of  dashes: min/avg/max = 295562/299878/303009, expected = 300000, divergence min/avg/max =   -1.479%/  -0.041%/   1.003%
-[II] duration of    dots: min/avg/max =  97274/ 99937/106259, expected = 100000, divergence min/avg/max =   -2.726%/  -0.063%/   6.259%
-
-
-Null sound system, 24 WPM
-[II] duration of  dashes: min/avg/max = 150116/150197/150255, expected = 150000, divergence min/avg/max =    0.077%/   0.131%/   0.170%
-[II] duration of    dots: min/avg/max =  50110/ 50158/ 50222, expected =  50000, divergence min/avg/max =    0.220%/   0.316%/   0.444%
-ALSA sound system, 24 WPM
-[II] duration of  dashes: min/avg/max = 141977/147780/154997, expected = 150000, divergence min/avg/max =   -5.349%/  -1.480%/   3.331%
-[II] duration of    dots: min/avg/max =  44731/ 47361/ 49472, expected =  50000, divergence min/avg/max =  -10.538%/  -5.278%/  -1.056%
-PulseAudio sound system, 24 WPM
-[II] duration of  dashes: min/avg/max = 142998/149541/152615, expected = 150000, divergence min/avg/max =   -4.668%/  -0.306%/   1.743%
-[II] duration of    dots: min/avg/max =  45374/ 50002/ 53423, expected =  50000, divergence min/avg/max =   -9.252%/   0.004%/   6.846%
-
-
-Null sound system, 36 WPM
-[II] duration of  dashes: min/avg/max = 100149/100217/100260, expected =  99999, divergence min/avg/max =    0.150%/   0.218%/   0.261%
-[II] duration of    dots: min/avg/max =  33451/ 33497/ 33567, expected =  33333, divergence min/avg/max =    0.354%/   0.492%/   0.702%
-ALSA sound system, 36 WPM
-[II] duration of  dashes: min/avg/max =  93665/ 98788/106536, expected =  99999, divergence min/avg/max =   -6.334%/  -1.211%/   6.537%
-[II] duration of    dots: min/avg/max =  28537/ 32776/ 41330, expected =  33333, divergence min/avg/max =  -14.388%/  -1.671%/  23.991%
-PulseAudio sound system, 36 WPM
-[II] duration of  dashes: min/avg/max =  97477/100152/105279, expected =  99999, divergence min/avg/max =   -2.522%/   0.153%/   5.280%
-[II] duration of    dots: min/avg/max =  27914/ 33103/ 35747, expected =  33333, divergence min/avg/max =  -16.257%/  -0.690%/   7.242%
-
-
-Null sound system, 60WMP
-[II] duration of  dashes: min/avg/max =  60143/ 60206/ 60256, expected =  60000, divergence min/avg/max =    0.238%/   0.343%/   0.427%
-[II] duration of    dots: min/avg/max =  20126/ 20178/ 20229, expected =  20000, divergence min/avg/max =    0.630%/   0.890%/   1.145%
-ALSA sound system, 60WMP
-[II] duration of  dashes: min/avg/max =  52534/ 56223/ 57938, expected =  60000, divergence min/avg/max =  -12.443%/  -6.295%/  -3.437%
-[II] duration of    dots: min/avg/max =  12107/ 16164/ 16757, expected =  20000, divergence min/avg/max =  -39.465%/ -19.180%/ -16.215%
-PulseAudio sound system, 60WMP
-[II] duration of  dashes: min/avg/max =  57549/ 60050/ 65158, expected =  60000, divergence min/avg/max =   -4.085%/   0.083%/   8.597%
-[II] duration of    dots: min/avg/max =  15114/ 19959/ 25528, expected =  20000, divergence min/avg/max =  -24.430%/  -0.205%/  27.640%
+  For ims/ics/iws I'm just copying data for dot, at least for now. Maybe I
+  will adjust the data in the future..
 */
 static test_data_t g_test_data[] = {
-	{ .sound_system = CW_AUDIO_NULL,      .speed =  4, .reference_div_dots = {    0.041,    0.068,    0.075 }, .reference_div_dashes = {    0.014,    0.023,    0.027 }},
-	{ .sound_system = CW_AUDIO_NULL,      .speed = 12, .reference_div_dots = {    0.113,    0.189,    0.241 }, .reference_div_dashes = {    0.034,    0.064,    0.079 }},
-	{ .sound_system = CW_AUDIO_NULL,      .speed = 24, .reference_div_dots = {    0.220,    0.316,    0.444 }, .reference_div_dashes = {    0.077,    0.131,    0.170 }},
-	{ .sound_system = CW_AUDIO_NULL,      .speed = 36, .reference_div_dots = {    0.354,    0.492,    0.702 }, .reference_div_dashes = {    0.150,    0.218,    0.261 }},
-	{ .sound_system = CW_AUDIO_NULL,      .speed = 60, .reference_div_dots = {    0.630,    0.890,    1.145 }, .reference_div_dashes = {    0.238,    0.343,    0.427 }},
 
-	{ .sound_system = CW_AUDIO_CONSOLE,   .speed =  4, .reference_div_dots = {    0.041,    0.068,    0.075 }, .reference_div_dashes = {    0.014,    0.023,    0.027 }},
-	{ .sound_system = CW_AUDIO_CONSOLE,   .speed = 12, .reference_div_dots = {    0.113,    0.189,    0.241 }, .reference_div_dashes = {    0.034,    0.064,    0.079 }},
-	{ .sound_system = CW_AUDIO_CONSOLE,   .speed = 24, .reference_div_dots = {    0.220,    0.316,    0.444 }, .reference_div_dashes = {    0.077,    0.131,    0.170 }},
-	{ .sound_system = CW_AUDIO_CONSOLE,   .speed = 36, .reference_div_dots = {    0.354,    0.492,    0.702 }, .reference_div_dashes = {    0.150,    0.218,    0.261 }},
-	{ .sound_system = CW_AUDIO_CONSOLE,   .speed = 60, .reference_div_dots = {    0.630,    0.890,    1.145 }, .reference_div_dashes = {    0.238,    0.343,    0.427 }},
+	/* sound system                      speed       expected divergence: dots      expected divergence: dashes    expected divergence: ims       expected divergence: ics       expected divergence: iws */
+	{ .sound_system = CW_AUDIO_NULL,    .speed =  4, {   0.041,   0.068,   0.075 }, {   0.014,   0.023,   0.027 }, {   0.041,   0.068,   0.075 }, {   0.041,   0.068,   0.075 }, {   0.041,   0.068,   0.075 } },
+	{ .sound_system = CW_AUDIO_NULL,    .speed = 12, {   0.113,   0.189,   0.241 }, {   0.034,   0.064,   0.079 }, {   0.113,   0.189,   0.241 }, {   0.113,   0.189,   0.241 }, {   0.113,   0.189,   0.241 } },
+	{ .sound_system = CW_AUDIO_NULL,    .speed = 24, {   0.220,   0.316,   0.444 }, {   0.077,   0.131,   0.170 }, {   0.220,   0.316,   0.444 }, {   0.220,   0.316,   0.444 }, {   0.220,   0.316,   0.444 } },
+	{ .sound_system = CW_AUDIO_NULL,    .speed = 36, {   0.354,   0.492,   0.702 }, {   0.150,   0.218,   0.261 }, {   0.354,   0.492,   0.702 }, {   0.354,   0.492,   0.702 }, {   0.354,   0.492,   0.702 } },
+	{ .sound_system = CW_AUDIO_NULL,    .speed = 60, {   0.630,   0.890,   1.145 }, {   0.238,   0.343,   0.427 }, {   0.630,   0.890,   1.145 }, {   0.630,   0.890,   1.145 }, {   0.630,   0.890,   1.145 } },
 
-	{ .sound_system = CW_AUDIO_OSS,       .speed =  4, .reference_div_dots = {   -2.304,   -1.263,   -0.172 }, .reference_div_dashes = {   -0.838,   -0.475,   -0.191 }},
-	{ .sound_system = CW_AUDIO_OSS,       .speed = 12, .reference_div_dots = {   -6.692,   -3.542,   -1.060 }, .reference_div_dashes = {   -2.413,   -1.410,   -0.301 }},
-	{ .sound_system = CW_AUDIO_OSS,       .speed = 24, .reference_div_dots = {  -10.538,   -5.278,   -1.056 }, .reference_div_dashes = {   -5.349,   -1.480,    3.331 }},
-	{ .sound_system = CW_AUDIO_OSS,       .speed = 36, .reference_div_dots = {  -14.388,   -1.671,   23.991 }, .reference_div_dashes = {   -6.334,   -1.211,    6.537 }},
-	{ .sound_system = CW_AUDIO_OSS,       .speed = 60, .reference_div_dots = {  -39.465,  -19.180,  -16.215 }, .reference_div_dashes = {  -12.443,   -6.295,   -3.437 }},
+	{ .sound_system = CW_AUDIO_CONSOLE, .speed =  4, {   0.041,   0.068,   0.075 }, {   0.014,   0.023,   0.027 }, {   0.041,   0.068,   0.075 }, {   0.041,   0.068,   0.075 }, {   0.041,   0.068,   0.075 } },
+	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 12, {   0.113,   0.189,   0.241 }, {   0.034,   0.064,   0.079 }, {   0.113,   0.189,   0.241 }, {   0.113,   0.189,   0.241 }, {   0.113,   0.189,   0.241 } },
+	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 24, {   0.220,   0.316,   0.444 }, {   0.077,   0.131,   0.170 }, {   0.220,   0.316,   0.444 }, {   0.220,   0.316,   0.444 }, {   0.220,   0.316,   0.444 } },
+	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 36, {   0.354,   0.492,   0.702 }, {   0.150,   0.218,   0.261 }, {   0.354,   0.492,   0.702 }, {   0.354,   0.492,   0.702 }, {   0.354,   0.492,   0.702 } },
+	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 60, {   0.630,   0.890,   1.145 }, {   0.238,   0.343,   0.427 }, {   0.630,   0.890,   1.145 }, {   0.630,   0.890,   1.145 }, {   0.630,   0.890,   1.145 } },
 
-	{ .sound_system = CW_AUDIO_ALSA,      .speed =  4, .reference_div_dots = {   -2.304,   -1.263,   -0.172 }, .reference_div_dashes = {   -0.838,   -0.475,   -0.191 }},
-	{ .sound_system = CW_AUDIO_ALSA,      .speed = 12, .reference_div_dots = {   -6.692,   -3.542,   -1.060 }, .reference_div_dashes = {   -2.413,   -1.410,   -0.301 }},
-	{ .sound_system = CW_AUDIO_ALSA,      .speed = 24, .reference_div_dots = {  -10.538,   -5.278,   -1.056 }, .reference_div_dashes = {   -5.349,   -1.480,    3.331 }},
-	{ .sound_system = CW_AUDIO_ALSA,      .speed = 36, .reference_div_dots = {  -14.388,   -1.671,   23.991 }, .reference_div_dashes = {   -6.334,   -1.211,    6.537 }},
-	{ .sound_system = CW_AUDIO_ALSA,      .speed = 60, .reference_div_dots = {  -39.465,  -19.180,  -16.215 }, .reference_div_dashes = {  -12.443,   -6.295,   -3.437 }},
+	{ .sound_system = CW_AUDIO_OSS,     .speed =  4, {  -2.304,  -1.263,  -0.172 }, {  -0.838,  -0.475,  -0.191 }, {  -2.304,  -1.263,  -0.172 }, {  -2.304,  -1.263,  -0.172 }, {  -2.304,  -1.263,  -0.172 } },
+	{ .sound_system = CW_AUDIO_OSS,     .speed = 12, {  -6.692,  -3.542,  -1.060 }, {  -2.413,  -1.410,  -0.301 }, {  -6.692,  -3.542,  -1.060 }, {  -6.692,  -3.542,  -1.060 }, {  -6.692,  -3.542,  -1.060 } },
+	{ .sound_system = CW_AUDIO_OSS,     .speed = 24, { -10.538,  -5.278,  -1.056 }, {  -5.349,  -1.480,   3.331 }, { -10.538,  -5.278,  -1.056 }, { -10.538,  -5.278,  -1.056 }, { -10.538,  -5.278,  -1.056 } },
+	{ .sound_system = CW_AUDIO_OSS,     .speed = 36, { -14.388,  -1.671,  23.991 }, {  -6.334,  -1.211,   6.537 }, { -14.388,  -1.671,  23.991 }, { -14.388,  -1.671,  23.991 }, { -14.388,  -1.671,  23.991 } },
+	{ .sound_system = CW_AUDIO_OSS,     .speed = 60, { -39.465, -19.180, -16.215 }, { -12.443,  -6.295,  -3.437 }, { -39.465, -19.180, -16.215 }, { -39.465, -19.180, -16.215 }, { -39.465, -19.180, -16.215 } },
 
-	{ .sound_system = CW_AUDIO_PA,        .speed =  4, .reference_div_dots = {   -1.830,   -0.156,    1.110 }, .reference_div_dashes = {   -0.288,    0.022,    0.754 }},
-	{ .sound_system = CW_AUDIO_PA,        .speed = 12, .reference_div_dots = {   -2.726,   -0.063,    6.259 }, .reference_div_dashes = {   -1.479,   -0.041,    1.003 }},
-	{ .sound_system = CW_AUDIO_PA,        .speed = 24, .reference_div_dots = {   -9.252,    0.004,    6.846 }, .reference_div_dashes = {   -4.668,   -0.306,    1.743 }},
-	{ .sound_system = CW_AUDIO_PA,        .speed = 36, .reference_div_dots = {  -16.257,   -0.690,    7.242 }, .reference_div_dashes = {   -2.522,    0.153,    5.280 }},
-	{ .sound_system = CW_AUDIO_PA,        .speed = 60, .reference_div_dots = {  -24.430,   -0.205,   27.640 }, .reference_div_dashes = {   -4.085,    0.083,    8.597 }},
+	{ .sound_system = CW_AUDIO_ALSA,    .speed =  4, {  -2.304,  -1.263,  -0.172 }, {  -0.838,  -0.475,  -0.191 }, {  -2.304,  -1.263,  -0.172 }, {  -2.304,  -1.263,  -0.172 }, {  -2.304,  -1.263,  -0.172 } },
+	{ .sound_system = CW_AUDIO_ALSA,    .speed = 12, {  -6.692,  -3.542,  -1.060 }, {  -2.413,  -1.410,  -0.301 }, {  -6.692,  -3.542,  -1.060 }, {  -6.692,  -3.542,  -1.060 }, {  -6.692,  -3.542,  -1.060 } },
+	{ .sound_system = CW_AUDIO_ALSA,    .speed = 24, { -10.538,  -5.278,  -1.056 }, {  -5.349,  -1.480,   3.331 }, { -10.538,  -5.278,  -1.056 }, { -10.538,  -5.278,  -1.056 }, { -10.538,  -5.278,  -1.056 } },
+	{ .sound_system = CW_AUDIO_ALSA,    .speed = 36, { -14.388,  -1.671,  23.991 }, {  -6.334,  -1.211,   6.537 }, { -14.388,  -1.671,  23.991 }, { -14.388,  -1.671,  23.991 }, { -14.388,  -1.671,  23.991 } },
+	{ .sound_system = CW_AUDIO_ALSA,    .speed = 60, { -39.465, -19.180, -16.215 }, { -12.443,  -6.295,  -3.437 }, { -39.465, -19.180, -16.215 }, { -39.465, -19.180, -16.215 }, { -39.465, -19.180, -16.215 } },
+
+	{ .sound_system = CW_AUDIO_PA,      .speed =  4, {  -1.830,  -0.156,   1.110 }, {  -0.288,   0.022,   0.754 }, {  -1.830,  -0.156,   1.110 }, {  -1.830,  -0.156,   1.110 }, {  -1.830,  -0.156,   1.110 } },
+	{ .sound_system = CW_AUDIO_PA,      .speed = 12, {  -2.726,  -0.063,   6.259 }, {  -1.479,  -0.041,   1.003 }, {  -2.726,  -0.063,   6.259 }, {  -2.726,  -0.063,   6.259 }, {  -2.726,  -0.063,   6.259 } },
+	{ .sound_system = CW_AUDIO_PA,      .speed = 24, {  -9.252,   0.004,   6.846 }, {  -4.668,  -0.306,   1.743 }, {  -9.252,   0.004,   6.846 }, {  -9.252,   0.004,   6.846 }, {  -9.252,   0.004,   6.846 } },
+	{ .sound_system = CW_AUDIO_PA,      .speed = 36, { -16.257,  -0.690,   7.242 }, {  -2.522,   0.153,   5.280 }, { -16.257,  -0.690,   7.242 }, { -16.257,  -0.690,   7.242 }, { -16.257,  -0.690,   7.242 } },
+	{ .sound_system = CW_AUDIO_PA,      .speed = 60, { -24.430,  -0.205,  27.640 }, {  -4.085,   0.083,   8.597 }, { -24.430,  -0.205,  27.640 }, { -24.430,  -0.205,  27.640 }, { -24.430,  -0.205,  27.640 } },
 };
 
 
 
 
-static cw_element_t g_test_input_elements[INPUT_ELEMENTS_COUNT] = {
-	/* "o" 1 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 }, /* TODO: this should be EOE + EOC, right? */
-
-	/* "o" 2 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 3 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 4 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 5 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 6 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 7 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 8 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-	/* "o" 9 */
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-	{ CW_DASH_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION,  0 },
-
-
-
-	/* "s" 1 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 2 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 3 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 4 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 5 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 6 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 7 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 8 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-
-	/* "s" 9 */
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-	{ CW_DOT_REPRESENTATION, 0 },
-	{ CW_EOE_REPRESENTATION, 0 },
-};
+/* Test string that will be played by test. */
+//static const char * const g_input_string = "one two three four";
+static const char * const g_input_string = "ooo""ooo""ooo sss""sss""sss";
 
 
 
 
+#define INPUT_ELEMENTS_COUNT 128
+static cw_element_t g_test_input_elements[INPUT_ELEMENTS_COUNT];
+/* Count of valid elements in the array. Depends on length of g_input_string. */
+static int g_test_input_elements_count;
+
+
+
+
+/**
+   Get ideal (expected) duration of given element (dot, dash, spaces)
+*/
+static int ideal_duration_of_element(element_type_t type, durations_t * durations)
+{
+	switch (type) {
+	case dot:
+		return durations->dot_usecs;
+	case dash:
+		return durations->dash_usecs;
+	case ims:
+		return durations->ims_usecs;
+	case ics:
+		return durations->ics_usecs;
+	case iws:
+		return durations->iws_usecs;
+	default:
+		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
+		return 1;
+	}
+}
+
+
+
+
+/**
+   @brief Callback function called on change of state of generator (open -> closed, or closed -> open)
+
+   @param[in/out] callback_arg callback's private data, registered in generator together with callback itself
+   @param[in] state state of generator: 0 == opened (no sound, space) or 1 == closed (sound, mark)
+*/
 static void gen_callback_fn(void * callback_arg, int state)
 {
+	/*
+	  The callback should be as fast as possible. This flag controls the speed.
+	  true: allow non-essential code executed by callback (increases execution time of callback).
+	  false: disable non-essential code.
+
+	  TODO: measure difference in time of execution of the callback. Maybe
+	  the flag doesn't have that much impact.
+	*/
+	const bool execute_nonessential = true;
+
 	callback_data_t * callback_data = (callback_data_t *) callback_arg;
 
 	struct timeval now_timestamp = { 0 };
 	gettimeofday(&now_timestamp, NULL);
+	struct timeval prev_timestamp = callback_data->prev_timestamp;
 
-	if (callback_data->counter > 0) { /* Don't do anything for zero-th element, for which there is no 'prev timestamp'. */
-		const int diff = cw_timestamp_compare_internal(&callback_data->prev_timestamp, &now_timestamp);
-#if 1
-		fprintf(stderr, "[II] Call %3d, state %d, representation = '%c', duration of previous element = %6d us\n",
-			callback_data->counter, state, g_test_input_elements[callback_data->counter].representation, diff);
-#endif
-
-		/* Notice that we do -1 here. We are at the beginning
-		   of new element, and currently calculated diff is
-		   how long *previous* element was. */
-		g_test_input_elements[callback_data->counter - 1].duration = diff;
-
+	const int this_idx = callback_data->element_idx;
+	cw_element_t * this_element = &g_test_input_elements[this_idx];
+	if (execute_nonessential) {
+		/* Check that state is consistent with element. */
 		if (state) {
-			if (CW_DOT_REPRESENTATION != g_test_input_elements[callback_data->counter].representation
-			    && CW_DASH_REPRESENTATION != g_test_input_elements[callback_data->counter].representation) {
-				fprintf(stderr, "[EE] Unexpected representation '%c' at %d for state 'closed'\n",
-					g_test_input_elements[callback_data->counter].representation,
-					callback_data->counter);
+			if (dot != this_element->type && dash != this_element->type) {
+				fprintf(stderr, "[ERROR] Unexpected element #%03d: '%c' for state 'closed'\n", this_idx, this_element->type);
 			}
 		} else {
-			if (CW_EOE_REPRESENTATION != g_test_input_elements[callback_data->counter].representation) {
-				fprintf(stderr, "[EE] Unexpected representation '%c' at %d for state 'open'\n",
-					g_test_input_elements[callback_data->counter].representation,
-					callback_data->counter);
+			if (iws != this_element->type && ics != this_element->type && ims != this_element->type) {
+				fprintf(stderr, "[ERROR] Unexpected element #%03d: '%c' for state 'open'\n", this_idx, this_element->type);
 			}
 		}
-
 	}
-	callback_data->counter++;
+
+	callback_data->element_idx++;
 	callback_data->prev_timestamp = now_timestamp;
+
+	cw_element_t * prev_element = NULL;
+	if (this_idx == 0) {
+		/* Don't do anything for zero-th element, for which there is no 'prev
+		   timestamp'. */
+		return;
+	} else {
+		/* Update previous element. We are at the beginning of new element,
+		   and currently calculated duration is how long *previous* element
+		   was. */
+		prev_element = &g_test_input_elements[this_idx - 1];
+		prev_element->duration = cw_timestamp_compare_internal(&prev_timestamp, &now_timestamp);
+	}
+
+	if (execute_nonessential) {
+		const int prev_duration_expected = ideal_duration_of_element(prev_element->type, &g_durations);
+		const double divergence = 100.0 * (prev_element->duration - prev_duration_expected) / (1.0 * prev_duration_expected);
+
+#if 0 /* For debugging only. */
+		fprintf(stderr, "[DEBUG] type = '%c', prev_duration = %7d, prev_duration_expected = %7d\n", prev_element->type, prev_element->duration, prev_duration_expected);
+#endif
+		fprintf(stderr, "[INFO ] Element %3d, state %d, type = '%c'; previous element: duration = %7d us, divergence = %8.3f%%\n",
+		        this_idx, state, this_element->type, prev_element->duration, divergence);
+	}
 }
 
 
@@ -454,9 +380,9 @@ static void update_element_stats(cw_element_stats_t * stats, int element_duratio
 
 static void calculate_divergences_from_stats(const cw_element_stats_t * stats, divergence_t * divergences, int duration_expected)
 {
-	divergences->min = 100 * (stats->duration_min - duration_expected) / (1.0 * duration_expected);
-	divergences->avg = 100 * (stats->duration_avg - duration_expected) / (1.0 * duration_expected);
-	divergences->max = 100 * (stats->duration_max - duration_expected) / (1.0 * duration_expected);
+	divergences->min = 100.0 * (stats->duration_min - duration_expected) / (1.0 * duration_expected);
+	divergences->avg = 100.0 * (stats->duration_avg - duration_expected) / (1.0 * duration_expected);
+	divergences->max = 100.0 * (stats->duration_max - duration_expected) / (1.0 * duration_expected);
 }
 
 
@@ -464,15 +390,15 @@ static void calculate_divergences_from_stats(const cw_element_stats_t * stats, d
 
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const divergence_t * divergences, const char * name, int duration_expected)
 {
-	fprintf(stderr, "[II] duration of %7s: min/avg/max = %6d/%6d/%6d, expected = %6d, divergence min/avg/max = %8.3f%%/%8.3f%%/%8.3f%%\n",
-		name,
-		stats->duration_min,
-		stats->duration_avg,
-		stats->duration_max,
-		duration_expected,
-		(double) divergences->min,
-		(double) divergences->avg,
-		(double) divergences->max);
+	fprintf(stderr, "[INFO ] duration of %-6s: min/avg/max = %7d/%7d/%7d, expected = %7d, divergence min/avg/max = %8.3f%%/%8.3f%%/%8.3f%%\n",
+	        name,
+	        stats->duration_min,
+	        stats->duration_avg,
+	        stats->duration_max,
+	        duration_expected,
+	        divergences->min,
+	        divergences->avg,
+	        divergences->max);
 }
 
 
@@ -482,6 +408,8 @@ static void print_element_stats_and_divergences(const cw_element_stats_t * stats
 cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
+
+	g_test_input_elements_count = initialize_elements(g_input_string, g_test_input_elements);
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -493,7 +421,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 		if (cte->current_gen_conf.sound_system != test_data->sound_system) {
 			continue;
 		}
-		if (cwt_retv_ok != test_cw_gen_state_callback_sub(cte, test_data, cte->current_gen_conf.sound_device)) {
+		if (cwt_retv_ok != test_cw_gen_state_callback_sub(cte, test_data, cte->current_gen_conf.sound_device, &g_durations)) {
 			retv = cwt_retv_err;
 			break;
 		}
@@ -507,7 +435,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 
 
 
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device)
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, durations_t * durations)
 {
 	cw_gen_config_t gen_conf = { .sound_system = test_data->sound_system };
 	snprintf(gen_conf.sound_device, sizeof (gen_conf.sound_device), "%s", sound_device);
@@ -515,37 +443,31 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_set_speed(gen, test_data->speed);
 	cw_gen_set_frequency(gen, cte->config->frequency);
 
-
 	callback_data_t callback_data = { 0 };
 	cw_gen_register_value_tracking_callback_internal(gen, gen_callback_fn, &callback_data);
 
 
-	int dot_usecs, dash_usecs,
-		end_of_element_usecs,
-		ics_usecs, end_of_word_usecs,
-		additional_usecs, adjustment_usecs;
+
 	cw_gen_get_timing_parameters_internal(gen,
-					      &dot_usecs, &dash_usecs,
-					      &end_of_element_usecs,
-					      &ics_usecs, &end_of_word_usecs,
-					      &additional_usecs, &adjustment_usecs);
-	fprintf(stderr,
-		"[II] dot duration  = %6d us\n"
-		"[II] dash duration = %6d us\n"
-		"[II] eoe duration  = %6d us\n"
-		"[II] ics duration  = %6d us\n"
-		"[II] iws duration  = %6d us\n"
-		"[II] additional duration = %6d us\n"
-		"[II] adjustment duration = %6d us\n",
-		dot_usecs, dash_usecs,
-		end_of_element_usecs,
-		ics_usecs, end_of_word_usecs,
-		additional_usecs, adjustment_usecs);
-	fprintf(stderr, "[II] speed = %d WPM\n", test_data->speed);
+	                                      &durations->dot_usecs,
+	                                      &durations->dash_usecs,
+	                                      &durations->ims_usecs,
+	                                      &durations->ics_usecs,
+	                                      &durations->iws_usecs,
+	                                      &durations->additional_usecs,
+	                                      &durations->adjustment_usecs);
+	fprintf(stderr, "[INFO ] dot duration        = %7d us\n", durations->dot_usecs);
+	fprintf(stderr, "[INFO ] dash duration       = %7d us\n", durations->dash_usecs);
+	fprintf(stderr, "[INFO ] ims duration        = %7d us\n", durations->ims_usecs);
+	fprintf(stderr, "[INFO ] ics duration        = %7d us\n", durations->ics_usecs);
+	fprintf(stderr, "[INFO ] iws duration        = %7d us\n", durations->iws_usecs);
+	fprintf(stderr, "[INFO ] additional duration = %7d us\n", durations->additional_usecs);
+	fprintf(stderr, "[INFO ] adjustment duration = %7d us\n", durations->adjustment_usecs);
+	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
 	cw_gen_start(gen);
-	cw_gen_enqueue_string(gen, input_string);
+	cw_gen_enqueue_string(gen, g_input_string);
 	cw_gen_wait_for_queue_level(gen, 0);
 
 
@@ -553,7 +475,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_delete(&gen);
 
 
-	calculate_test_results(g_test_input_elements, test_data, dot_usecs, dash_usecs);
+	calculate_test_results(g_test_input_elements, g_test_input_elements_count, test_data, durations);
 	evaluate_test_results(cte, test_data);
 	clear_data(g_test_input_elements);
 
@@ -567,38 +489,51 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
    Calculate current divergences (from current run of test) that will be
    compared with reference values
 */
-static void calculate_test_results(const cw_element_t * test_input_elements, test_data_t * test_data, int dot_usecs, int dash_usecs)
+static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const durations_t * durations)
 {
-	cw_element_stats_t stats_dot  = { .duration_min = 1000000000, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
-	cw_element_stats_t stats_dash = { .duration_min = 1000000000, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	const int initial = 1000000000;
+	cw_element_stats_t stats_dot  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	cw_element_stats_t stats_dash = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	cw_element_stats_t stats_ims  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	cw_element_stats_t stats_ics  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	cw_element_stats_t stats_iws  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
 
-	/* Skip first two elements and a last element. The way
-	   the test is structured may impact correctness of
-	   values of these elements. TODO: make the elements
+	/* Skip first and last element. The way the test is structured may impact
+	   correctness of values of these elements. TODO: make the elements
 	   correct. */
-	for (int i = 2; i < INPUT_ELEMENTS_COUNT - 1; i++) {
-		switch (test_input_elements[i].representation) {
-		case CW_DOT_REPRESENTATION:
-			update_element_stats(&stats_dot, test_input_elements[i].duration);
+	for (int i = 1; i < n_elements - 1; i++) {
+		switch (elements[i].type) {
+		case dot:
+			update_element_stats(&stats_dot, elements[i].duration);
 			break;
-		case CW_DASH_REPRESENTATION:
-			update_element_stats(&stats_dash, test_input_elements[i].duration);
+		case dash:
+			update_element_stats(&stats_dash, elements[i].duration);
 			break;
-		case CW_EOE_REPRESENTATION:
-			/* TODO: implement. */
+		case ims:
+			update_element_stats(&stats_ims, elements[i].duration);
+			break;
+		case ics:
+			update_element_stats(&stats_ics, elements[i].duration);
+			break;
+		case iws:
+			update_element_stats(&stats_iws, elements[i].duration);
 			break;
 		default:
 			break;
 		}
 	}
 
-	calculate_divergences_from_stats(&stats_dot, &test_data->current_div_dots, dot_usecs);
-	calculate_divergences_from_stats(&stats_dash, &test_data->current_div_dashes, dash_usecs);
+	calculate_divergences_from_stats(&stats_dot, &test_data->current_div_dots, durations->dot_usecs);
+	calculate_divergences_from_stats(&stats_dash, &test_data->current_div_dashes, durations->dash_usecs);
+	calculate_divergences_from_stats(&stats_ims, &test_data->current_div_ims, durations->ims_usecs);
+	calculate_divergences_from_stats(&stats_ics, &test_data->current_div_ics, durations->ics_usecs);
+	calculate_divergences_from_stats(&stats_iws, &test_data->current_div_iws, durations->iws_usecs);
 
-	print_element_stats_and_divergences(&stats_dot, &test_data->current_div_dots, "dots", dot_usecs);
-	print_element_stats_and_divergences(&stats_dash, &test_data->current_div_dashes, "dashes", dash_usecs);
-
-	return;
+	print_element_stats_and_divergences(&stats_dot, &test_data->current_div_dots, "dots", durations->dot_usecs);
+	print_element_stats_and_divergences(&stats_dash, &test_data->current_div_dashes, "dashes", durations->dash_usecs);
+	print_element_stats_and_divergences(&stats_ims, &test_data->current_div_ims, "ims", durations->ims_usecs);
+	print_element_stats_and_divergences(&stats_ics, &test_data->current_div_ics, "ics", durations->ics_usecs);
+	print_element_stats_and_divergences(&stats_iws, &test_data->current_div_iws, "iws", durations->iws_usecs);
 }
 
 
@@ -612,45 +547,168 @@ static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_d
 {
 	/* Margin above 1.0: allow current results to be slightly worse than reference.
 	   Margin below 1.0: accept current results only if they are better than reference. */
-	const float margin = 1.5F;
-	{
-		const float expected_div = fabsf(test_data->reference_div_dots.min) * margin;
-		const float current_div = fabsf(test_data->current_div_dots.min);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dots, min");
-	}
-	{
-		const float expected_div = fabsf(test_data->reference_div_dots.avg) * margin;
-		const float current_div = fabsf(test_data->current_div_dots.avg);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dots, avg");
-	}
-	{
-		const float expected_div = fabsf(test_data->reference_div_dots.max) * margin;
-		const float current_div = fabsf(test_data->current_div_dots.max);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dots, max");
-	}
+	const double margin = 1.5;
 
 	{
-		const float expected_div = fabsf(test_data->reference_div_dashes.min) * margin;
-		const float current_div = fabsf(test_data->current_div_dashes.min);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dashes, min");
+		const double expected_div = fabs(test_data->reference_div_dots.min) * margin;
+		const double current_div = fabs(test_data->current_div_dots.min);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dots, min");
 	}
 	{
-		const float expected_div = fabsf(test_data->reference_div_dashes.avg) * margin;
-		const float current_div = fabsf(test_data->current_div_dashes.avg);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dashes, avg");
+		const double expected_div = fabs(test_data->reference_div_dots.avg) * margin;
+		const double current_div = fabs(test_data->current_div_dots.avg);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dots, avg");
 	}
 	{
-		const float expected_div = fabsf(test_data->reference_div_dashes.max) * margin;
-		const float current_div = fabsf(test_data->current_div_dashes.max);
-		cte->expect_op_float(cte, expected_div, ">", current_div, "divergence of dashes, max");
+		const double expected_div = fabs(test_data->reference_div_dots.max) * margin;
+		const double current_div = fabs(test_data->current_div_dots.max);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dots, max");
+	}
+
+
+	{
+		const double expected_div = fabs(test_data->reference_div_dashes.min) * margin;
+		const double current_div = fabs(test_data->current_div_dashes.min);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dashes, min");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_dashes.avg) * margin;
+		const double current_div = fabs(test_data->current_div_dashes.avg);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dashes, avg");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_dashes.max) * margin;
+		const double current_div = fabs(test_data->current_div_dashes.max);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of dashes, max");
+	}
+
+
+	{
+		const double expected_div = fabs(test_data->reference_div_ims.min) * margin;
+		const double current_div = fabs(test_data->current_div_ims.min);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ims, min");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_ims.avg) * margin;
+		const double current_div = fabs(test_data->current_div_ims.avg);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ims, avg");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_ims.max) * margin;
+		const double current_div = fabs(test_data->current_div_ims.max);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ims, max");
+	}
+
+
+	{
+		const double expected_div = fabs(test_data->reference_div_ics.min) * margin;
+		const double current_div = fabs(test_data->current_div_ics.min);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ics, min");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_ics.avg) * margin;
+		const double current_div = fabs(test_data->current_div_ics.avg);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ics, avg");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_ics.max) * margin;
+		const double current_div = fabs(test_data->current_div_ics.max);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of ics, max");
+	}
+
+
+	{
+		const double expected_div = fabs(test_data->reference_div_iws.min) * margin;
+		const double current_div = fabs(test_data->current_div_iws.min);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of iws, min");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_iws.avg) * margin;
+		const double current_div = fabs(test_data->current_div_iws.avg);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of iws, avg");
+	}
+	{
+		const double expected_div = fabs(test_data->reference_div_iws.max) * margin;
+		const double current_div = fabs(test_data->current_div_iws.max);
+		cte->expect_op_double(cte, expected_div, ">", current_div, "divergence of iws, max");
 	}
 
 	/* TODO: the test should also have test for absolute
 	   value of divergence, not only for comparison with
 	   post_3.5.1 branch. The production code should aim
 	   at low absolute divergence, e.g. no higher than 3%. */
+}
 
-	return;
+
+
+
+/**
+   Convert given string into test elements' types
+
+   @param[in] string string to be used as input of tests
+   @param[out] elements array of marks, spaces, their types and their timings
+*/
+static int initialize_elements(const char * string, cw_element_t * elements)
+{
+	int e = 0;
+
+	int s = 0;
+	while (string[s] != '\0') {
+
+		if (string[s] == ' ') {
+			/* ' ' character is represented by iws. This is a special case
+			   because this character doesn't have its "natural"
+			   representation in form of dots and dashes. */
+			if (e > 0 && (elements[e - 1].type == ims || elements[e - 1].type == ics)) {
+				/* Overwrite last end-of-element. */
+				elements[e - 1].type = iws;
+				/* No need to increment 'e' as we are not adding new element. */
+			} else {
+				elements[e].type = iws;
+				e++;
+			}
+		} else {
+			/* Regular (non-space) character has its Morse representation.
+			   Get the representation, and copy each dot/dash into
+			   'elements'. Add ims after each dot/dash. */
+			const char * representation = cw_character_to_representation_internal(string[s]);
+			int r = 0;
+			while (representation[r] != '\0') {
+				switch (representation[r]) {
+				case '.':
+					elements[e].type = dot;
+					break;
+				case '-':
+					elements[e].type = dash;
+					break;
+				default:
+					break;
+				};
+				r++;
+				e++;
+				elements[e].type = ims;
+				e++;
+
+			}
+			/* Turn ims after last mark (the last mark in character) into ics. */
+			elements[e - 1].type = ics;
+		}
+		s++;
+	}
+
+	if (e > INPUT_ELEMENTS_COUNT) {
+		fprintf(stderr, "[ERROR] Count of elements (%d) exceeds available space (%d)\n", e, INPUT_ELEMENTS_COUNT);
+		exit(EXIT_FAILURE);
+	}
+	const int elements_count = e;
+
+#if 0 /* For debugging only. */
+	for (int i = 0; i < elements_count; i++) {
+		fprintf(stderr, "[DEBUG] Initialized element %3d with type '%c'\n", i, elements[i].type);
+	}
+#endif
+
+	return elements_count;
 }
 
 
@@ -660,13 +718,12 @@ static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_d
    Clear data accumulated in current test run. The function should be used as
    a preparation for next test run.
 */
-static void clear_data(cw_element_t * test_input_elements)
+static void clear_data(cw_element_t * elements)
 {
 	/* Clear durations calculated in current test before next call of
 	   this test function. */
-	for (int i = 0; i < INPUT_ELEMENTS_COUNT; i++) {
-		test_input_elements[i].duration = 0;
+	for (int e = 0; e < INPUT_ELEMENTS_COUNT; e++) {
+		elements[e].duration = 0;
 	}
-
-	return;
 }
+

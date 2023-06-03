@@ -88,6 +88,9 @@ static bool cw_test_expect_op_float(struct cw_test_executor_t * self, float expe
 static bool cw_test_expect_op_float_errors_only(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, bool errors_only, const char * va_buf);
 
+static bool cw_test_expect_op_double(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
+static bool cw_test_expect_op_double_errors_only(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
+
 static bool cw_test_expect_between_int(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 static bool cw_test_expect_between_int_errors_only(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 
@@ -420,6 +423,33 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 	return as_expected;
 }
 
+
+
+
+bool cw_test_expect_op_double(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...)
+{
+	char va_buf[128] = { 0 };
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	va_end(ap);
+
+	return cw_test_expect_op_float_sub(self, (float) expected_value, operator, (float) received_value, false, va_buf);
+}
+
+
+
+
+bool cw_test_expect_op_double_errors_only(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...)
+{
+	char va_buf[128] = { 0 };
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	va_end(ap);
+
+	return cw_test_expect_op_float_sub(self, (float) expected_value, operator, (float) received_value, true, va_buf);
+}
 
 
 
@@ -993,6 +1023,8 @@ void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const
 	self->expect_op_int_errors_only = cw_test_expect_op_int_errors_only;
 	self->expect_op_float = cw_test_expect_op_float;
 	self->expect_op_float_errors_only = cw_test_expect_op_float_errors_only;
+	self->expect_op_double = cw_test_expect_op_double;
+	self->expect_op_double_errors_only = cw_test_expect_op_double_errors_only;
 
 	self->expect_between_int = cw_test_expect_between_int;
 	self->expect_between_int_errors_only = cw_test_expect_between_int_errors_only;
