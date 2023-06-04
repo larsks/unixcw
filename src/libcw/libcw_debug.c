@@ -299,7 +299,7 @@ bool cw_debug_has_flag(const cw_debug_t * debug_object, uint32_t flag)
 
 
 
-#ifdef LIBCW_WITH_DEV
+#if LIBCW_WITH_DEV
 
 
 
@@ -511,5 +511,5 @@ void cw_dev_debug_raw_sink_close_internal(cw_gen_t * gen)
 
 
 
-#endif /* #ifdef LIBCW_WITH_DEV */
+#endif /* #if LIBCW_WITH_DEV */
 

@@ -217,7 +217,7 @@ enum {
   during development of libcw, and should not be used by client code.
 */
 
-#ifdef LIBCW_WITH_DEV
+#if LIBCW_WITH_DEV
 /* Including private header in public header is accepted here only because it
    is inside of "build with development tests" flag. */
 #include "libcw_gen.h"
