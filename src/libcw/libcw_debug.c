@@ -372,7 +372,10 @@ void cw_dev_debug_print_generator_setup_internal(const cw_gen_t * gen)
 	fprintf(stderr, "frequency:            %d Hz\n",  gen->frequency);
 	fprintf(stderr, "sound buffer size:    %d\n",     gen->buffer_n_samples);
 
-	fprintf(stderr, "debug sink file:      %s\n", gen->dev_raw_sink != -1 ? "yes" : "no");
+	fprintf(stderr, "debug sink file:      %s\n",     gen->dev_raw_sink != -1 ? "opened" : "not opened");
+	if (gen->dev_raw_sink != -1) {
+		fprintf(stderr, "debug sink file path: '%s'\n",   gen->dev_raw_sink_path);
+	}
 
 	return;
 }
@@ -479,21 +482,19 @@ void cw_debug_event_internal(cw_debug_t * debug_object, uint32_t flag, uint32_t 
 
 void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen)
 {
-	char path[256] = { 0 };
-
 	/* TODO: this may not be true if int16_t integer is represented by e.g.
 	   32-bit integer on given platform. */
 	const size_t sample_size = sizeof (cw_sample_t) * CHAR_BIT;
 
-	snprintf(path, sizeof (path), "/tmp/cw_file_%s_%uHz_mono_signed_%zdbit_pcm.raw",
+	snprintf(gen->dev_raw_sink_path, sizeof (gen->dev_raw_sink_path), "/tmp/cw_file_%s_%uHz_mono_signed_%zdbit_pcm.raw",
 	         cw_get_audio_system_label(gen->sound_system),
 	         gen->sample_rate,
 	         sample_size);
-	gen->dev_raw_sink = open(path,
+	gen->dev_raw_sink = open(gen->dev_raw_sink_path,
 	                         O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK,
 	                         S_IRUSR | S_IWUSR);
 	if (gen->dev_raw_sink == -1) {
-		fprintf(stderr, MSG_PREFIX "open: failed to open dev raw sink file with path '%s': '%s'\n", path, strerror(errno));
+		fprintf(stderr, MSG_PREFIX "open: failed to open dev raw sink file with path '%s': '%s'\n", gen->dev_raw_sink_path, strerror(errno));
 	}
 }
 
