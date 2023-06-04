@@ -93,7 +93,7 @@ CW_STATIC_FUNC volatile cw_key_t cw_key = {
 
 
 	.sk = {
-		.key_value = CW_KEY_STATE_OPEN
+		.key_value = CW_KEY_VALUE_OPEN
 	},
 
 
