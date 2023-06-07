@@ -19,6 +19,7 @@
 
 
 
+#include "config.h"
 
 #include <stdbool.h>
 
@@ -38,12 +39,20 @@
 #include "libcw_legacy_api_tests.h"
 #include "libcw_legacy_api_tests_rec_poll.h"
 #include "libcw_test_tq_short_space.h"
+#include "libcw_gen_tests_debug_pcm_file_timings.h"
 #include "libcw_gen_tests_state_callback.h"
 
 
 
 
 #define WITH_LIBCW_LEGACY_API 1
+
+
+
+
+/* Whether a test is quick (completes in short time). */
+static const bool is_quick = true;
+static const bool is_not_quick = !is_quick;
 
 
 
@@ -261,6 +270,9 @@ cw_test_set_t cw_test_sets[] = {
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_forever_internal, false),
 
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_state_callback, false),
+#if LIBCW_WITH_DEV
+			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, is_not_quick),
+#endif
 
 			LIBCW_TEST_FUNCTION_INSERT(NULL, true),
 		}

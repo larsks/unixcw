@@ -106,6 +106,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = libcw_tests$(EXEEXT)
+
+# Functional tests that require samples sink file. The file is available only
+# when dev support is enabled.
+@LIBCW_WITH_DEV_TRUE@am__append_1 = libcw_gen_tests_debug_pcm_file_timings.c \
+@LIBCW_WITH_DEV_TRUE@	libcw_gen_tests_debug_pcm_file_timings.h
+
 subdir = src/libcw/tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -119,6 +125,20 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am__libcw_tests_SOURCES_DIST = libcw_legacy_api_tests.c \
+	libcw_legacy_api_tests.h libcw_legacy_api_tests_rec_poll.c \
+	libcw_legacy_api_tests_rec_poll.h libcw_data_tests.c \
+	libcw_data_tests.h libcw_gen_tests.c libcw_gen_tests.h \
+	libcw_gen_tests_state_callback.c \
+	libcw_gen_tests_state_callback.h libcw_rec_tests.c \
+	libcw_rec_tests.h libcw_utils_tests.c libcw_utils_tests.h \
+	libcw_key_tests.c libcw_key_tests.h libcw_debug_tests.c \
+	libcw_debug_tests.h libcw_tq_tests.c libcw_tq_tests.h \
+	libcw_gen_tests_debug_pcm_file_timings.c \
+	libcw_gen_tests_debug_pcm_file_timings.h \
+	libcw_test_tq_short_space.c libcw_test_tq_short_space.h \
+	test_framework.c test_framework.h test_data.c test_sets.c \
+	test_main.c
 am__objects_1 = libcw_tests-libcw_legacy_api_tests.$(OBJEXT) \
 	libcw_tests-libcw_legacy_api_tests_rec_poll.$(OBJEXT)
 am__objects_2 = libcw_tests-libcw_data_tests.$(OBJEXT) \
@@ -129,10 +149,12 @@ am__objects_2 = libcw_tests-libcw_data_tests.$(OBJEXT) \
 	libcw_tests-libcw_key_tests.$(OBJEXT) \
 	libcw_tests-libcw_debug_tests.$(OBJEXT) \
 	libcw_tests-libcw_tq_tests.$(OBJEXT)
-am__objects_3 = libcw_tests-libcw_test_tq_short_space.$(OBJEXT)
-am__objects_4 = libcw_tests-test_framework.$(OBJEXT)
+@LIBCW_WITH_DEV_TRUE@am__objects_3 = libcw_tests-libcw_gen_tests_debug_pcm_file_timings.$(OBJEXT)
+am__objects_4 = $(am__objects_3)
+am__objects_5 = libcw_tests-libcw_test_tq_short_space.$(OBJEXT)
+am__objects_6 = libcw_tests-test_framework.$(OBJEXT)
 am_libcw_tests_OBJECTS = $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) \
+	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
 	libcw_tests-test_data.$(OBJEXT) \
 	libcw_tests-test_sets.$(OBJEXT) \
 	libcw_tests-test_main.$(OBJEXT)
@@ -165,6 +187,7 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libcw_tests-libcw_data_tests.Po \
 	./$(DEPDIR)/libcw_tests-libcw_debug_tests.Po \
 	./$(DEPDIR)/libcw_tests-libcw_gen_tests.Po \
+	./$(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po \
 	./$(DEPDIR)/libcw_tests-libcw_gen_tests_state_callback.Po \
 	./$(DEPDIR)/libcw_tests-libcw_key_tests.Po \
 	./$(DEPDIR)/libcw_tests-libcw_legacy_api_tests.Po \
@@ -197,7 +220,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libcw_tests_SOURCES)
-DIST_SOURCES = $(libcw_tests_SOURCES)
+DIST_SOURCES = $(am__libcw_tests_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -607,9 +630,13 @@ legacy_api_test_files = \
 	libcw_legacy_api_tests_rec_poll.c \
 	libcw_legacy_api_tests_rec_poll.h
 
+
+# Tests that test some functionality, not a programmer API.
+functional_test_files = $(am__append_1)
 libcw_tests_SOURCES = \
 	$(legacy_api_test_files) \
 	$(modern_api_test_files) \
+	$(functional_test_files) \
 	$(bug_test_files) \
 	$(test_framework_files) \
 	test_data.c \
@@ -686,6 +713,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_data_tests.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_debug_tests.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_gen_tests.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_gen_tests_state_callback.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_key_tests.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-libcw_legacy_api_tests.Po@am__quote@ # am--include-marker
@@ -865,6 +893,20 @@ libcw_tests-libcw_tq_tests.obj: libcw_tq_tests.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libcw_tq_tests.c' object='libcw_tests-libcw_tq_tests.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcw_tests-libcw_tq_tests.obj `if test -f 'libcw_tq_tests.c'; then $(CYGPATH_W) 'libcw_tq_tests.c'; else $(CYGPATH_W) '$(srcdir)/libcw_tq_tests.c'; fi`
+
+libcw_tests-libcw_gen_tests_debug_pcm_file_timings.o: libcw_gen_tests_debug_pcm_file_timings.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcw_tests-libcw_gen_tests_debug_pcm_file_timings.o -MD -MP -MF $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Tpo -c -o libcw_tests-libcw_gen_tests_debug_pcm_file_timings.o `test -f 'libcw_gen_tests_debug_pcm_file_timings.c' || echo '$(srcdir)/'`libcw_gen_tests_debug_pcm_file_timings.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Tpo $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libcw_gen_tests_debug_pcm_file_timings.c' object='libcw_tests-libcw_gen_tests_debug_pcm_file_timings.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcw_tests-libcw_gen_tests_debug_pcm_file_timings.o `test -f 'libcw_gen_tests_debug_pcm_file_timings.c' || echo '$(srcdir)/'`libcw_gen_tests_debug_pcm_file_timings.c
+
+libcw_tests-libcw_gen_tests_debug_pcm_file_timings.obj: libcw_gen_tests_debug_pcm_file_timings.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcw_tests-libcw_gen_tests_debug_pcm_file_timings.obj -MD -MP -MF $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Tpo -c -o libcw_tests-libcw_gen_tests_debug_pcm_file_timings.obj `if test -f 'libcw_gen_tests_debug_pcm_file_timings.c'; then $(CYGPATH_W) 'libcw_gen_tests_debug_pcm_file_timings.c'; else $(CYGPATH_W) '$(srcdir)/libcw_gen_tests_debug_pcm_file_timings.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Tpo $(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libcw_gen_tests_debug_pcm_file_timings.c' object='libcw_tests-libcw_gen_tests_debug_pcm_file_timings.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcw_tests-libcw_gen_tests_debug_pcm_file_timings.obj `if test -f 'libcw_gen_tests_debug_pcm_file_timings.c'; then $(CYGPATH_W) 'libcw_gen_tests_debug_pcm_file_timings.c'; else $(CYGPATH_W) '$(srcdir)/libcw_gen_tests_debug_pcm_file_timings.c'; fi`
 
 libcw_tests-libcw_test_tq_short_space.o: libcw_test_tq_short_space.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcw_tests-libcw_test_tq_short_space.o -MD -MP -MF $(DEPDIR)/libcw_tests-libcw_test_tq_short_space.Tpo -c -o libcw_tests-libcw_test_tq_short_space.o `test -f 'libcw_test_tq_short_space.c' || echo '$(srcdir)/'`libcw_test_tq_short_space.c
@@ -1238,6 +1280,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libcw_tests-libcw_data_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_debug_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests.Po
+	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests_state_callback.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_key_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_legacy_api_tests.Po
@@ -1298,6 +1341,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libcw_tests-libcw_data_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_debug_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests.Po
+	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests_debug_pcm_file_timings.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_gen_tests_state_callback.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_key_tests.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-libcw_legacy_api_tests.Po

@@ -62,6 +62,7 @@ modern_api_test_files = \
 	libcw_tq_tests.c \
 	libcw_tq_tests.h
 
+
 legacy_api_test_files = \
 	libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h \
@@ -70,15 +71,29 @@ legacy_api_test_files = \
 
 
 
+# Tests that test some functionality, not a programmer API.
+functional_test_files =
+
+# Functional tests that require samples sink file. The file is available only
+# when dev support is enabled.
+if LIBCW_WITH_DEV
+functional_test_files+=libcw_gen_tests_debug_pcm_file_timings.c \
+	libcw_gen_tests_debug_pcm_file_timings.h
+endif
+
+
 
 libcw_tests_SOURCES = \
 	$(legacy_api_test_files) \
 	$(modern_api_test_files) \
+	$(functional_test_files) \
 	$(bug_test_files) \
 	$(test_framework_files) \
 	test_data.c \
 	test_sets.c \
 	test_main.c
+
+
 
 libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -DLIBCW_UNIT_TESTS
 #libcw_tests_CFLAGS = -I../../
