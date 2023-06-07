@@ -18,6 +18,8 @@
 
 -include $(top_builddir)/Makefile.inc
 
+SUBDIRS=lib
+
 # targets to be built in this directory
 check_PROGRAMS=cw_dictionary_tests
 
