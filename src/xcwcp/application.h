@@ -33,7 +33,7 @@
 
 #include "libcw.h"
 #include "modeset.h"
-#include "cw_common.h"
+#include "cwutils/cw_common.h"
 
 
 

@@ -20,13 +20,13 @@
 
 
 
-#include <cw_common.h>
+#include <cwutils/cw_common.h>
 #include <libcw.h>
 
 
 
 
-#include "test_framework_tools.h"
+#include "cwutils/test_framework_tools.h"
 
 
 

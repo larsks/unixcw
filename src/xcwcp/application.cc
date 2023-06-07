@@ -51,13 +51,13 @@
 #include "receiver.h"
 #include "textarea.h"
 #include "modeset.h"
-#include "cw_common.h"
+#include "cwutils/cw_common.h"
 
 #include "libcw.h"
 
-#include "i18n.h"
-#include "cw_copyright.h"
-#include "cw_rec_utils.h"
+#include "cwutils/i18n.h"
+#include "cwutils/cw_copyright.h"
+#include "cwutils/cw_rec_utils.h"
 
 
 

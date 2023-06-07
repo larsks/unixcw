@@ -35,9 +35,9 @@
 # include <strings.h>
 #endif
 
-#include "i18n.h"
-#include "cw_cmdline.h"
-#include "cw_copyright.h"
+#include "cwutils/i18n.h"
+#include "cwutils/cw_cmdline.h"
+#include "cwutils/cw_copyright.h"
 #include "memory.h"
 
 

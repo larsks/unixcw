@@ -62,10 +62,10 @@
 
 #include "libcw.h"
 #include "libcw_debug.h"
-#include "cw_cmdline.h"
+#include "cwutils/cw_cmdline.h"
 
 #include "test_framework.h"
-#include "test_framework_tools.h"
+#include "cwutils/test_framework_tools.h"
 
 
 

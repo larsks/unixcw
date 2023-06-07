@@ -32,7 +32,7 @@
 
 #include "libcw.h"
 
-#include "i18n.h"
+#include "cwutils/i18n.h"
 
 
 

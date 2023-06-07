@@ -40,10 +40,10 @@
 #include "libcw.h"
 #include "libcw_debug.h"
 
-#include "i18n.h"
-#include "cw_cmdline.h"
-#include "cw_copyright.h"
-#include "dictionary.h"
+#include "cwutils/i18n.h"
+#include "cwutils/cw_cmdline.h"
+#include "cwutils/cw_copyright.h"
+#include "cwutils/dictionary.h"
 
 
 extern cw_debug_t cw_debug_object;

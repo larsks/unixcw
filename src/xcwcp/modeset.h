@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "dictionary.h"
+#include "cwutils/dictionary.h"
 
 
 

@@ -13,7 +13,7 @@
 #include "libcw.h"
 #include "libcw2.h"
 
-#include "cw_config.h"
+#include "cwutils/cw_config.h"
 #include "libcw_alsa.h"
 #include "libcw_console.h"
 #include "libcw_key.h"

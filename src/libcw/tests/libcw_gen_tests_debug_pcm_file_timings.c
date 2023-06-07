@@ -28,10 +28,10 @@
 
 
 
-#include "lib/elements.h"
-#include "lib/elements_detect.h"
-#include "lib/misc.h"
-#include "lib/wav.h"
+#include "cwutils/lib/elements.h"
+#include "cwutils/lib/elements_detect.h"
+#include "cwutils/lib/misc.h"
+#include "cwutils/lib/wav.h"
 
 
 #include "libcw_data.h"

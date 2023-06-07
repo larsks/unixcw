@@ -33,8 +33,8 @@
 #include "libcw_gen_tests_state_callback.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
-#include "lib/elements.h"
-#include "lib/misc.h"
+#include "cwutils/lib/elements.h"
+#include "cwutils/lib/misc.h"
 
 
 

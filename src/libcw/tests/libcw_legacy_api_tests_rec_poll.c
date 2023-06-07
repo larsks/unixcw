@@ -34,9 +34,9 @@
 # include <strings.h>
 #endif
 
-#include <cw_common.h>
-#include <cw_rec_tester.h>
-#include <cw_rec_utils.h>
+#include <cwutils/cw_common.h>
+#include <cwutils/cw_rec_tester.h>
+#include <cwutils/cw_rec_utils.h>
 
 
 
@@ -53,7 +53,7 @@
 #include "libcw_utils.h"
 
 #include "test_framework.h"
-#include "test_framework_tools.h"
+#include "cwutils/test_framework_tools.h"
 #include "libcw_legacy_api_tests_rec_poll.h"
 
 
