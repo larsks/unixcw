@@ -674,7 +674,8 @@ AC_CONFIG_FILES([Makefile.inc
 	src/Makefile
 	src/libcw/Makefile
 	src/libcw/tests/Makefile
-	src/cwutils/Makefile])
+	src/cwutils/Makefile
+	src/cwutils/lib/Makefile])
 
 if test "$WITH_CWGEN" = 'yes' ; then
    AC_CONFIG_FILES([src/cwgen/Makefile])
