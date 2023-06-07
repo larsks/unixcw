@@ -2151,6 +2151,27 @@ void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
 
 
 /**
+   @brief Convenience wrapper around cw_gen_get_timing_parameters_internal()
+
+   @param[in] gen generator from which to get durations
+   @param[out] durations structure with generator's durations
+*/
+void cw_gen_get_durations_internal(cw_gen_t * gen, cw_durations_t * durations)
+{
+	cw_gen_get_timing_parameters_internal(gen,
+	                                      &durations->dot_usecs,
+	                                      &durations->dash_usecs,
+	                                      &durations->ims_usecs,
+	                                      &durations->ics_usecs,
+	                                      &durations->iws_usecs,
+	                                      &durations->additional_usecs,
+	                                      &durations->adjustment_usecs);
+}
+
+
+
+
+/**
    @brief Enqueue a mark (Dot or Dash)
 
    Low level primitive to enqueue a tone for mark of the given type, followed

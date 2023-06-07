@@ -93,22 +93,9 @@ typedef enum {
 
 
 
-typedef struct {
-	int dot_usecs;
-	int dash_usecs;
-	int ims_usecs;
-	int ics_usecs;
-	int iws_usecs;
-	int additional_usecs;
-	int adjustment_usecs;
-} durations_t;
-
-
-
-
 /* Ideal durations of dots, dashes and spaces, as reported by libcw for given
    wpm speed [microseconds]. */
-static durations_t g_durations;
+static cw_durations_t g_durations;
 
 
 
@@ -186,12 +173,12 @@ static void gen_callback_fn(void * callback_arg, int state);
 static void update_element_stats(cw_element_stats_t * stats, int element_duration);
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const divergence_t * divergences, const char * name, int duration_expected);
 static void calculate_divergences_from_stats(const cw_element_stats_t * stats, divergence_t * divergences, int duration_expected);
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, durations_t * durations);
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations);
 
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const durations_t * durations);
+static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations);
 static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_data);
 
-static int ideal_duration_of_element(element_type_t type, durations_t * durations);
+static int ideal_duration_of_element(element_type_t type, cw_durations_t * durations);
 
 static int initialize_elements(const char * string, cw_element_t * elements);
 static void clear_data(cw_element_t * elements);
@@ -269,7 +256,7 @@ static int g_test_input_elements_count;
 /**
    Get ideal (expected) duration of given element (dot, dash, spaces)
 */
-static int ideal_duration_of_element(element_type_t type, durations_t * durations)
+static int ideal_duration_of_element(element_type_t type, cw_durations_t * durations)
 {
 	switch (type) {
 	case dot:
@@ -435,7 +422,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 
 
 
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, durations_t * durations)
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations)
 {
 	cw_gen_config_t gen_conf = { .sound_system = test_data->sound_system };
 	snprintf(gen_conf.sound_device, sizeof (gen_conf.sound_device), "%s", sound_device);
@@ -448,14 +435,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 
 
 
-	cw_gen_get_timing_parameters_internal(gen,
-	                                      &durations->dot_usecs,
-	                                      &durations->dash_usecs,
-	                                      &durations->ims_usecs,
-	                                      &durations->ics_usecs,
-	                                      &durations->iws_usecs,
-	                                      &durations->additional_usecs,
-	                                      &durations->adjustment_usecs);
+	cw_gen_get_durations_internal(gen, durations);
 	fprintf(stderr, "[INFO ] dot duration        = %7d us\n", durations->dot_usecs);
 	fprintf(stderr, "[INFO ] dash duration       = %7d us\n", durations->dash_usecs);
 	fprintf(stderr, "[INFO ] ims duration        = %7d us\n", durations->ims_usecs);
@@ -489,7 +469,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
    Calculate current divergences (from current run of test) that will be
    compared with reference values
 */
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const durations_t * durations)
+static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations)
 {
 	const int initial = 1000000000;
 	cw_element_stats_t stats_dot  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };

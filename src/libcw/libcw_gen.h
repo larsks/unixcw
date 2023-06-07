@@ -53,6 +53,23 @@ enum { CW_SYMBOL_SPACE = ' ' };
 
 
 
+/* This is a structure that may be used in the future outside of libcw. It is
+   used in libcw tests. */
+typedef struct {
+	int dot_usecs;
+	int dash_usecs;
+	int ims_usecs;
+	int ics_usecs;
+	int iws_usecs;
+	int additional_usecs;
+	int adjustment_usecs;
+} cw_durations_t;
+
+
+
+
+/* This is internal struct that probably won't be made public, and won't be
+   used outside of libcw. */
 typedef struct cw_gen_durations_t {
 	int unit_duration;
 	int weighting_duration;
@@ -433,6 +450,7 @@ void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
 					   int * iws_duration,
 					   int * additional_space_duration,
 					   int * adjustment_space_duration);
+void cw_gen_get_durations_internal(cw_gen_t * gen, cw_durations_t * durations);
 
 
 
