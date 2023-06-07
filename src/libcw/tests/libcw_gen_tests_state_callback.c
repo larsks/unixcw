@@ -33,6 +33,8 @@
 #include "libcw_gen_tests_state_callback.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
+#include "lib/elements.h"
+#include "lib/misc.h"
 
 
 
@@ -77,56 +79,9 @@
 
 
 
-/*
-  Custom type for dots, dashes and spaces just for the purpose of this test.
-  The enum members are also visual representations of the dots, dashes and
-  spaces.
-*/
-typedef enum {
-	dot  = '.',
-	dash = '-',
-	ims  = 'M',
-	ics  = 'C',
-	iws  = 'W'
-} element_type_t;
-
-
-
-
 /* Ideal durations of dots, dashes and spaces, as reported by libcw for given
    wpm speed [microseconds]. */
 static cw_durations_t g_durations;
-
-
-
-
-/* How much durations of real dots, dashes and spaces diverge from ideal
-   ones? */
-typedef struct divergence_t {
-	double min; /* [percentages] */
-	double avg; /* [percentages] */
-	double max; /* [percentages] */
-} divergence_t;
-
-
-
-
-typedef struct cw_element_t {
-	element_type_t type;
-	int duration; /* microseconds */
-} cw_element_t;
-
-
-
-
-typedef struct cw_element_stats_t {
-	int duration_min;
-	int duration_avg;
-	int duration_max;
-
-	int duration_total;
-	int count;
-} cw_element_stats_t;
 
 
 
@@ -152,36 +107,29 @@ typedef struct test_data_t {
 	int speed;
 
 	/* Reference values from tests in post_3.5.1 branch. */
-	struct divergence_t reference_div_dots;
-	struct divergence_t reference_div_dashes;
-	struct divergence_t reference_div_ims;
-	struct divergence_t reference_div_ics;
-	struct divergence_t reference_div_iws;
+	struct cw_duration_divergence_t reference_div_dots;
+	struct cw_duration_divergence_t reference_div_dashes;
+	struct cw_duration_divergence_t reference_div_ims;
+	struct cw_duration_divergence_t reference_div_ics;
+	struct cw_duration_divergence_t reference_div_iws;
 
 	/* Values obtained in current test run. */
-	struct divergence_t current_div_dots;
-	struct divergence_t current_div_dashes;
-	struct divergence_t current_div_ims;
-	struct divergence_t current_div_ics;
-	struct divergence_t current_div_iws;
+	struct cw_duration_divergence_t current_div_dots;
+	struct cw_duration_divergence_t current_div_dashes;
+	struct cw_duration_divergence_t current_div_ims;
+	struct cw_duration_divergence_t current_div_ics;
+	struct cw_duration_divergence_t current_div_iws;
 } test_data_t;
 
 
 
 
 static void gen_callback_fn(void * callback_arg, int state);
-static void update_element_stats(cw_element_stats_t * stats, int element_duration);
-static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const divergence_t * divergences, const char * name, int duration_expected);
-static void calculate_divergences_from_stats(const cw_element_stats_t * stats, divergence_t * divergences, int duration_expected);
+static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_duration_divergence_t * divergences, const char * name, int duration_expected);
 static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations);
 
 static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations);
 static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_data);
-
-static int ideal_duration_of_element(element_type_t type, cw_durations_t * durations);
-
-static int initialize_elements(const char * string, cw_element_t * elements);
-static void clear_data(cw_element_t * elements);
 
 
 
@@ -249,31 +197,6 @@ static const char * const g_input_string = "ooo""ooo""ooo sss""sss""sss";
 static cw_element_t g_test_input_elements[INPUT_ELEMENTS_COUNT];
 /* Count of valid elements in the array. Depends on length of g_input_string. */
 static int g_test_input_elements_count;
-
-
-
-
-/**
-   Get ideal (expected) duration of given element (dot, dash, spaces)
-*/
-static int ideal_duration_of_element(element_type_t type, cw_durations_t * durations)
-{
-	switch (type) {
-	case dot:
-		return durations->dot_usecs;
-	case dash:
-		return durations->dash_usecs;
-	case ims:
-		return durations->ims_usecs;
-	case ics:
-		return durations->ics_usecs;
-	case iws:
-		return durations->iws_usecs;
-	default:
-		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
-		return 1;
-	}
-}
 
 
 
@@ -348,34 +271,7 @@ static void gen_callback_fn(void * callback_arg, int state)
 
 
 
-static void update_element_stats(cw_element_stats_t * stats, int element_duration)
-{
-	stats->duration_total += element_duration;
-	stats->count++;
-	stats->duration_avg = stats->duration_total / stats->count;
-
-	if (element_duration > stats->duration_max) {
-		stats->duration_max = element_duration;
-	}
-	if (element_duration < stats->duration_min) {
-		stats->duration_min = element_duration;
-	}
-}
-
-
-
-
-static void calculate_divergences_from_stats(const cw_element_stats_t * stats, divergence_t * divergences, int duration_expected)
-{
-	divergences->min = 100.0 * (stats->duration_min - duration_expected) / (1.0 * duration_expected);
-	divergences->avg = 100.0 * (stats->duration_avg - duration_expected) / (1.0 * duration_expected);
-	divergences->max = 100.0 * (stats->duration_max - duration_expected) / (1.0 * duration_expected);
-}
-
-
-
-
-static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const divergence_t * divergences, const char * name, int duration_expected)
+static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_duration_divergence_t * divergences, const char * name, int duration_expected)
 {
 	fprintf(stderr, "[INFO ] duration of %-6s: min/avg/max = %7d/%7d/%7d, expected = %7d, divergence min/avg/max = %8.3f%%/%8.3f%%/%8.3f%%\n",
 	        name,
@@ -396,7 +292,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
-	g_test_input_elements_count = initialize_elements(g_input_string, g_test_input_elements);
+	g_test_input_elements_count = elements_from_string(g_input_string, g_test_input_elements, INPUT_ELEMENTS_COUNT);
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -434,15 +330,8 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_register_value_tracking_callback_internal(gen, gen_callback_fn, &callback_data);
 
 
-
 	cw_gen_get_durations_internal(gen, durations);
-	fprintf(stderr, "[INFO ] dot duration        = %7d us\n", durations->dot_usecs);
-	fprintf(stderr, "[INFO ] dash duration       = %7d us\n", durations->dash_usecs);
-	fprintf(stderr, "[INFO ] ims duration        = %7d us\n", durations->ims_usecs);
-	fprintf(stderr, "[INFO ] ics duration        = %7d us\n", durations->ics_usecs);
-	fprintf(stderr, "[INFO ] iws duration        = %7d us\n", durations->iws_usecs);
-	fprintf(stderr, "[INFO ] additional duration = %7d us\n", durations->additional_usecs);
-	fprintf(stderr, "[INFO ] adjustment duration = %7d us\n", durations->adjustment_usecs);
+	cw_durations_print(stderr, durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
@@ -457,7 +346,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 
 	calculate_test_results(g_test_input_elements, g_test_input_elements_count, test_data, durations);
 	evaluate_test_results(cte, test_data);
-	clear_data(g_test_input_elements);
+	elements_clear_durations(g_test_input_elements, g_test_input_elements_count);
 
 	return 0;
 }
@@ -484,19 +373,19 @@ static void calculate_test_results(const cw_element_t * elements, int n_elements
 	for (int i = 1; i < n_elements - 1; i++) {
 		switch (elements[i].type) {
 		case dot:
-			update_element_stats(&stats_dot, elements[i].duration);
+			element_stats_update(&stats_dot, elements[i].duration);
 			break;
 		case dash:
-			update_element_stats(&stats_dash, elements[i].duration);
+			element_stats_update(&stats_dash, elements[i].duration);
 			break;
 		case ims:
-			update_element_stats(&stats_ims, elements[i].duration);
+			element_stats_update(&stats_ims, elements[i].duration);
 			break;
 		case ics:
-			update_element_stats(&stats_ics, elements[i].duration);
+			element_stats_update(&stats_ics, elements[i].duration);
 			break;
 		case iws:
-			update_element_stats(&stats_iws, elements[i].duration);
+			element_stats_update(&stats_iws, elements[i].duration);
 			break;
 		default:
 			break;
@@ -622,88 +511,4 @@ static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_d
 
 
 
-/**
-   Convert given string into test elements' types
-
-   @param[in] string string to be used as input of tests
-   @param[out] elements array of marks, spaces, their types and their timings
-*/
-static int initialize_elements(const char * string, cw_element_t * elements)
-{
-	int e = 0;
-
-	int s = 0;
-	while (string[s] != '\0') {
-
-		if (string[s] == ' ') {
-			/* ' ' character is represented by iws. This is a special case
-			   because this character doesn't have its "natural"
-			   representation in form of dots and dashes. */
-			if (e > 0 && (elements[e - 1].type == ims || elements[e - 1].type == ics)) {
-				/* Overwrite last end-of-element. */
-				elements[e - 1].type = iws;
-				/* No need to increment 'e' as we are not adding new element. */
-			} else {
-				elements[e].type = iws;
-				e++;
-			}
-		} else {
-			/* Regular (non-space) character has its Morse representation.
-			   Get the representation, and copy each dot/dash into
-			   'elements'. Add ims after each dot/dash. */
-			const char * representation = cw_character_to_representation_internal(string[s]);
-			int r = 0;
-			while (representation[r] != '\0') {
-				switch (representation[r]) {
-				case '.':
-					elements[e].type = dot;
-					break;
-				case '-':
-					elements[e].type = dash;
-					break;
-				default:
-					break;
-				};
-				r++;
-				e++;
-				elements[e].type = ims;
-				e++;
-
-			}
-			/* Turn ims after last mark (the last mark in character) into ics. */
-			elements[e - 1].type = ics;
-		}
-		s++;
-	}
-
-	if (e > INPUT_ELEMENTS_COUNT) {
-		fprintf(stderr, "[ERROR] Count of elements (%d) exceeds available space (%d)\n", e, INPUT_ELEMENTS_COUNT);
-		exit(EXIT_FAILURE);
-	}
-	const int elements_count = e;
-
-#if 0 /* For debugging only. */
-	for (int i = 0; i < elements_count; i++) {
-		fprintf(stderr, "[DEBUG] Initialized element %3d with type '%c'\n", i, elements[i].type);
-	}
-#endif
-
-	return elements_count;
-}
-
-
-
-
-/**
-   Clear data accumulated in current test run. The function should be used as
-   a preparation for next test run.
-*/
-static void clear_data(cw_element_t * elements)
-{
-	/* Clear durations calculated in current test before next call of
-	   this test function. */
-	for (int e = 0; e < INPUT_ELEMENTS_COUNT; e++) {
-		elements[e].duration = 0;
-	}
-}
 

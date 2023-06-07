@@ -88,6 +88,7 @@ libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -DLIBCW_UNIT_TESTS
 # symbols from the dynamic library.
 libcw_tests_LDADD  = $(top_builddir)/src/cwutils/lib_libcw_tests.a
 libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib_rec_tests.a
+libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib/libcwutils.a
 libcw_tests_LDADD += $(INTL_LIB) -lm -lpthread $(DL_LIB) -L../.libs -lcw_test
 
 
