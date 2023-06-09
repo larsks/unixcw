@@ -30,6 +30,7 @@
 
 #include "cwutils/lib/elements.h"
 #include "cwutils/lib/elements_detect.h"
+#include "cwutils/lib/element_stats.h"
 #include "cwutils/lib/misc.h"
 #include "cwutils/lib/wav.h"
 
@@ -79,25 +80,25 @@ typedef struct test_data_t {
 	int speed;
 
 	/* Reference values from tests in post_3.5.1 branch. */
-	struct cw_duration_divergence_t reference_div_dots;
-	struct cw_duration_divergence_t reference_div_dashes;
-	struct cw_duration_divergence_t reference_div_ims;
-	struct cw_duration_divergence_t reference_div_ics;
-	struct cw_duration_divergence_t reference_div_iws;
+	struct cw_element_stats_divergences_t reference_div_dots;
+	struct cw_element_stats_divergences_t reference_div_dashes;
+	struct cw_element_stats_divergences_t reference_div_ims;
+	struct cw_element_stats_divergences_t reference_div_ics;
+	struct cw_element_stats_divergences_t reference_div_iws;
 
 	/* Values obtained in current test run. */
-	struct cw_duration_divergence_t current_div_dots;
-	struct cw_duration_divergence_t current_div_dashes;
-	struct cw_duration_divergence_t current_div_ims;
-	struct cw_duration_divergence_t current_div_ics;
-	struct cw_duration_divergence_t current_div_iws;
+	struct cw_element_stats_divergences_t current_div_dots;
+	struct cw_element_stats_divergences_t current_div_dashes;
+	struct cw_element_stats_divergences_t current_div_ims;
+	struct cw_element_stats_divergences_t current_div_ics;
+	struct cw_element_stats_divergences_t current_div_iws;
 } test_data_t;
 
 
 
 
 
-static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_duration_divergence_t * divergences, const char * name, int duration_expected);
+static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_element_stats_divergences_t * divergences, const char * name, int duration_expected);
 static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations);
 
 static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations);
@@ -177,7 +178,7 @@ static int g_string_elements_count;
 
 
 
-static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_duration_divergence_t * divergences, const char * name, int duration_expected)
+static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_element_stats_divergences_t * divergences, const char * name, int duration_expected)
 {
 	fprintf(stderr, "[INFO ] duration of %-6s: min/avg/max = %7d/%7d/%7d, expected = %7d, divergence min/avg/max = %8.3f%%/%8.3f%%/%8.3f%%\n",
 	        name,
@@ -275,12 +276,11 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 			fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", sample_spacing);
 
 			cw_element_t wav_elements[1000] = { 0 };
-			int wav_elements_iter = 0;
-			elements_detect_from_wav(input_fd, wav_elements, &wav_elements_iter, sample_spacing);
+			const int wav_elements_count = elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
 			close(input_fd);
 
 			fprintf(stderr, "\n[INFO ] wav elements:\n");
-			elements_print_to_file(stderr, wav_elements, wav_elements_iter);
+			elements_print_to_file(stderr, wav_elements, wav_elements_count);
 	}
 
 	fprintf(stderr, "\n[INFO ] string elements:\n");
@@ -334,11 +334,11 @@ static void calculate_test_results(const cw_element_t * elements, int n_elements
 		}
 	}
 
-	calculate_divergences_from_stats(&stats_dot, &test_data->current_div_dots, durations->dot_usecs);
-	calculate_divergences_from_stats(&stats_dash, &test_data->current_div_dashes, durations->dash_usecs);
-	calculate_divergences_from_stats(&stats_ims, &test_data->current_div_ims, durations->ims_usecs);
-	calculate_divergences_from_stats(&stats_ics, &test_data->current_div_ics, durations->ics_usecs);
-	calculate_divergences_from_stats(&stats_iws, &test_data->current_div_iws, durations->iws_usecs);
+	element_stats_calculate_divergences(&stats_dot, &test_data->current_div_dots, durations->dot_usecs);
+	element_stats_calculate_divergences(&stats_dash, &test_data->current_div_dashes, durations->dash_usecs);
+	element_stats_calculate_divergences(&stats_ims, &test_data->current_div_ims, durations->ims_usecs);
+	element_stats_calculate_divergences(&stats_ics, &test_data->current_div_ics, durations->ics_usecs);
+	element_stats_calculate_divergences(&stats_iws, &test_data->current_div_iws, durations->iws_usecs);
 
 	print_element_stats_and_divergences(&stats_dot, &test_data->current_div_dots, "dots", durations->dot_usecs);
 	print_element_stats_and_divergences(&stats_dash, &test_data->current_div_dashes, "dashes", durations->dash_usecs);

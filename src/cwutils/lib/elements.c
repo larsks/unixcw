@@ -1,6 +1,26 @@
+/*
+  Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+
+
+
 #include <stdlib.h>
 
-#include "libcw_data.h"
+#include <libcw_data.h>
 
 #include "elements.h"
 
@@ -38,8 +58,6 @@ void elements_print_to_file(FILE * file, cw_element_t * elements, int count)
 
 
 
-
-
 void elements_append_new(cw_element_t * elements, int * elements_iter, cw_state_t state, int duration)
 {
 	if (state == CW_STATE_MARK) {
@@ -58,29 +76,10 @@ void elements_append_new(cw_element_t * elements, int * elements_iter, cw_state_
 
 
 
-
-void element_stats_update(cw_element_stats_t * stats, int element_duration)
-{
-	stats->duration_total += element_duration;
-	stats->count++;
-	stats->duration_avg = stats->duration_total / stats->count;
-
-	if (element_duration > stats->duration_max) {
-		stats->duration_max = element_duration;
-	}
-	if (element_duration < stats->duration_min) {
-		stats->duration_min = element_duration;
-	}
-}
-
-
-
-
-
 /**
    Convert given string into elements
 
-   Function sets 'type' and 'state' in @elements' items
+   Function sets 'type' and 'state' in @p elements' items
 
    @param[in] string string to be used as input of tests
    @param[out] elements array of marks, spaces, their types and their timings

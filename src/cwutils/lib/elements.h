@@ -10,21 +10,23 @@
 
 
 /*
-  Custom type for dots, dashes and spaces just for the purpose of this test.
-  The enum members are also visual representations of the dots, dashes and
-  spaces.
+  Custom type for dots, dashes and spaces. The enum members are also visual
+  representations of the dots, dashes and spaces.
+
+  TODO: decouple representations of values from the definitions of values.
 */
 typedef enum {
-	dot  = '.',
-	dash = '-',
-	ims  = 'M',
-	ics  = 'C',
-	iws  = 'W'
+	dot  = '.',   /**< Dot mark. */
+	dash = '-',   /**< Dash mark. */
+	ims  = 'M',   /**< Inter-mark-space. */
+	ics  = 'C',   /**< Inter-character-space. */
+	iws  = 'W'    /**< Inter-word-space. */
 } cw_element_type_t;
 
 
 
 
+/* Yet another type for representing marks and spaces (and closed/open). */
 typedef enum cw_state_t {
 	CW_STATE_SPACE,
 	CW_STATE_MARK
@@ -41,23 +43,11 @@ typedef struct cw_element_t {
 
 
 
-typedef struct cw_element_stats_t {
-	int duration_min;
-	int duration_avg;
-	int duration_max;
-
-	int duration_total;
-	int count;
-} cw_element_stats_t;
-
-
-
 
 
 void elements_append_new(cw_element_t * elements, int * elements_iter, cw_state_t state, int duration);
 void elements_clear_durations(cw_element_t * elements, int count);
 void elements_print_to_file(FILE * file, cw_element_t * elements, int count);
-void element_stats_update(cw_element_stats_t * stats, int element_duration);
 int elements_from_string(const char * string, cw_element_t * elements, int array_size);
 
 

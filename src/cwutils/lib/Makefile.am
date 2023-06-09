@@ -20,7 +20,7 @@
 
 
 noinst_LIBRARIES = libcwutils.a
-libcwutils_a_SOURCES = wav.c misc.c elements.c elements_detect.c
+libcwutils_a_SOURCES = wav.c misc.c elements.c elements_detect.c element_stats.c
 
 
 

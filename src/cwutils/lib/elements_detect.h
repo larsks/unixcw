@@ -9,7 +9,28 @@
 
 
 
-void elements_detect_from_wav(int input_fd, cw_element_t * elements, int * elements_iter, float sample_spacing);
+/**
+   @brief Detect elements in a wav sample
+
+   Function reads samples from @p input_fd, decides whether samples indicate
+   'mark' or 'space' state, and sets values of cw_element_t::duration and
+   cw_element_t::state in @p elements.
+
+   Each new element is set on each detected change between mark and space. As
+   a result, returned value will indicate how many marks or spaces are put
+   into @p elements.
+
+   @p elements is a preallocated array of elements. Size of the array must be
+   somehow guessed in advance, before this function is called (it's ok to
+   over-estimate the size).
+
+   @param[in] input_fd File descriptor from which to read samples
+   @param[out] elements Pre-allocated array of elements into which to save elements
+   @param[in] sample_spacing Time span between consecutive samples
+
+   @return Count of items added to @p elements
+*/
+int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample_spacing);
 
 
 

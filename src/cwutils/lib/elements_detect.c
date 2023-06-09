@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+
+
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -8,6 +28,15 @@
 
 #include "elements.h"
 #include "elements_detect.h"
+
+
+
+
+/**
+   @file elements_detect.c
+
+   Detect elements (their duration and their mark/space state) in a wav file.
+*/
 
 
 
@@ -32,6 +61,9 @@ typedef struct state_memory_t {
 	int compare_count;
 } state_memory_t;
 
+
+
+
 static bool state_detect(state_memory_t * memory, cw_sample_t sample, cw_state_t * state);
 static void state_init_memory(state_memory_t * memory);
 
@@ -39,9 +71,10 @@ static void state_init_memory(state_memory_t * memory);
 
 
 
-
-void elements_detect_from_wav(int input_fd, cw_element_t * elements, int * elements_iter, float sample_spacing)
+int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample_spacing)
 {
+	int elements_iter = 0;
+
 	/* Time stamp of start of previous element. Zero time stamp is at the
 	   beginning of pcm file. */
 	float prev_element_start_ts = 0.0F;
@@ -83,7 +116,7 @@ void elements_detect_from_wav(int input_fd, cw_element_t * elements, int * eleme
 				const float current_timestamp = sample_i * sample_spacing;
 				const int prev_duration = (int) (current_timestamp - prev_element_start_ts);
 				prev_element_start_ts = current_timestamp;
-				elements_append_new(elements, elements_iter, prev_state, prev_duration);
+				elements_append_new(elements, &elements_iter, prev_state, prev_duration);
 				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == CW_STATE_MARK ? "mark" : "space");
 				prev_state = current_state;
 			}
@@ -97,8 +130,11 @@ void elements_detect_from_wav(int input_fd, cw_element_t * elements, int * eleme
 	   its duration. */
 	const float current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
 	const int current_duration = (int) (current_timestamp - prev_element_start_ts);
-	elements_append_new(elements, elements_iter, current_state, current_duration);
+	elements_append_new(elements, &elements_iter, current_state, current_duration);
+
+	return elements_iter;
 }
+
 
 
 
@@ -169,6 +205,7 @@ static bool state_detect(state_memory_t * memory, cw_sample_t sample, cw_state_t
 
 
 
+
 /**
    @brief Initialize 'state memory' data structure
 
@@ -185,10 +222,4 @@ static void state_init_memory(state_memory_t * memory)
 
 	memory->compare_count = STATE_MEMORY_SIZE;
 }
-
-
-
-
-
-
 

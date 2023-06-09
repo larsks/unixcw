@@ -1,7 +1,29 @@
+/*
+  Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+
+
+
 #include <stdio.h>
 
-
 #include "misc.h"
+
+
+
 
 /**
    Get ideal (expected) duration of given element (dot, dash, spaces)
@@ -23,17 +45,6 @@ int ideal_duration_of_element(cw_element_type_t type, cw_durations_t * durations
 		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
 		return 1;
 	}
-}
-
-
-
-
-
-void calculate_divergences_from_stats(const cw_element_stats_t * stats, cw_duration_divergence_t * divergences, int duration_expected)
-{
-	divergences->min = 100.0 * (stats->duration_min - duration_expected) / (1.0 * duration_expected);
-	divergences->avg = 100.0 * (stats->duration_avg - duration_expected) / (1.0 * duration_expected);
-	divergences->max = 100.0 * (stats->duration_max - duration_expected) / (1.0 * duration_expected);
 }
 
 

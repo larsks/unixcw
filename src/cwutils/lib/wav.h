@@ -27,11 +27,21 @@ typedef struct __attribute__((packed)) wav_header_t {
 	char subchunk_2_id[4]; /* "data" */
 	uint32_t subchunk_2_size;
 } wav_header_t;
-#define FILE_HEADER_SIZE 44 /* 44 bytes per spec. */
 
 
 
 
+/**
+   @Brief Read header of WAV file
+
+   Function doesn't validate the header's fields.
+
+   @param[in] fd File handle of WAV file
+   @param[out] header Preallocated header structure into which to read the header
+
+   @return 0 on success
+   @return -1 on failure
+*/
 int read_wav_header(int fd, wav_header_t * header);
 
 
