@@ -40,6 +40,14 @@ cw_dictionary_tests_CFLAGS = -rdynamic
 
 
 
+noinst_PROGRAMS = wav_state_detector
+
+wav_state_detector_SOURCES = wav_state_detector.c
+wav_state_detector_CPPFLAGS = -I./
+wav_state_detector_CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99
+wav_state_detector_LDADD = ./lib/libcwutils.a -L../libcw/.libs -lcw
+
+
 # no header from this dir should be installed
 # noinst_HEADERS = cw_cmdline.h cw_copyright.h cw_config.h cw_common.h cw_words.h dictionary.h i18n.h memory.h
 

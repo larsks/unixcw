@@ -32,6 +32,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -107,6 +108,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = cw_dictionary_tests$(EXEEXT)
+noinst_PROGRAMS = wav_state_detector$(EXEEXT)
 @WITH_XCWCP_REC_TEST_TRUE@am__append_1 = test_framework_tools.c test_framework_tools.h
 subdir = src/cwutils
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -121,6 +123,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+PROGRAMS = $(noinst_PROGRAMS)
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
@@ -185,6 +188,14 @@ cw_dictionary_tests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(cw_dictionary_tests_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_wav_state_detector_OBJECTS =  \
+	wav_state_detector-wav_state_detector.$(OBJEXT)
+wav_state_detector_OBJECTS = $(am_wav_state_detector_OBJECTS)
+wav_state_detector_DEPENDENCIES = ./lib/libcwutils.a
+wav_state_detector_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(wav_state_detector_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -217,7 +228,8 @@ am__depfiles_remade = ./$(DEPDIR)/cw_cmdline.Po \
 	./$(DEPDIR)/lib_xcwcp_a-i18n.Po \
 	./$(DEPDIR)/lib_xcwcp_a-memory.Po \
 	./$(DEPDIR)/lib_xcwcp_a-test_framework_tools.Po \
-	./$(DEPDIR)/memory.Po ./$(DEPDIR)/test_framework_tools.Po
+	./$(DEPDIR)/memory.Po ./$(DEPDIR)/test_framework_tools.Po \
+	./$(DEPDIR)/wav_state_detector-wav_state_detector.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -240,11 +252,11 @@ am__v_CCLD_1 =
 SOURCES = $(lib_cw_a_SOURCES) $(lib_cwcp_a_SOURCES) \
 	$(lib_cwgen_a_SOURCES) $(lib_libcw_tests_a_SOURCES) \
 	$(lib_rec_tests_a_SOURCES) $(lib_xcwcp_a_SOURCES) \
-	$(cw_dictionary_tests_SOURCES)
+	$(cw_dictionary_tests_SOURCES) $(wav_state_detector_SOURCES)
 DIST_SOURCES = $(lib_cw_a_SOURCES) $(lib_cwcp_a_SOURCES) \
 	$(lib_cwgen_a_SOURCES) $(lib_libcw_tests_a_SOURCES) \
 	$(lib_rec_tests_a_SOURCES) $(am__lib_xcwcp_a_SOURCES_DIST) \
-	$(cw_dictionary_tests_SOURCES)
+	$(cw_dictionary_tests_SOURCES) $(wav_state_detector_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -669,6 +681,10 @@ cw_dictionary_tests_LDADD = -L$(top_builddir)/src/libcw/.libs -lcw $(INTL_LIB)
 
 # target-specific compiler flags
 cw_dictionary_tests_CFLAGS = -rdynamic
+wav_state_detector_SOURCES = wav_state_detector.c
+wav_state_detector_CPPFLAGS = -I./
+wav_state_detector_CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99
+wav_state_detector_LDADD = ./lib/libcwutils.a -L../libcw/.libs -lcw
 
 # no header from this dir should be installed
 # noinst_HEADERS = cw_cmdline.h cw_copyright.h cw_config.h cw_common.h cw_words.h dictionary.h i18n.h memory.h
@@ -739,6 +755,15 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
@@ -776,6 +801,10 @@ cw_dictionary_tests$(EXEEXT): $(cw_dictionary_tests_OBJECTS) $(cw_dictionary_tes
 	@rm -f cw_dictionary_tests$(EXEEXT)
 	$(AM_V_CCLD)$(cw_dictionary_tests_LINK) $(cw_dictionary_tests_OBJECTS) $(cw_dictionary_tests_LDADD) $(LIBS)
 
+wav_state_detector$(EXEEXT): $(wav_state_detector_OBJECTS) $(wav_state_detector_DEPENDENCIES) $(EXTRA_wav_state_detector_DEPENDENCIES) 
+	@rm -f wav_state_detector$(EXEEXT)
+	$(AM_V_CCLD)$(wav_state_detector_LINK) $(wav_state_detector_OBJECTS) $(wav_state_detector_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -804,6 +833,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-test_framework_tools.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memory.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_framework_tools.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wav_state_detector-wav_state_detector.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1013,6 +1043,20 @@ cw_dictionary_tests-cw_common.obj: cw_common.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_common.c' object='cw_dictionary_tests-cw_common.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-cw_common.obj `if test -f 'cw_common.c'; then $(CYGPATH_W) 'cw_common.c'; else $(CYGPATH_W) '$(srcdir)/cw_common.c'; fi`
+
+wav_state_detector-wav_state_detector.o: wav_state_detector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(wav_state_detector_CFLAGS) $(CFLAGS) -MT wav_state_detector-wav_state_detector.o -MD -MP -MF $(DEPDIR)/wav_state_detector-wav_state_detector.Tpo -c -o wav_state_detector-wav_state_detector.o `test -f 'wav_state_detector.c' || echo '$(srcdir)/'`wav_state_detector.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wav_state_detector-wav_state_detector.Tpo $(DEPDIR)/wav_state_detector-wav_state_detector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wav_state_detector.c' object='wav_state_detector-wav_state_detector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(wav_state_detector_CFLAGS) $(CFLAGS) -c -o wav_state_detector-wav_state_detector.o `test -f 'wav_state_detector.c' || echo '$(srcdir)/'`wav_state_detector.c
+
+wav_state_detector-wav_state_detector.obj: wav_state_detector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(wav_state_detector_CFLAGS) $(CFLAGS) -MT wav_state_detector-wav_state_detector.obj -MD -MP -MF $(DEPDIR)/wav_state_detector-wav_state_detector.Tpo -c -o wav_state_detector-wav_state_detector.obj `if test -f 'wav_state_detector.c'; then $(CYGPATH_W) 'wav_state_detector.c'; else $(CYGPATH_W) '$(srcdir)/wav_state_detector.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wav_state_detector-wav_state_detector.Tpo $(DEPDIR)/wav_state_detector-wav_state_detector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wav_state_detector.c' object='wav_state_detector-wav_state_detector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(wav_state_detector_CFLAGS) $(CFLAGS) -c -o wav_state_detector-wav_state_detector.obj `if test -f 'wav_state_detector.c'; then $(CYGPATH_W) 'wav_state_detector.c'; else $(CYGPATH_W) '$(srcdir)/wav_state_detector.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1344,7 +1388,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-recursive
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(PROGRAMS) $(LIBRARIES)
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -1384,7 +1428,7 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES mostlyclean-am
+	clean-noinstLIBRARIES clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 		-rm -f ./$(DEPDIR)/cw_cmdline.Po
@@ -1409,6 +1453,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-test_framework_tools.Po
 	-rm -f ./$(DEPDIR)/memory.Po
 	-rm -f ./$(DEPDIR)/test_framework_tools.Po
+	-rm -f ./$(DEPDIR)/wav_state_detector-wav_state_detector.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1476,6 +1521,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-test_framework_tools.Po
 	-rm -f ./$(DEPDIR)/memory.Po
 	-rm -f ./$(DEPDIR)/test_framework_tools.Po
+	-rm -f ./$(DEPDIR)/wav_state_detector-wav_state_detector.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1499,18 +1545,18 @@ uninstall-am:
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--depfiles check check-TESTS check-am clean \
 	clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am recheck tags tags-am \
-	uninstall uninstall-am
+	clean-noinstLIBRARIES clean-noinstPROGRAMS cscopelist-am ctags \
+	ctags-am distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	recheck tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 
