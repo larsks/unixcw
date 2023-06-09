@@ -13,6 +13,26 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+# Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+# Config file for non-recursive (auto)make
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -87,6 +107,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+noinst_PROGRAMS = noinst/bin/wav_state_detector$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -103,6 +124,17 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = Makefile.inc
 CONFIG_CLEAN_VPATH_FILES =
+PROGRAMS = $(noinst_PROGRAMS)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_noinst_bin_wav_state_detector_OBJECTS = ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.$(OBJEXT)
+noinst_bin_wav_state_detector_OBJECTS =  \
+	$(am_noinst_bin_wav_state_detector_OBJECTS)
+noinst_bin_wav_state_detector_DEPENDENCIES =  \
+	./src/cwutils/lib/libcwutils.a
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -115,8 +147,31 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
-DIST_SOURCES =
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__maybe_remake_depfiles = depfiles
+am__depfiles_remade = ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
+am__mv = mv -f
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+SOURCES = $(noinst_bin_wav_state_detector_SOURCES)
+DIST_SOURCES = $(noinst_bin_wav_state_detector_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -160,7 +215,8 @@ CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.inc.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS README THANKS compile \
+	$(srcdir)/src/cwutils/wav_state_detector/Makemodule.am AUTHORS \
+	COPYING ChangeLog INSTALL NEWS README THANKS compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -344,6 +400,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+noinst_bin_wav_state_detector_SOURCES = ./src/cwutils/wav_state_detector/main.c
+noinst_bin_wav_state_detector_CPPFLAGS = -Isrc/cwutils/
+noinst_bin_wav_state_detector_LDADD = ./src/cwutils/lib/libcwutils.a -Lsrc/libcw/.libs -lcw
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 EXTRA_DIST = \
@@ -356,9 +415,10 @@ EXTRA_DIST = \
 all: all-recursive
 
 .SUFFIXES:
+.SUFFIXES: .c .lo .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -380,6 +440,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles);; \
 	esac;
+$(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -392,11 +453,90 @@ $(am__aclocal_m4_deps):
 Makefile.inc: $(top_builddir)/config.status $(srcdir)/Makefile.inc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+src/cwutils/wav_state_detector/$(am__dirstamp):
+	@$(MKDIR_P) ./src/cwutils/wav_state_detector
+	@: > src/cwutils/wav_state_detector/$(am__dirstamp)
+src/cwutils/wav_state_detector/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ./src/cwutils/wav_state_detector/$(DEPDIR)
+	@: > src/cwutils/wav_state_detector/$(DEPDIR)/$(am__dirstamp)
+./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.$(OBJEXT):  \
+	src/cwutils/wav_state_detector/$(am__dirstamp) \
+	src/cwutils/wav_state_detector/$(DEPDIR)/$(am__dirstamp)
+noinst/bin/$(am__dirstamp):
+	@$(MKDIR_P) noinst/bin
+	@: > noinst/bin/$(am__dirstamp)
+
+noinst/bin/wav_state_detector$(EXEEXT): $(noinst_bin_wav_state_detector_OBJECTS) $(noinst_bin_wav_state_detector_DEPENDENCIES) $(EXTRA_noinst_bin_wav_state_detector_DEPENDENCIES) noinst/bin/$(am__dirstamp)
+	@rm -f noinst/bin/wav_state_detector$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(noinst_bin_wav_state_detector_OBJECTS) $(noinst_bin_wav_state_detector_LDADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+	-rm -f ./src/cwutils/wav_state_detector/*.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po@am__quote@ # am--include-marker
+
+$(am__depfiles_remade):
+	@$(MKDIR_P) $(@D)
+	@echo '# dummy' >$@-t && $(am__mv) $@-t $@
+
+am--depfiles: $(am__depfiles_remade)
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.o: ./src/cwutils/wav_state_detector/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(noinst_bin_wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.o -MD -MP -MF ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Tpo -c -o ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.o `test -f './src/cwutils/wav_state_detector/main.c' || echo '$(srcdir)/'`./src/cwutils/wav_state_detector/main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Tpo ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='./src/cwutils/wav_state_detector/main.c' object='./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(noinst_bin_wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.o `test -f './src/cwutils/wav_state_detector/main.c' || echo '$(srcdir)/'`./src/cwutils/wav_state_detector/main.c
+
+./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.obj: ./src/cwutils/wav_state_detector/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(noinst_bin_wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.obj -MD -MP -MF ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Tpo -c -o ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.obj `if test -f './src/cwutils/wav_state_detector/main.c'; then $(CYGPATH_W) './src/cwutils/wav_state_detector/main.c'; else $(CYGPATH_W) '$(srcdir)/./src/cwutils/wav_state_detector/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Tpo ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='./src/cwutils/wav_state_detector/main.c' object='./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(noinst_bin_wav_state_detector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ./src/cwutils/wav_state_detector/noinst_bin_wav_state_detector-main.obj `if test -f './src/cwutils/wav_state_detector/main.c'; then $(CYGPATH_W) './src/cwutils/wav_state_detector/main.c'; else $(CYGPATH_W) '$(srcdir)/./src/cwutils/wav_state_detector/main.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf noinst/bin/.libs noinst/bin/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -706,7 +846,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(PROGRAMS)
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -735,19 +875,24 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f noinst/bin/$(am__dirstamp)
+	-rm -f src/cwutils/wav_state_detector/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/cwutils/wav_state_detector/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+		-rm -f ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -792,12 +937,14 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
+		-rm -f ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -812,10 +959,11 @@ uninstall-am:
 .MAKE: $(am__recursive_targets) install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
-	am--refresh check check-am clean clean-cscope clean-generic \
-	clean-libtool cscope cscopelist-am ctags ctags-am dist \
-	dist-all dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ \
-	dist-xz dist-zip dist-zstd distcheck distclean \
+	am--depfiles am--refresh check check-am clean clean-cscope \
+	clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
+	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
+	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
+	dist-zstd distcheck distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
@@ -824,12 +972,16 @@ uninstall-am:
 	install-info-am install-man install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 
+
+clean-local:
+# 'noinst' is a directory into which some compilation results are placed.
+	rm -rf noinst
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
