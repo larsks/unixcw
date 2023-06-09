@@ -30,7 +30,7 @@
 
    @return Count of items added to @p elements
 */
-int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample_spacing);
+int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_time_t sample_spacing);
 
 
 

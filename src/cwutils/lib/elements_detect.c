@@ -71,13 +71,13 @@ static void state_init_memory(state_memory_t * memory);
 
 
 
-int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample_spacing)
+int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_time_t sample_spacing)
 {
 	int elements_iter = 0;
 
 	/* Time stamp of start of previous element. Zero time stamp is at the
 	   beginning of pcm file. */
-	float prev_element_start_ts = 0.0F;
+	cw_element_time_t prev_element_start_ts = 0.0F;
 
 	cw_state_t prev_state = CW_STATE_SPACE;
 	cw_state_t current_state = CW_STATE_SPACE;
@@ -102,7 +102,7 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample
 		if (beginning_of_file) {
 			/* Special case for beginning of file. */
 			beginning_of_file = false;
-			const float current_element_start_ts = sample_i * sample_spacing;
+			const cw_element_time_t current_element_start_ts = sample_i * sample_spacing;
 			prev_element_start_ts = current_element_start_ts;
 			prev_state = current_state;
 			fprintf(stderr, "[DEBUG] Detected initial state %s\n", current_state == CW_STATE_MARK ? "mark" : "space");
@@ -113,8 +113,8 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample
 				   the duration of the previous state, and the previous
 				   state itself. Therefore we pass 'prev_state' to
 				   elements_append_new() below. */
-				const float current_timestamp = sample_i * sample_spacing;
-				const int prev_duration = (int) (current_timestamp - prev_element_start_ts);
+				const cw_element_time_t current_timestamp = sample_i * sample_spacing;
+				const cw_element_time_t prev_duration = current_timestamp - prev_element_start_ts;
 				prev_element_start_ts = current_timestamp;
 				elements_append_new(elements, &elements_iter, prev_state, prev_duration);
 				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == CW_STATE_MARK ? "mark" : "space");
@@ -128,8 +128,8 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, float sample
 	   saved (because in the loop we always saved previous state). Now we
 	   have to save the last element found in file - the current state and
 	   its duration. */
-	const float current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
-	const int current_duration = (int) (current_timestamp - prev_element_start_ts);
+	const cw_element_time_t current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
+	const cw_element_time_t current_duration = current_timestamp - prev_element_start_ts;
 	elements_append_new(elements, &elements_iter, current_state, current_duration);
 
 	return elements_iter;

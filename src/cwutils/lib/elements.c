@@ -36,7 +36,7 @@ void elements_clear_durations(cw_element_t * elements, int count)
 	/* Clear durations calculated in current test before next call of
 	   this test function. */
 	for (int e = 0; e < count; e++) {
-		elements[e].duration = 0;
+		elements[e].duration = 0.0F;
 	}
 }
 
@@ -48,9 +48,9 @@ void elements_print_to_file(FILE * file, cw_element_t * elements, int count)
 {
 	for (int i = 0; i < count; i++) {
 		if (CW_STATE_MARK == elements[i].state) {
-			fprintf(file, "mark:   %8dus, '%c'\n", elements[i].duration, elements[i].type);
+			fprintf(file, "mark:   %11.2fus, '%c'\n", (double) elements[i].duration, elements[i].type);
 		} else {
-			fprintf(file, "space:  %8dus, '%c'\n", elements[i].duration, elements[i].type);
+			fprintf(file, "space:  %11.2fus, '%c'\n", (double) elements[i].duration, elements[i].type);
 		}
 	}
 }
@@ -58,7 +58,7 @@ void elements_print_to_file(FILE * file, cw_element_t * elements, int count)
 
 
 
-void elements_append_new(cw_element_t * elements, int * elements_iter, cw_state_t state, int duration)
+void elements_append_new(cw_element_t * elements, int * elements_iter, cw_state_t state, cw_element_time_t duration)
 {
 	if (state == CW_STATE_MARK) {
 		elements[*elements_iter].state = CW_STATE_MARK;

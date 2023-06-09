@@ -86,27 +86,6 @@
 
 
 /**
-   @brief Print elements' states and durations to file
-
-   @param[out] file File to write to
-   @param[in] elements Elements to write to @p file
-   @param[int] count Count of elements to write
-*/
-static void print_elements_to_file(FILE * file, cw_element_t * elements, int count)
-{
-	for (int i = 0; i < count; i++) {
-		if (CW_STATE_MARK == elements[i].state) {
-			fprintf(file, "mark:  %8d\n", elements[i].duration);
-		} else {
-			fprintf(file, "space: %8d\n", elements[i].duration);
-		}
-	}
-}
-
-
-
-
-/**
    @brief Write given @p elements as a series of samples into raw file
 
    Function writes a square wave into a file. The high/low states of the wave
@@ -123,7 +102,7 @@ static void print_elements_to_file(FILE * file, cw_element_t * elements, int cou
    @param[in] elements_count Count of elements to write to file
    @param[in] sample_spacing Time span between samples
 */
-static void write_elements_to_file(int fd, cw_element_t * elements, int elements_count, float sample_spacing)
+static void write_elements_to_file(int fd, cw_element_t * elements, int elements_count, cw_element_time_t sample_spacing)
 {
 	const cw_sample_t high = 30000;
 	const cw_sample_t low = -30000;
@@ -132,10 +111,10 @@ static void write_elements_to_file(int fd, cw_element_t * elements, int elements
 		  For 44100 sample rate the sample spacing is 22.6757 microseconds.
 		  If we were using integer type for increment, we would lose a lot of
 		  time over N samples, and the data in input wav and in output raw
-		  files would diverge over time. Use float for better results.
+		  files would diverge over time. Use floating point for better results.
 		*/
-		float d = 0.0F;
-		while (d < (float) elements[e].duration) {
+		cw_element_time_t d = 0.0F;
+		while (d < elements[e].duration) {
 			if (elements[e].state == CW_STATE_MARK) {
 				write(fd, &high, sizeof (high));
 			} else {
@@ -166,7 +145,7 @@ int main(int argc, char * argv[])
 	wav_header_t header = { 0 };
 	read_wav_header(input_fd, &header);
 
-	const float sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
+	const cw_element_time_t sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
 	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
 	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
 
@@ -175,7 +154,7 @@ int main(int argc, char * argv[])
 	close(input_fd);
 	fprintf(stderr, "[INFO ] Detected %d elements in wav file\n", wav_elements_count);
 	/* Debug. */
-	print_elements_to_file(stderr, wav_elements, wav_elements_count);
+	elements_print_to_file(stderr, wav_elements, wav_elements_count);
 
 
 	/* Write square wave representing states into new output file. The file
