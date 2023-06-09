@@ -24,6 +24,6 @@
 
 noinst_PROGRAMS += noinst/bin/wav_state_detector
 noinst_bin_wav_state_detector_SOURCES = ./src/cwutils/wav_state_detector/main.c
-noinst_bin_wav_state_detector_CPPFLAGS = -Isrc/cwutils/
-noinst_bin_wav_state_detector_LDADD = ./src/cwutils/lib/libcwutils.a -Lsrc/libcw/.libs -lcw
+noinst_bin_wav_state_detector_CPPFLAGS = -I$(top_srcdir)/../src/cwutils/
+noinst_bin_wav_state_detector_LDADD = ./src/cwutils/lib/libcwutils.a -L./src/libcw/.libs -lcw
 

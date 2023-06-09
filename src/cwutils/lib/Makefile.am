@@ -20,7 +20,16 @@
 
 
 noinst_LIBRARIES = libcwutils.a
-libcwutils_a_SOURCES = wav.c misc.c elements.c elements_detect.c element_stats.c
+
+# https://www.gnu.org/software/automake/manual/html_node/Headers.html:
+# "when the header belongs to a single convenience library or program, we
+# recommend listing it in the program’s or library’s _SOURCES variable"
+libcwutils_a_SOURCES = \
+	wav.c wav.h \
+	misc.c misc.h \
+	elements.c elements.h \
+	elements_detect.c elements_detect.h \
+	element_stats.c element_stats.h
 
 
 

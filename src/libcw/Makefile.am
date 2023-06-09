@@ -32,21 +32,30 @@ EXTRA_DIST=include.awk libdoc.awk libfuncs.awk libpc.awk libsigs.awk \
 	libcw.3.m4 \
 	libcw.pc.in \
 	cw.7 \
-	libcw_gen.h libcw_rec.h \
-	libcw_tq.h libcw_data.h libcw_key.h libcw_utils.h libcw_signal.h \
-	libcw_null.h libcw_console.h libcw_oss.h libcw_alsa.h libcw_pa.h \
-	libcw_gen_internal.h libcw_rec_internal.h libcw_tq_internal.h \
 	Doxyfile clang_tidy.sh
 
 # These files are used to build two different targets - list them only
 # once. I can't compile these files into an utility library because
 # the two targets are compiled with different CPPFLAGS.
-LIBCW_BASE_C_FILES = \
+#
+# https://www.gnu.org/software/automake/manual/html_node/Program-Sources.html
+# "Header files listed in a _SOURCES definition will be included in the
+# distribution but otherwise ignored."
+LIBCW_SOURCE_FILES = \
 	libcw.c \
-	libcw_gen.c libcw_rec.c \
-	libcw_tq.c libcw_data.c libcw_key.c libcw_utils.c libcw_signal.c \
-	libcw_null.c libcw_console.c libcw_oss.c libcw_alsa.c libcw_pa.c \
-	libcw_debug.c
+	libcw_gen.c libcw_gen.h libcw_gen_internal.h \
+	libcw_rec.c libcw_rec.h libcw_rec_internal.h \
+	libcw_tq.c libcw_tq.h libcw_tq_internal.h \
+	libcw_data.c libcw_data.h \
+	libcw_key.c libcw_key.h \
+	libcw_utils.c libcw_utils.h \
+	libcw_signal.c libcw_signal.h \
+	libcw_null.c libcw_null.h \
+	libcw_console.c libcw_console.h \
+	libcw_oss.c libcw_oss.h \
+	libcw_alsa.c libcw_alsa.h \
+	libcw_pa.c libcw_pa.h \
+	libcw_debug.c libcw_debug_internal.h
 
 
 
@@ -55,7 +64,7 @@ LIBCW_BASE_C_FILES = \
 # target: shared library
 
 # source code files used to build libcw shared library
-libcw_la_SOURCES = $(LIBCW_BASE_C_FILES)
+libcw_la_SOURCES = $(LIBCW_SOURCE_FILES)
 
 # target-specific linker flags (objects to link)
 libcw_la_LIBADD=-lm -lpthread $(DL_LIB) $(OSS_LIB)
@@ -88,7 +97,7 @@ libcw_include_HEADERS = libcw.h libcw2.h libcw_debug.h
 # target: shared library for tests
 
 # source code files used to build libcw shared library
-libcw_test_la_SOURCES = $(LIBCW_BASE_C_FILES)
+libcw_test_la_SOURCES = $(LIBCW_SOURCE_FILES)
 
 # target-specific linker flags (objects to link)
 libcw_test_la_LIBADD=-lm -lpthread $(DL_LIB) $(OSS_LIB)
