@@ -1,3 +1,11 @@
+# Next two lines are for non-recursive automake.
+# http://karelzak.blogspot.com/2013/02/non-recursive-automake.html
+noinst_PROGRAMS=
+include src/cwutils/wav_state_detector/Makemodule.am
+
+
+
+
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS=src
@@ -8,3 +16,10 @@ EXTRA_DIST = \
 	po/UnixCW.po \
 	THANKS HISTORY \
 	patches # debian
+
+
+
+clean-local:
+# 'noinst' is a directory into which some compilation results are placed.
+	rm -rf noinst
+

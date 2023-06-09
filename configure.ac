@@ -22,7 +22,7 @@ AC_PREREQ(2.57)
 AC_INIT([unixcw], [3.6.0])
 AC_CONFIG_SRCDIR([src/libcw/libcw_gen.c])
 AC_CONFIG_MACRO_DIRS([m4])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 # Libtool initialization, added during tests on FreeBSD
 LT_INIT
