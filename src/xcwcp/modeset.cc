@@ -112,7 +112,9 @@ ModeSetHelper::ModeSetHelper()
 	modes.push_back(new ReceiveMode("Receive Keyed CW"));
 
 #ifdef XCWCP_WITH_REC_TEST
-	modes.push_back(new ReceiverTestMode("Run Receiver Test"));
+	// Use "==" prefix and postfix to make the text more noticeable in modes
+	// drop-down menu.
+	modes.push_back(new ReceiverTestMode("== Run Receiver Test =="));
 #endif
 
 	return;
