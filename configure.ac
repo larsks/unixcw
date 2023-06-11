@@ -715,15 +715,15 @@ AC_MSG_NOTICE([  build cw:  ..............................  $WITH_CW])
 AC_MSG_NOTICE([  build cwgen:  ...........................  $WITH_CWGEN])
 AC_MSG_NOTICE([  build cwcp:  ............................  $WITH_CWCP])
 AC_MSG_NOTICE([  build xcwcp:  ...........................  $WITH_XCWCP])
-if test "$enable_xcwcp_rec_test" = 'yes' ; then
-    AC_MSG_NOTICE([      include dev receiver test:  .........  $enable_xcwcp_rec_test])
+if test "$WITH_XCWCP" = 'yes' ; then
+    if test "$enable_xcwcp_rec_test" = 'yes' ; then
+        AC_MSG_NOTICE([      include dev receiver test:  .........  $enable_xcwcp_rec_test])
+    fi
+    AC_MSG_NOTICE([      Qt5 LIBS:  ..........................  $QT5_LIBS])
+    AC_MSG_NOTICE([      Qt5 MOC:  ...........................  $MOC])
+    AC_MSG_NOTICE([      Qt5 CFLAGS:  ........................  $QT5_CFLAGS])
 fi
 AC_MSG_NOTICE([  CFLAGS:  ................................  $CFLAGS])
-if test "$WITH_XCWCP" = 'yes' ; then
-    AC_MSG_NOTICE([  Qt5 CFLAGS:  ............................  $QT5_CFLAGS])
-    AC_MSG_NOTICE([  Qt5 LIBS:  ..............................  $QT5_LIBS])
-    AC_MSG_NOTICE([  Qt5 MOC:  ...............................  $MOC])
-fi
 if test "$WITH_DEV" = 'yes' ; then
     AC_MSG_NOTICE([  enable dev support: .....................  yes])
 fi
