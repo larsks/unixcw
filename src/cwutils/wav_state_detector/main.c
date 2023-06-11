@@ -98,15 +98,14 @@
    were samples in input wav file used to create @p elements.
 
    @param[out] fd File into which to write the samples
-   @param[in] elements Elements to write to file
-   @param[in] elements_count Count of elements to write to file
+   @param[in] elements Elements structure to write to file
    @param[in] sample_spacing Time span between samples
 */
-static void write_elements_to_file(int fd, cw_element_t * elements, int elements_count, cw_element_time_t sample_spacing)
+static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_time_t sample_spacing)
 {
 	const cw_sample_t high = 30000;
 	const cw_sample_t low = -30000;
-	for (int e = 0; e < elements_count; e++) {
+	for (size_t e = 0; e < elements->curr_count; e++) {
 		/*
 		  For 44100 sample rate the sample spacing is 22.6757 microseconds.
 		  If we were using integer type for increment, we would lose a lot of
@@ -114,8 +113,8 @@ static void write_elements_to_file(int fd, cw_element_t * elements, int elements
 		  files would diverge over time. Use floating point for better results.
 		*/
 		cw_element_time_t d = 0.0F;
-		while (d < elements[e].duration) {
-			if (elements[e].state == CW_STATE_MARK) {
+		while (d < elements->array[e].duration) {
+			if (elements->array[e].state == cw_state_mark) {
 				write(fd, &high, sizeof (high));
 			} else {
 				write(fd, &low, sizeof (low));
@@ -149,12 +148,17 @@ int main(int argc, char * argv[])
 	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
 	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
 
-	cw_element_t wav_elements[1000] = { 0 };
-	const int wav_elements_count = elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
+	cw_elements_t * wav_elements = cw_elements_new(1000);
+	const int retval = elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
 	close(input_fd);
-	fprintf(stderr, "[INFO ] Detected %d elements in wav file\n", wav_elements_count);
+	if (-1 == retval) {
+		fprintf(stderr, "[ERROR] Failed to detect elements in wav\n");
+		cw_elements_delete(&wav_elements);
+		return -1;
+	}
+	fprintf(stderr, "[INFO ] Detected %zd elements in wav file\n", wav_elements->curr_count);
 	/* Debug. */
-	elements_print_to_file(stderr, wav_elements, wav_elements_count);
+	cw_elements_print_to_file(stderr, wav_elements);
 
 
 	/* Write square wave representing states into new output file. The file
@@ -166,11 +170,13 @@ int main(int argc, char * argv[])
 	int states_fd = open(states_path, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
 	if (-1 == states_fd) {
 		fprintf(stderr, "[ERROR] Failed to open output raw file '%s': %s\n", states_path, strerror(errno));
+		cw_elements_delete(&wav_elements);
 		exit(EXIT_FAILURE);
 	}
-	write_elements_to_file(states_fd, wav_elements, wav_elements_count, sample_spacing);
+	write_elements_to_file(states_fd, wav_elements, sample_spacing);
 	close(states_fd);
 
+	cw_elements_delete(&wav_elements);
 	exit(EXIT_SUCCESS);
 }
 

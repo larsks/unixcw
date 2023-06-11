@@ -31,19 +31,19 @@
 int ideal_duration_of_element(cw_element_type_t type, cw_durations_t * durations)
 {
 	switch (type) {
-	case dot:
+	case cw_element_type_dot:
 		return durations->dot_usecs;
-	case dash:
+	case cw_element_type_dash:
 		return durations->dash_usecs;
-	case ims:
+	case cw_element_type_ims:
 		return durations->ims_usecs;
-	case ics:
+	case cw_element_type_ics:
 		return durations->ics_usecs;
-	case iws:
+	case cw_element_type_iws:
 		return durations->iws_usecs;
 	default:
 		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
-		return 1;
+		return 3210; /* Some recognizable integer. */
 	}
 }
 

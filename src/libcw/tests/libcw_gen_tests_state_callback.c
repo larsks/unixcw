@@ -80,9 +80,15 @@
 
 
 
-/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
-   wpm speed [microseconds]. */
-static cw_durations_t g_durations;
+/*
+  This parameter is selected experimentally.
+
+  Ideally the count of elements should be calculated from input string, but
+  I didn't want to write a function for it. Instead I chose to select a value
+  that is "big enough". If I'm wrong, there are checks in elements code that
+  detect attempt to overflow array of elements.
+*/
+#define ELEMENTS_COUNT_MAX 128
 
 
 
@@ -91,7 +97,13 @@ static cw_durations_t g_durations;
    We need to store a persistent state of some data between callback calls. */
 typedef struct callback_data_t {
 	struct timeval prev_timestamp; /* Timestamp at which previous callback was made. */
-	int element_idx; /* Index to g_test_input_elements[]. */
+
+	int element_idx; /* Index to elements->array[]. */
+	cw_elements_t * elements;
+
+	/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
+	   wpm speed [microseconds]. */
+	cw_durations_t * durations;
 } callback_data_t;
 
 
@@ -127,9 +139,9 @@ typedef struct test_data_t {
 
 static void gen_callback_fn(void * callback_arg, int state);
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_element_stats_divergences_t * divergences, const char * name, int duration_expected);
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations);
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string);
 
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations);
+static void calculate_test_results(const cw_elements_t * elements, test_data_t * test_data, const cw_durations_t * durations);
 static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_data);
 
 
@@ -187,21 +199,6 @@ static test_data_t g_test_data[] = {
 
 
 
-/* Test string that will be played by test. */
-//static const char * const g_input_string = "one two three four";
-static const char * const g_input_string = "ooo""ooo""ooo sss""sss""sss";
-
-
-
-
-#define INPUT_ELEMENTS_COUNT 128
-static cw_element_t g_test_input_elements[INPUT_ELEMENTS_COUNT];
-/* Count of valid elements in the array. Depends on length of g_input_string. */
-static int g_test_input_elements_count;
-
-
-
-
 /**
    @brief Callback function called on change of state of generator (open -> closed, or closed -> open)
 
@@ -221,28 +218,34 @@ static void gen_callback_fn(void * callback_arg, int state)
 	const bool execute_nonessential = true;
 
 	callback_data_t * callback_data = (callback_data_t *) callback_arg;
+	const cw_elements_t * elements = callback_data->elements;
+	const size_t this_idx = callback_data->element_idx;
+
 
 	struct timeval now_timestamp = { 0 };
 	gettimeofday(&now_timestamp, NULL);
 	struct timeval prev_timestamp = callback_data->prev_timestamp;
 
-	const int this_idx = callback_data->element_idx;
-	cw_element_t * this_element = &g_test_input_elements[this_idx];
+
+	cw_element_t * this_element = &elements->array[this_idx];
 	if (execute_nonessential) {
 		/* Check that state is consistent with element. */
 		if (state) {
-			if (dot != this_element->type && dash != this_element->type) {
-				fprintf(stderr, "[ERROR] Unexpected element #%03d: '%c' for state 'closed'\n", this_idx, this_element->type);
+			if (cw_element_type_dot != this_element->type && cw_element_type_dash != this_element->type) {
+				fprintf(stderr, "[ERROR] Unexpected element #%03zd: '%c' for state 'closed'\n", this_idx, this_element->type);
 			}
 		} else {
-			if (iws != this_element->type && ics != this_element->type && ims != this_element->type) {
-				fprintf(stderr, "[ERROR] Unexpected element #%03d: '%c' for state 'open'\n", this_idx, this_element->type);
+			if (cw_element_type_iws != this_element->type && cw_element_type_ics != this_element->type && cw_element_type_ims != this_element->type) {
+				fprintf(stderr, "[ERROR] Unexpected element #%03zd: '%c' for state 'open'\n", this_idx, this_element->type);
 			}
 		}
 	}
 
 	callback_data->element_idx++;
 	callback_data->prev_timestamp = now_timestamp;
+	/* Don't increment elements->curr_count because it's indicating
+	   how many non-empty elements are there in elements. All elements are
+	   already appended in there, we are just filling durations. */
 
 	cw_element_t * prev_element = NULL;
 	if (this_idx == 0) {
@@ -253,18 +256,18 @@ static void gen_callback_fn(void * callback_arg, int state)
 		/* Update previous element. We are at the beginning of new element,
 		   and currently calculated duration is how long *previous* element
 		   was. */
-		prev_element = &g_test_input_elements[this_idx - 1];
+		prev_element = &elements->array[this_idx - 1];
 		prev_element->duration = cw_timestamp_compare_internal(&prev_timestamp, &now_timestamp);
 	}
 
 	if (execute_nonessential) {
-		const int prev_duration_expected = ideal_duration_of_element(prev_element->type, &g_durations);
+		const int prev_duration_expected = ideal_duration_of_element(prev_element->type, callback_data->durations);
 		const double divergence = 100.0 * (prev_element->duration - prev_duration_expected) / (1.0 * prev_duration_expected);
 
 #if 0 /* For debugging only. */
-		fprintf(stderr, "[DEBUG] type = '%c', prev_duration = %7d, prev_duration_expected = %7d\n", prev_element->type, prev_element->duration, prev_duration_expected);
+		fprintf(stderr, "[DEBUG] prev element type = '%c', prev duration = %12.2f, prev duration expected = %7d\n", prev_element->type, prev_element->duration, prev_duration_expected);
 #endif
-		fprintf(stderr, "[INFO ] Element %3d, state %d, type = '%c'; previous element: duration = %7d us, divergence = %8.3f%%\n",
+		fprintf(stderr, "[INFO ] Element %3zd, state %d, type = '%c'; previous element: duration = %12.2f us, divergence = %8.3f%%\n",
 		        this_idx, state, this_element->type, prev_element->duration, divergence);
 	}
 }
@@ -293,7 +296,10 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
-	g_test_input_elements_count = elements_from_string(g_input_string, g_test_input_elements, INPUT_ELEMENTS_COUNT);
+	/* Test string that will be played by test. Length of string may have impact
+	   on required value of ELEMENTS_COUNT_MAX. */
+	//const char * const input_string = "one two three four";
+	const char * const input_string = "ooo""ooo""ooo sss""sss""sss";
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -305,7 +311,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 		if (cte->current_gen_conf.sound_system != test_data->sound_system) {
 			continue;
 		}
-		if (cwt_retv_ok != test_cw_gen_state_callback_sub(cte, test_data, cte->current_gen_conf.sound_device, &g_durations)) {
+		if (cwt_retv_ok != test_cw_gen_state_callback_sub(cte, test_data, cte->current_gen_conf.sound_device, input_string)) {
 			retv = cwt_retv_err;
 			break;
 		}
@@ -319,7 +325,7 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 
 
 
-static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations)
+static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string)
 {
 	cw_gen_config_t gen_conf = { .sound_system = test_data->sound_system };
 	snprintf(gen_conf.sound_device, sizeof (gen_conf.sound_device), "%s", sound_device);
@@ -327,17 +333,36 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_set_speed(gen, test_data->speed);
 	cw_gen_set_frequency(gen, cte->config->frequency);
 
-	callback_data_t callback_data = { 0 };
-	cw_gen_register_value_tracking_callback_internal(gen, gen_callback_fn, &callback_data);
-
-
-	cw_gen_get_durations_internal(gen, durations);
-	cw_durations_print(stderr, durations);
+	/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
+	   wpm speed [microseconds]. */
+	cw_durations_t durations = { 0 };
+	cw_gen_get_durations_internal(gen, &durations);
+	cw_durations_print(stderr, &durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
+	cw_elements_t * elements = cw_elements_new(ELEMENTS_COUNT_MAX);
+	if (NULL == elements) {
+		/* This is treated as developer's error, therefore we exit. Developer
+		   should ensure sufficient count of elements for given string. */
+		fprintf(stderr, "[ERROR] Failed to allocate string elements for string '%s'\n", input_string);
+		exit(EXIT_FAILURE);
+	}
+	if (0 != cw_elements_from_string(input_string, elements)) {
+		/* This is treated as developer's error, therefore we exit. Developer
+		   should ensure that cw_elements_from_string() work correctly for valid
+		   input strings. */
+		fprintf(stderr, "[ERROR] Failed to get elements from input string '%s'\n", input_string);
+		exit(EXIT_FAILURE);
+	}
+
+	callback_data_t callback_data = { 0 };
+	callback_data.elements = elements;
+	callback_data.durations = &durations;
+	cw_gen_register_value_tracking_callback_internal(gen, gen_callback_fn, &callback_data);
+
 	cw_gen_start(gen);
-	cw_gen_enqueue_string(gen, g_input_string);
+	cw_gen_enqueue_string(gen, input_string);
 	cw_gen_wait_for_queue_level(gen, 0);
 
 
@@ -345,9 +370,10 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_delete(&gen);
 
 
-	calculate_test_results(g_test_input_elements, g_test_input_elements_count, test_data, durations);
+	calculate_test_results(elements, test_data, &durations);
 	evaluate_test_results(cte, test_data);
-	elements_clear_durations(g_test_input_elements, g_test_input_elements_count);
+
+	cw_elements_delete(&elements);
 
 	return 0;
 }
@@ -359,7 +385,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
    Calculate current divergences (from current run of test) that will be
    compared with reference values
 */
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations)
+static void calculate_test_results(const cw_elements_t * elements, test_data_t * test_data, const cw_durations_t * durations)
 {
 	const int initial = 1000000000;
 	cw_element_stats_t stats_dot  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
@@ -371,22 +397,22 @@ static void calculate_test_results(const cw_element_t * elements, int n_elements
 	/* Skip first and last element. The way the test is structured may impact
 	   correctness of values of these elements. TODO: make the elements
 	   correct. */
-	for (int i = 1; i < n_elements - 1; i++) {
-		switch (elements[i].type) {
-		case dot:
-			element_stats_update(&stats_dot, elements[i].duration);
+	for (size_t i = 1; i < elements->curr_count - 1; i++) {
+		switch (elements->array[i].type) {
+		case cw_element_type_dot:
+			element_stats_update(&stats_dot, elements->array[i].duration);
 			break;
-		case dash:
-			element_stats_update(&stats_dash, elements[i].duration);
+		case cw_element_type_dash:
+			element_stats_update(&stats_dash, elements->array[i].duration);
 			break;
-		case ims:
-			element_stats_update(&stats_ims, elements[i].duration);
+		case cw_element_type_ims:
+			element_stats_update(&stats_ims, elements->array[i].duration);
 			break;
-		case ics:
-			element_stats_update(&stats_ics, elements[i].duration);
+		case cw_element_type_ics:
+			element_stats_update(&stats_ics, elements->array[i].duration);
 			break;
-		case iws:
-			element_stats_update(&stats_iws, elements[i].duration);
+		case cw_element_type_iws:
+			element_stats_update(&stats_iws, elements->array[i].duration);
 			break;
 		default:
 			break;

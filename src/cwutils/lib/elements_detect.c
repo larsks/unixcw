@@ -71,16 +71,14 @@ static void state_init_memory(state_memory_t * memory);
 
 
 
-int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_time_t sample_spacing)
+int elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing)
 {
-	int elements_iter = 0;
-
 	/* Time stamp of start of previous element. Zero time stamp is at the
 	   beginning of pcm file. */
 	cw_element_time_t prev_element_start_ts = 0.0F;
 
-	cw_state_t prev_state = CW_STATE_SPACE;
-	cw_state_t current_state = CW_STATE_SPACE;
+	cw_state_t prev_state = cw_state_space;
+	cw_state_t current_state = cw_state_space;
 
 	size_t sample_i = 0;
 	cw_sample_t sample = 0;
@@ -105,19 +103,22 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_t
 			const cw_element_time_t current_element_start_ts = sample_i * sample_spacing;
 			prev_element_start_ts = current_element_start_ts;
 			prev_state = current_state;
-			fprintf(stderr, "[DEBUG] Detected initial state %s\n", current_state == CW_STATE_MARK ? "mark" : "space");
+			fprintf(stderr, "[DEBUG] Detected initial state %s\n", current_state == cw_state_mark ? "mark" : "space");
 		} else {
 			if (current_state != prev_state) {
 				/* We have just detected change of state. We now know how
 				   long the previous state lasted, and we need to save
 				   the duration of the previous state, and the previous
 				   state itself. Therefore we pass 'prev_state' to
-				   elements_append_new() below. */
+				   cw_elements_append_element() below. */
 				const cw_element_time_t current_timestamp = sample_i * sample_spacing;
 				const cw_element_time_t prev_duration = current_timestamp - prev_element_start_ts;
 				prev_element_start_ts = current_timestamp;
-				elements_append_new(elements, &elements_iter, prev_state, prev_duration);
-				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == CW_STATE_MARK ? "mark" : "space");
+				if (0 != cw_elements_append_element(elements, prev_state, prev_duration)) {
+					fprintf(stderr, "[ERROR] Failed to append element from wav\n");
+					return -1;
+				}
+				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == cw_state_mark ? "mark" : "space");
 				prev_state = current_state;
 			}
 		}
@@ -130,9 +131,12 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_t
 	   its duration. */
 	const cw_element_time_t current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
 	const cw_element_time_t current_duration = current_timestamp - prev_element_start_ts;
-	elements_append_new(elements, &elements_iter, current_state, current_duration);
+	if (0 != cw_elements_append_element(elements, current_state, current_duration)) {
+		fprintf(stderr, "[ERROR] Failed to append last element from wav\n");
+		return -1;
+	}
 
-	return elements_iter;
+	return 0;
 }
 
 
@@ -142,7 +146,7 @@ int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_t
    @brief Detect current state of sound in set of samples
 
    Look at current @p sample, look at past samples saved in @p memory, and
-   decide if there is no sound (@p state will be set CW_STATE_SPACE) or a
+   decide if there is no sound (@p state will be set cw_state_space) or a
    sound (@p will be set to CW_SPACE_MARK).
 
    Function may be unable to detect either mark or space - this can happen if
@@ -192,11 +196,11 @@ static bool state_detect(state_memory_t * memory, cw_sample_t sample, cw_state_t
 	}
 
 	if (memory->compare_count == zeros) {
-		*state = CW_STATE_SPACE; /* N consecutive zeros mean a space. */
+		*state = cw_state_space; /* N consecutive zeros mean a space. */
 		return true;
 	}
 	if (memory->compare_count == non_zeros) {
-		*state = CW_STATE_MARK; /* N consecutive non-zeros mean a mark. */
+		*state = cw_state_mark; /* N consecutive non-zeros mean a mark. */
 		return true;
 	}
 

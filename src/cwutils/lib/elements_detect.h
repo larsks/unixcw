@@ -25,12 +25,13 @@
    over-estimate the size).
 
    @param[in] input_fd File descriptor from which to read samples
-   @param[out] elements Pre-allocated array of elements into which to save elements
+   @param[out] elements Pre-allocated elements structure into which to save elements
    @param[in] sample_spacing Time span between consecutive samples
 
-   @return Count of items added to @p elements
+   @return 0 on success
+   @return -1 on failure
 */
-int elements_detect_from_wav(int input_fd, cw_element_t * elements, cw_element_time_t sample_spacing);
+int elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing);
 
 
 

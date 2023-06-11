@@ -57,14 +57,15 @@
 
 
 
+/*
+  This parameter is selected experimentally.
 
-
-
-
-
-/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
-   wpm speed [microseconds]. */
-static cw_durations_t g_durations;
+  Ideally the count of elements should be calculated from input string, but
+  I didn't want to write a function for it. Instead I chose to select a value
+  that is "big enough". If I'm wrong, there are checks in elements code that
+  detect attempt to overflow array of elements.
+*/
+#define ELEMENTS_COUNT_MAX 128
 
 
 
@@ -99,11 +100,13 @@ typedef struct test_data_t {
 
 
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_element_stats_divergences_t * divergences, const char * name, int duration_expected);
-static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations);
+static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string);
 
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations);
+static void calculate_test_results(const cw_elements_t * elements, test_data_t * test_data, const cw_durations_t * durations);
 static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_data);
 
+static int get_elements_from_wav_file(const char * path, cw_elements_t * elements);
+static void elements_set_ideal_durations(cw_elements_t * elements, cw_durations_t * durations);
 
 
 //static void clear_data(cw_element_t * elements, int count);
@@ -163,21 +166,6 @@ static test_data_t g_test_data[] = {
 
 
 
-/* Test string that will be played by test. */
-//static const char * const g_input_string = "one two three four";
-static const char * const g_input_string = " abc ";
-
-
-
-
-#define STRING_ELEMENTS_COUNT 128
-static cw_element_t g_string_elements[STRING_ELEMENTS_COUNT];
-/* Count of valid elements in the array. Depends on length of g_input_string. */
-static int g_string_elements_count;
-
-
-
-
 static void print_element_stats_and_divergences(const cw_element_stats_t * stats, const cw_element_stats_divergences_t * divergences, const char * name, int duration_expected)
 {
 	fprintf(stderr, "[INFO ] duration of %-6s: min/avg/max = %7d/%7d/%7d, expected = %7d, divergence min/avg/max = %8.3f%%/%8.3f%%/%8.3f%%\n",
@@ -199,7 +187,11 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
-	g_string_elements_count = elements_from_string(g_input_string, g_string_elements, STRING_ELEMENTS_COUNT);
+	/* Test string that will be played by test. Length of string may have
+	   impact on required value of ELEMENTS_COUNT_MAX. */
+	//static const char * const g_input_string = "one two three four";
+	const char * const input_string = " abc ";
+
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -211,7 +203,7 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 		if (cte->current_gen_conf.sound_system != test_data->sound_system) {
 			continue;
 		}
-		if (cwt_retv_ok != test_cw_gen_debug_pcm_file_timings_sub(cte, test_data, cte->current_gen_conf.sound_device, &g_durations)) {
+		if (cwt_retv_ok != test_cw_gen_debug_pcm_file_timings_sub(cte, test_data, cte->current_gen_conf.sound_device, input_string)) {
 			retv = cwt_retv_err;
 			break;
 		}
@@ -223,7 +215,19 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 }
 
 
-static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, cw_durations_t * durations)
+
+
+void elements_set_ideal_durations(cw_elements_t * elements, cw_durations_t * durations)
+{
+	for (size_t i = 0; i < elements->curr_count; i++) {
+		elements->array[i].duration = ideal_duration_of_element(elements->array[i].type, durations);
+	}
+}
+
+
+
+
+static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string)
 {
 	cw_gen_config_t gen_conf = { .sound_system = test_data->sound_system };
 	snprintf(gen_conf.sound_device, sizeof (gen_conf.sound_device), "%s", sound_device);
@@ -232,17 +236,38 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 	cw_gen_set_frequency(gen, cte->config->frequency);
 
 
-	cw_gen_get_durations_internal(gen, durations);
-	cw_durations_print(stderr, durations);
+	/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
+	   wpm speed [microseconds]. */
+	cw_durations_t durations = { 0 };
+	cw_gen_get_durations_internal(gen, &durations);
+	cw_durations_print(stderr, &durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
-	for (int i = 0; i < g_string_elements_count; i++) {
-		g_string_elements[i].duration = ideal_duration_of_element(g_string_elements[i].type, &g_durations);
+
+	cw_elements_t * string_elements = cw_elements_new(ELEMENTS_COUNT_MAX);
+	if (NULL == string_elements) {
+		/* This is treated as developer's error, therefore we exit. Developer
+		   should ensure sufficient count of elements for given string. */
+		fprintf(stderr, "[ERROR] Failed to allocate string elements for string '%s'\n", input_string);
+		exit(EXIT_FAILURE);
 	}
+	if (0 != cw_elements_from_string(input_string, string_elements)) {
+		/* This is treated as developer's error, therefore we exit. Developer
+		   should ensure that cw_elements_from_string() work correctly for valid
+		   input strings. */
+		fprintf(stderr, "[ERROR] Failed to get elements from input string '%s'\n", input_string);
+		cw_elements_delete(&string_elements);
+		exit(EXIT_FAILURE);
+	}
+	/* Set how long each element should be (ideally, in ideal generation
+	   conditions). Expected durations of elements depend on generator's wpm,
+	   so we can set them in string elements only here, after a generator has
+	   been created and configured. */
+	elements_set_ideal_durations(string_elements, &durations);
 
 
 	cw_gen_start(gen);
-	cw_gen_enqueue_string(gen, g_input_string);
+	cw_gen_enqueue_string(gen, input_string);
 	cw_gen_wait_for_queue_level(gen, 0);
 	cw_gen_stop(gen);
 
@@ -260,37 +285,52 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 	}
 	cw_gen_delete(&gen);
 
-	{
-			const char * path = wav_file_path;
-			int input_fd = open(path, O_RDONLY);
-			if (-1 == input_fd) {
-				fprintf(stderr, "[ERROR] Can't open input file '%s'\n", path);
-				exit(EXIT_FAILURE);
-			}
-
-			wav_header_t header = { 0 };
-			read_wav_header(input_fd, &header);
-
-			const float sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
-			fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
-			fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", sample_spacing);
-
-			cw_element_t wav_elements[1000] = { 0 };
-			const int wav_elements_count = elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
-			close(input_fd);
-
-			fprintf(stderr, "\n[INFO ] wav elements:\n");
-			elements_print_to_file(stderr, wav_elements, wav_elements_count);
+	cw_elements_t * wav_elements = cw_elements_new(ELEMENTS_COUNT_MAX);
+	const int wav_elements_count = get_elements_from_wav_file(wav_file_path, wav_elements);
+	if (-1 == wav_elements_count) {
+		cw_elements_delete(&wav_elements);
+		exit(EXIT_FAILURE);
 	}
+	fprintf(stderr, "\n[INFO ] wav elements:\n");
+	cw_elements_print_to_file(stderr, wav_elements);
 
 	fprintf(stderr, "\n[INFO ] string elements:\n");
-	elements_print_to_file(stderr, g_string_elements, g_string_elements_count);
+	cw_elements_print_to_file(stderr, string_elements);
 
-	calculate_test_results(g_string_elements, g_string_elements_count, test_data, durations);
+	calculate_test_results(string_elements, test_data, &durations);
 	evaluate_test_results(cte, test_data);
-	elements_clear_durations(g_string_elements, STRING_ELEMENTS_COUNT);
 
+	cw_elements_delete(&string_elements);
+	cw_elements_delete(&wav_elements);
 	return cwt_retv_ok;
+}
+
+
+
+
+/**
+   @return 0 on success
+   @return -1 on failure
+*/
+static int get_elements_from_wav_file(const char * path, cw_elements_t * elements)
+{
+	int input_fd = open(path, O_RDONLY);
+	if (-1 == input_fd) {
+		fprintf(stderr, "[ERROR] Can't open input file '%s'\n", path);
+		return -1;
+	}
+
+	wav_header_t header = { 0 };
+	read_wav_header(input_fd, &header);
+
+	const float sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
+	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
+	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
+
+	const int retval = elements_detect_from_wav(input_fd, elements, sample_spacing);
+	close(input_fd);
+
+	return retval;
 }
 
 
@@ -300,7 +340,7 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
    Calculate current divergences (from current run of test) that will be
    compared with reference values
 */
-static void calculate_test_results(const cw_element_t * elements, int n_elements, test_data_t * test_data, const cw_durations_t * durations)
+static void calculate_test_results(const cw_elements_t * elements, test_data_t * test_data, const cw_durations_t * durations)
 {
 	const int initial = 1000000000;
 	cw_element_stats_t stats_dot  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
@@ -312,22 +352,22 @@ static void calculate_test_results(const cw_element_t * elements, int n_elements
 	/* Skip first and last element. The way the test is structured may impact
 	   correctness of values of these elements. TODO: make the elements
 	   correct. */
-	for (int i = 1; i < n_elements - 1; i++) {
-		switch (elements[i].type) {
-		case dot:
-			element_stats_update(&stats_dot, elements[i].duration);
+	for (size_t i = 1; i < elements->curr_count - 1; i++) {
+		switch (elements->array[i].type) {
+		case cw_element_type_dot:
+			element_stats_update(&stats_dot, elements->array[i].duration);
 			break;
-		case dash:
-			element_stats_update(&stats_dash, elements[i].duration);
+		case cw_element_type_dash:
+			element_stats_update(&stats_dash, elements->array[i].duration);
 			break;
-		case ims:
-			element_stats_update(&stats_ims, elements[i].duration);
+		case cw_element_type_ims:
+			element_stats_update(&stats_ims, elements->array[i].duration);
 			break;
-		case ics:
-			element_stats_update(&stats_ics, elements[i].duration);
+		case cw_element_type_ics:
+			element_stats_update(&stats_ics, elements->array[i].duration);
 			break;
-		case iws:
-			element_stats_update(&stats_iws, elements[i].duration);
+		case cw_element_type_iws:
+			element_stats_update(&stats_iws, elements->array[i].duration);
 			break;
 		default:
 			break;
