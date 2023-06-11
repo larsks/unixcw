@@ -149,7 +149,7 @@ int main(int argc, char * argv[])
 	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
 
 	cw_elements_t * wav_elements = cw_elements_new(1000);
-	const int retval = elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
+	const int retval = cw_elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
 	close(input_fd);
 	if (-1 == retval) {
 		fprintf(stderr, "[ERROR] Failed to detect elements in wav\n");
@@ -164,7 +164,7 @@ int main(int argc, char * argv[])
 	/* Write square wave representing states into new output file. The file
 	   can be imported into e.g. Audacity and the square wave can be compared
 	   with input file. The visual comparison done by human is a kind of
-	   verification that elements_detect_from_wav() works correctly. */
+	   verification that cw_elements_detect_from_wav() works correctly. */
 	char states_path[1024] = { 0 };
 	snprintf(states_path, sizeof (states_path), "%s_states.raw", path);
 	int states_fd = open(states_path, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);

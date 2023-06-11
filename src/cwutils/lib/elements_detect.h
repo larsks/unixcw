@@ -31,7 +31,7 @@
    @return 0 on success
    @return -1 on failure
 */
-int elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing);
+int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing);
 
 
 

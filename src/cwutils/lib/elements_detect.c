@@ -71,7 +71,7 @@ static void state_init_memory(state_memory_t * memory);
 
 
 
-int elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing)
+int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_element_time_t sample_spacing)
 {
 	/* Time stamp of start of previous element. Zero time stamp is at the
 	   beginning of pcm file. */
