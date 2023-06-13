@@ -2363,11 +2363,18 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 		enqueued++;
 	}
 
-	CW_TONE_INIT(&tone, 0, gen->adjustment_space_duration, CW_SLOPE_MODE_NO_SLOPES);
-	if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
-		return CW_FAILURE;
+	/* TODO acerion 2023.06.13: Don't enqueue the adjustment space as
+	   separate tone. Add value of gen->adjustment_space_duration to
+	   'duration' and enqueue resulting duration above. See how
+	   'additional_space_duration' is added to ics duration in
+	   cw_gen_enqueue_2u_ics_internal(). */
+	if (gen->adjustment_space_duration > 0) {
+		CW_TONE_INIT(&tone, 0, gen->adjustment_space_duration, CW_SLOPE_MODE_NO_SLOPES);
+		if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
+			return CW_FAILURE;
+		}
+		enqueued++;
 	}
-	enqueued++;
 
 	cw_debug_msg (&cw_debug_object, CW_DEBUG_GENERATOR, CW_DEBUG_DEBUG,
 		      MSG_PREFIX "enqueued %d tones per iws, tq len = %zu",
