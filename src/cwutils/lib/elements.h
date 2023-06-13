@@ -13,14 +13,17 @@
   Custom type for dots, dashes and spaces. The enum members are also visual
   representations of the dots, dashes and spaces.
 
-  TODO: decouple representations of values from the definitions of values.
+  Use cw_element_type_get_representation() to get printable representation of
+  the type, or write your own code for getting representation of the type if
+  you need to (or just print plain integers).
 */
 typedef enum {
-	cw_element_type_dot  = '.',   /**< Dot mark. */
-	cw_element_type_dash = '-',   /**< Dash mark. */
-	cw_element_type_ims  = 'M',   /**< Inter-mark-space. */
-	cw_element_type_ics  = 'C',   /**< Inter-character-space. */
-	cw_element_type_iws  = 'W'    /**< Inter-word-space. */
+	cw_element_type_none = 0,
+	cw_element_type_dot,
+	cw_element_type_dash,
+	cw_element_type_ims,
+	cw_element_type_ics,
+	cw_element_type_iws
 } cw_element_type_t;
 
 
@@ -156,6 +159,18 @@ void cw_elements_print_to_file(FILE * file, cw_elements_t * elements);
    @return -1 on failure
 */
 int cw_elements_from_string(const char * string, cw_elements_t * elements);
+
+
+
+
+/**
+   @brief Get printable representation of element's type
+
+   @param element Element for which to get the representation
+
+   @return Single character with printable representation of given @p type
+*/
+char cw_element_type_get_representation(cw_element_type_t type);
 
 
 

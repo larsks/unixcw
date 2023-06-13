@@ -287,7 +287,7 @@ static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_
 		fprintf(file, "[DEBUG] %5zd | %5s     '%c' %12.2fus | %5s   %12.2fus |\n",
 		        i,
 		        string_elements->array[i].state == cw_state_mark ? "mark" : "space",
-		        string_elements->array[i].type,
+		        cw_element_type_get_representation(string_elements->array[i].type),
 		        string_elements->array[i].duration,
 		        wav_elements->array[i].state == cw_state_mark ? "mark" : "space",
 		        wav_elements->array[i].duration);

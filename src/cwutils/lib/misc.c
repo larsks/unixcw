@@ -41,9 +41,10 @@ int ideal_duration_of_element(cw_element_type_t type, cw_durations_t * durations
 		return durations->ics_usecs;
 	case cw_element_type_iws:
 		return durations->iws_usecs;
+	case cw_element_type_none:
 	default:
 		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
-		return 3210; /* Some recognizable integer. */
+		return 3210; /* Some recognizable integer. TODO: use -1*/
 	}
 }
 

@@ -31,9 +31,9 @@ void cw_elements_print_to_file(FILE * file, cw_elements_t * elements)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		if (cw_state_mark == elements->array[i].state) {
-			fprintf(file, "mark:   %11.2fus, '%c'\n", (double) elements->array[i].duration, elements->array[i].type);
+			fprintf(file, "mark:   %11.2fus, '%c'\n", (double) elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
 		} else {
-			fprintf(file, "space:  %11.2fus, '%c'\n", (double) elements->array[i].duration, elements->array[i].type);
+			fprintf(file, "space:  %11.2fus, '%c'\n", (double) elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
 		}
 	}
 }
@@ -128,7 +128,7 @@ int cw_elements_from_string(const char * string, cw_elements_t * elements)
 
 #if 0 /* For debugging only. */
 	for (int i = 0; i < elements->curr_count; i++) {
-		fprintf(stderr, "[DEBUG] Initialized element %3d with type '%c'\n", i, elements->array[i].type);
+		fprintf(stderr, "[DEBUG] Initialized element %3d with type '%c'\n", i, cw_element_type_get_representation(elements->array[i].type));
 	}
 #endif
 
@@ -171,6 +171,28 @@ void cw_elements_delete(cw_elements_t ** elements)
 	}
 	free(*elements);
 	*elements = NULL;
+}
+
+
+
+
+char cw_element_type_get_representation(cw_element_type_t type)
+{
+	switch (type) {
+	case cw_element_type_dot:
+		return '.';
+	case cw_element_type_dash:
+		return '-';
+	case cw_element_type_ims:
+		return 'M';
+	case cw_element_type_ics:
+		return 'C';
+	case cw_element_type_iws:
+		return 'W';
+	case cw_element_type_none:
+	default:
+		return '?';
+	}
 }
 
 
