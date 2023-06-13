@@ -36,7 +36,7 @@
 
 /* Symbolic name for inter-mark-space. TODO: this should not be a space
    character. Space character is reserved for inter-character-space.*/
-enum { CW_SYMBOL_SPACE = ' ' };
+enum { CW_SYMBOL_IMS = ' ' };
 
 
 
@@ -462,10 +462,10 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen);
 cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character);
 
 /* These are also 'enqueue' primitives, but are intended to be used on
-   hardware keying events. */
-cw_ret_t cw_gen_enqueue_begin_mark_internal(cw_gen_t * gen);
-cw_ret_t cw_gen_enqueue_begin_space_internal(cw_gen_t * gen);
-cw_ret_t cw_gen_enqueue_symbol_no_ims_internal(cw_gen_t * gen, char symbol);
+   hardware keying events from straight key (sk) and iambic keyer (ik). */
+cw_ret_t cw_gen_enqueue_sk_begin_mark_internal(cw_gen_t * gen);
+cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen);
+cw_ret_t cw_gen_enqueue_ik_symbol_no_ims_internal(cw_gen_t * gen, char symbol);
 
 cw_ret_t cw_gen_silence_internal(cw_gen_t * gen);
 char * cw_gen_get_sound_system_label_internal(const cw_gen_t * gen, char * buffer, size_t size);

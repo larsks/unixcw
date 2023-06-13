@@ -2755,14 +2755,14 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
 
 
 /**
-   Helper function intended to hide details of tone queue and of
-   enqueueing a tone from cw_key module.
+   @brief Enqueue beginning of mark from straight key
 
-   The function should be called only on "key down" (begin mark) event
+   Helper function intended to hide from keying module the details of tone
+   queue and of enqueueing a tone.
+
+   Call this function from straight key code only (see "sk" in function's
+   name). The function should be called only on "key down" (begin mark) event
    from hardware straight key.
-
-   The function is called in very specific context, see cw_key module
-   for details.
 
    @internal
    @reviewed 2020-08-06
@@ -2773,7 +2773,7 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
    @return CW_SUCCESS on success
    @return CW_FAILURE on failure
 */
-cw_ret_t cw_gen_enqueue_begin_mark_internal(cw_gen_t * gen)
+cw_ret_t cw_gen_enqueue_sk_begin_mark_internal(cw_gen_t * gen)
 {
 	/* In case of straight key we don't know at all how long the
 	   tone should be (we don't know for how long the straight key
@@ -2822,14 +2822,14 @@ cw_ret_t cw_gen_enqueue_begin_mark_internal(cw_gen_t * gen)
 
 
 /**
-   Helper function intended to hide details of tone queue and of
-   enqueueing a tone from cw_key module.
+   @brief Enqueue beginning of space from straight key
 
-   The function should be called only on "key up" (begin space) event
+   Helper function intended to hide from keying module the details of tone
+   queue and of enqueueing a tone.
+
+   Call this function from straight key code only (see "sk" in function's
+   name). The function should be called only on "key up" (begin space) event
    from hardware straight key.
-
-   The function is called in very specific context, see cw_key module
-   for details.
 
    @internal
    @reviewed 2020-08-06
@@ -2840,7 +2840,7 @@ cw_ret_t cw_gen_enqueue_begin_mark_internal(cw_gen_t * gen)
    @return CW_SUCCESS on success
    @return CW_FAILURE on failure
 */
-cw_ret_t cw_gen_enqueue_begin_space_internal(cw_gen_t * gen)
+cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
 {
 	if (gen->sound_system == CW_AUDIO_CONSOLE) {
 		/* FIXME: I think that enqueueing tone is not just a
@@ -2891,18 +2891,20 @@ cw_ret_t cw_gen_enqueue_begin_space_internal(cw_gen_t * gen)
 
 
 /**
-   Helper function intended to hide details of tone queue and of
-   enqueueing a tone from cw_key module.
+   @brief Enqueue an element (dot/dash/ims) from iambic keyer
 
-   The function should be called on hardware key events only. Since we
+   Helper function intended to hide from keying module the details of tone
+   queue and of enqueueing a tone.
+
+   Call this function from iambic keyer code only (see "ik" in function's
+   name). The function should be called on hardware key events only. Since we
    enqueue symbols, we know that they have limited, specified
    length. This means that the function should be called for events
    from iambic keyer.
 
-   The function doesn't add any inter-mark-space (hence "no_ims" in name).
-
-   The function is called in very specific context, see cw_key module
-   for details.
+   @p symbol may be an ims, and the ims will be enqueued. But of the symbol
+   is dot or dash, the function won't append ims after the dot or dash -
+   hence "no_ims" in function's name.
 
    @internal
    @reviewed 2020-08-06
@@ -2914,7 +2916,7 @@ cw_ret_t cw_gen_enqueue_begin_space_internal(cw_gen_t * gen)
    @return CW_SUCCESS on success
    @return CW_FAILURE on failure
 */
-cw_ret_t cw_gen_enqueue_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
+cw_ret_t cw_gen_enqueue_ik_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
 {
 	cw_tone_t tone = { 0 };
 
@@ -2927,7 +2929,7 @@ cw_ret_t cw_gen_enqueue_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
 		CW_TONE_INIT(&tone, gen->frequency, gen->dash_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		break;
 
-	case CW_SYMBOL_SPACE: /* TODO: how come we enqueue IMS in "no_ims" function? */
+	case CW_SYMBOL_IMS:
 		CW_TONE_INIT(&tone, 0, gen->ims_duration, CW_SLOPE_MODE_NO_SLOPES);
 		break;
 	default:

@@ -323,11 +323,11 @@ cw_ret_t cw_key_sk_set_value_internal(volatile cw_key_t * key, cw_key_value_t ke
 		   Let's enqueue a beginning of mark. A
 		   constant tone will be generated until function
 		   receives CW_KEY_VALUE_OPEN key value. */
-		cwret = cw_gen_enqueue_begin_mark_internal(key->gen);
+		cwret = cw_gen_enqueue_sk_begin_mark_internal(key->gen);
 	} else {
 		/* CW_KEY_VALUE_OPEN, time to go from Mark
 		   (audible tone) to Space (silence). */
-		cwret = cw_gen_enqueue_begin_space_internal(key->gen);
+		cwret = cw_gen_enqueue_sk_begin_space_internal(key->gen);
 	}
 	cw_assert (CW_SUCCESS == cwret, MSG_PREFIX_SK "failed to enqueue key value %d", key->sk.key_value);
 	return cwret;
@@ -406,7 +406,7 @@ cw_ret_t cw_key_ik_set_value_internal(volatile cw_key_t * key, cw_key_value_t ke
 	/* TODO: if you want to have a per-key callback called on each key value
 	  change, you should call it here. */
 
-	cw_ret_t cwret = cw_gen_enqueue_symbol_no_ims_internal(key->gen, symbol);
+	cw_ret_t cwret = cw_gen_enqueue_ik_symbol_no_ims_internal(key->gen, symbol);
 	cw_assert (CW_SUCCESS == cwret, MSG_PREFIX_IK "failed to key symbol '%c'", symbol);
 	return cwret;
 }
@@ -571,7 +571,7 @@ cw_ret_t cw_key_ik_update_graph_state_internal(volatile cw_key_t * key)
 		/* We are ending a Dot, so turn off tone and begin the
 		   after-dot Space.
 		   No routine status checks are made! (TODO) */
-		cw_key_ik_set_value_internal(key, CW_KEY_VALUE_OPEN, CW_SYMBOL_SPACE);
+		cw_key_ik_set_value_internal(key, CW_KEY_VALUE_OPEN, CW_SYMBOL_IMS);
 		key->ik.graph_state = key->ik.graph_state == KS_IN_DOT_A ? KS_AFTER_DOT_A : KS_AFTER_DOT_B;
 		break;
 
@@ -587,7 +587,7 @@ cw_ret_t cw_key_ik_update_graph_state_internal(volatile cw_key_t * key)
 		/* We are ending a Dash, so turn off tone and begin
 		   the after-dash Space.
 		   No routine status checks are made! (TODO) */
-		cw_key_ik_set_value_internal(key, CW_KEY_VALUE_OPEN, CW_SYMBOL_SPACE);
+		cw_key_ik_set_value_internal(key, CW_KEY_VALUE_OPEN, CW_SYMBOL_IMS);
 		key->ik.graph_state = key->ik.graph_state == KS_IN_DASH_A ? KS_AFTER_DASH_A : KS_AFTER_DASH_B;
 		break;
 
