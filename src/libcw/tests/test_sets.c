@@ -41,6 +41,7 @@
 #include "libcw_test_tq_short_space.h"
 #include "libcw_gen_tests_debug_pcm_file_timings.h"
 #include "libcw_gen_tests_state_callback.h"
+#include "gen/cw_gen_remove_last_character.h"
 
 
 

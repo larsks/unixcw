@@ -47,6 +47,8 @@ test_framework_files = \
 modern_api_test_files = \
 	libcw_data_tests.c \
 	libcw_data_tests.h \
+	gen/cw_gen_remove_last_character.c \
+	gen/cw_gen_remove_last_character.h \
 	libcw_gen_tests.c \
 	libcw_gen_tests.h \
 	libcw_gen_tests_state_callback.c \
