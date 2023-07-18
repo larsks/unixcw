@@ -56,7 +56,7 @@ lib_xcwcp_a_CPPFLAGS      =-DXCWCP_WITH_REC_TEST
 endif
 
 lib_cwgen_a_SOURCES       = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h
-lib_libcw_tests_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h
+lib_libcw_tests_a_SOURCES = cw_easy_rec.c cw_easy_rec.h cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h
 lib_rec_tests_a_SOURCES   = cw_rec_tester.c cw_rec_tester.h cw_rec_utils.c cw_rec_utils.h test_framework_tools.c test_framework_tools.h
 
 
