@@ -202,7 +202,7 @@ void cw_easy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_st
 	if (key_state) {
 		/* Key down. */
 		//fprintf(stderr, "start receive tone: %10ld . %10ld\n", easy_rec->main_timer->tv_sec, easy_rec->main_timer->tv_usec);
-		if (!cw_start_receive_tone(&easy_rec->main_timer)) {
+		if (CW_SUCCESS != cw_start_receive_tone(&easy_rec->main_timer)) {
 			// TODO: Perhaps this should be counted as test error
 			perror("cw_start_receive_tone");
 			return;
@@ -210,7 +210,7 @@ void cw_easy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_st
 	} else {
 		/* Key up. */
 		//fprintf(stderr, "end receive tone:   %10ld . %10ld\n", easy_rec->main_timer->tv_sec, easy_rec->main_timer->tv_usec);
-		if (!cw_end_receive_tone(&easy_rec->main_timer)) {
+		if (CW_SUCCESS != cw_end_receive_tone(&easy_rec->main_timer)) {
 			/* Handle receive error detected on tone end.
 			   For ENOMEM and ENOENT we set the error in a
 			   class flag, and display the appropriate
@@ -257,7 +257,7 @@ void cw_easy_receiver_start(cw_easy_receiver_t * easy_rec)
 
 
 
-
+#if 0
 /**
    \brief Poll the CW library receive buffer and handle anything found in the
    buffer
@@ -269,7 +269,7 @@ bool cw_easy_receiver_poll(cw_easy_receiver_t * easy_rec, int (* callback)(const
 	if (easy_rec->is_pending_iws) {
 		/* Check if receiver received the pending inter-word-space. */
 		cw_rec_data_t erd = { 0 };
-		if (cw_easy_receiver_poll_space(easy_rec, &erd)) {
+		if (cw_easy_receiver_poll_iws(easy_rec, &erd)) {
 			if (callback) {
 				callback(&erd);
 			}
@@ -315,7 +315,7 @@ bool cw_easy_receiver_poll_data(cw_easy_receiver_t * easy_rec, cw_rec_data_t * e
 
 	if (easy_rec->is_pending_iws) {
 		/* Check if receiver received the pending inter-word-space. */
-		cw_easy_receiver_poll_space(easy_rec, erd);
+		cw_easy_receiver_poll_iws(easy_rec, erd);
 
 		if (!easy_rec->is_pending_iws) {
 			/* We received the pending space. After it the
@@ -334,6 +334,7 @@ bool cw_easy_receiver_poll_data(cw_easy_receiver_t * easy_rec, cw_rec_data_t * e
 
 	return false; /* Nothing was polled at this time. */
 }
+#endif
 
 
 
@@ -352,9 +353,9 @@ bool cw_easy_receiver_poll_character(cw_easy_receiver_t * easy_rec, cw_rec_data_
 	//fprintf(stderr, "poll_receive_char:  %10ld : %10ld\n", timer.tv_sec, timer.tv_usec);
 
 	errno = 0;
-	const bool received = cw_receive_character(&timer, &erd->character, &erd->is_iws, NULL);
+	const cw_ret_t cwret = cw_receive_character(&timer, &erd->character, &erd->is_iws, NULL);
 	erd->errno_val = errno;
-	if (received) {
+	if (CW_SUCCESS == cwret) {
 
 #ifdef XCWCP_WITH_REC_TEST
 		if (CW_SUCCESS != cw_rec_tester_on_character(easy_rec->rec_tester, erd, &timer)) {
@@ -374,7 +375,7 @@ bool cw_easy_receiver_poll_character(cw_easy_receiver_t * easy_rec, cw_rec_data_
 		   inter-word space. */
 		easy_rec->is_pending_iws = true;
 
-		//fprintf(stderr, "Received character '%c'\n", erd->character);
+		//fprintf(stderr, "[DD] Received character '%c'\n", erd->character);
 
 		return true;
 
@@ -416,7 +417,7 @@ bool cw_easy_receiver_poll_character(cw_easy_receiver_t * easy_rec, cw_rec_data_
 
 // TODO: can we return true when a space has been successfully polled,
 // instead of returning it through erd?
-bool cw_easy_receiver_poll_space(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd)
+bool cw_easy_receiver_poll_iws(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd)
 {
 	/* We expect the receiver to contain a character, but we don't
 	   ask for it this time. The receiver should also store
@@ -430,7 +431,7 @@ bool cw_easy_receiver_poll_space(cw_easy_receiver_t * easy_rec, cw_rec_data_t * 
 	   timer. */
 	struct timeval timer;
 	gettimeofday(&timer, NULL);
-	//fprintf(stderr, "poll_space(): %10ld : %10ld\n", timer.tv_sec, timer.tv_usec);
+	//fprintf(stderr, "poll_iws(): %10ld : %10ld\n", timer.tv_sec, timer.tv_usec);
 
 	cw_receive_character(&timer, &erd->character, &erd->is_iws, NULL);
 	if (erd->is_iws) {
