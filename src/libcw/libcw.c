@@ -1631,8 +1631,8 @@ int cw_receive_character(const struct timeval *timestamp,
 			 /* out */ bool *is_end_of_word,
 			 /* out */ bool *is_error)
 {
-	int rv = cw_rec_poll_character(&cw_receiver, timestamp, c, is_end_of_word, is_error);
-	return rv;
+	cw_ret_t cwret = cw_rec_poll_character(&cw_receiver, timestamp, c, is_end_of_word, is_error);
+	return (int) cwret;
 }
 
 
@@ -1655,7 +1655,8 @@ int cw_receive_character(const struct timeval *timestamp,
 */
 void cw_clear_receive_buffer(void)
 {
-	/* In 3.5.1 this was implemented by cw_rec_clear_buffer_internal() like this: */
+	/* In 3.5.1 this was implemented by cw_rec_clear_buffer_internal() (now
+	   cw_rec_reset_state()) like this: */
 
 	memset(cw_receiver.representation, 0, sizeof (cw_receiver.representation));
 	cw_receiver.representation_ind = 0;

@@ -1032,6 +1032,26 @@ cw_ret_t cw_rec_poll_character(cw_rec_t * rec, const struct timeval * timestamp,
 
 
 /* Setters of receiver's essential parameters. */
+
+/**
+   @brief Set receive speed of given receiver
+
+   If a receiver is working in non-adaptive mode, it needs to have its
+   receive speed set to specific value (to the value of source (sender) of
+   Morse code data). Otherwise there will be a mismatch between speeds of
+   sender and receiver, and the receiving will fail.
+
+   Range of valid speeds is the same as for generator (CW_SPEED_MIN to
+   CW_SPEED_MAX, inclusive).
+
+   By default a receiver works in non-adaptive mode.
+
+   @param[in] rec Receiver for which to set the speed
+   @param[in] speed New value of speed
+
+   @return CW_SUCCESS on success
+   @return CW_FAILURE if function failed to set speed in receiver
+*/
 cw_ret_t cw_rec_set_speed(cw_rec_t * rec, int new_value);
 cw_ret_t cw_rec_set_tolerance(cw_rec_t * rec, int new_value);
 cw_ret_t cw_rec_set_gap(cw_rec_t * rec, int new_value);
