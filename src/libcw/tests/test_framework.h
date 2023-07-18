@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <syslog.h> /* For log severity values (LOG_DEBUG etc.) */
 
 
 
@@ -151,6 +152,7 @@ typedef struct cw_test_executor_t {
 	bool (* expect_op_float_errors_only)(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 	bool (* expect_op_double)(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 	bool (* expect_op_double_errors_only)(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
+	bool (* expect_strcasecmp)(struct cw_test_executor_t * self, const char * expected_value, const char * received_value, const char * fmt, ...) __attribute__ ((format (printf, 4, 5)));
 
 	/**
 	   Verify that @param received_value is between @param
@@ -332,7 +334,15 @@ typedef struct cw_test_executor_t {
 	const char * (* get_current_sound_device)(struct cw_test_executor_t * self);
 
 
+	/**
+	   Log message with given severity to cw_test_executor_t::stdout file (if it is set).
+	   Add severity prefix string/mark at the beginning.
+	   Add message prefix at the beginning.
+	   Don't add newline character at the end.
 
+	   @return number of characters printed
+	*/
+	int (* cte_log)(struct cw_test_executor_t * self, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 	/**
 	   Log information to cw_test_executor_t::stdout file (if it is set).
@@ -342,7 +352,7 @@ typedef struct cw_test_executor_t {
 
 	   @return number of characters printed
 	*/
-        int (* log_info)(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
+	int (* log_info)(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 	/**
 	   Log text to cw_test_executor_t::stdout file (if it is set).

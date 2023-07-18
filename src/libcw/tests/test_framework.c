@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <unistd.h>
 
 #ifndef __FreeBSD__
@@ -91,6 +92,8 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 static bool cw_test_expect_op_double(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 static bool cw_test_expect_op_double_errors_only(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 
+static bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * expected_value, const char * received_value, const char * fmt, ...) __attribute__ ((format (printf, 4, 5)));
+
 static bool cw_test_expect_between_int(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 static bool cw_test_expect_between_int_errors_only(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));
 
@@ -124,6 +127,7 @@ static void cw_test_set_current_topic_and_gen_config(cw_test_executor_t * self, 
 
 static void cw_test_print_test_stats(cw_test_executor_t * self);
 
+static int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 static int cw_test_log_info(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 static void cw_test_log_info_cont(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 static void cw_test_flush_info(struct cw_test_executor_t * self);
@@ -450,6 +454,54 @@ bool cw_test_expect_op_double_errors_only(struct cw_test_executor_t * self, doub
 
 	return cw_test_expect_op_float_sub(self, (float) expected_value, operator, (float) received_value, true, va_buf);
 }
+
+
+
+
+bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * expected_value, const char * received_value, const char * fmt, ...)
+{
+	bool as_expected = false;
+
+	char va_buf[128] = { 0 };
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	va_end(ap);
+
+	char msg_buf[1024] = { 0 };
+	/* FIXME: these snprintf() call introduce large delays when running tests under valgrind/callgrind. */
+	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
+	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
+	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
+
+
+	bool errors_only = false;
+	bool success = 0 == strcasecmp(expected_value, received_value);
+	if (success) {
+		if (!errors_only) {
+			self->stats->successes++;
+
+			/* FIXME: believe it or not, this line
+			   introduces large delays when running tests
+			   under valgrind/callgrind. */
+			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+
+			self->log_info(self, "%s\n", msg_buf);
+		}
+		as_expected = true;
+	} else {
+		self->stats->failures++;
+
+		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		self->log_error(self, "%s\n", msg_buf);
+		self->log_error(self, "   ***   expected [%s], got [%s]   ***\n", expected_value, received_value);
+
+		as_expected = false;
+	}
+
+	return as_expected;
+}
+
 
 
 
@@ -1025,6 +1077,7 @@ void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const
 	self->expect_op_float_errors_only = cw_test_expect_op_float_errors_only;
 	self->expect_op_double = cw_test_expect_op_double;
 	self->expect_op_double_errors_only = cw_test_expect_op_double_errors_only;
+	self->expect_strcasecmp = cw_test_expect_strcasecmp;
 
 	self->expect_between_int = cw_test_expect_between_int;
 	self->expect_between_int_errors_only = cw_test_expect_between_int_errors_only;
@@ -1055,6 +1108,7 @@ void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const
 
 	self->print_test_stats = cw_test_print_test_stats;
 
+	self->cte_log = cw_test_log;
 	self->log_info = cw_test_log_info;
 	self->log_info_cont = cw_test_log_info_cont;
 	self->flush_info = cw_test_flush_info;
@@ -1075,6 +1129,40 @@ void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const
 void cw_test_deinit(cw_test_executor_t * self)
 {
 	cw_config_delete(&self->config);
+}
+
+
+
+
+int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt, ...)
+{
+	if (NULL == self->file_out) {
+		return 0;
+	}
+
+	const char * tag = "[??]";
+	switch (severity) {
+	case LOG_DEBUG:
+		tag = "[DD]";
+		break;
+	default:
+		break;
+	}
+
+	char va_buf[256] = { 0 };
+
+	va_list ap;
+	va_start(ap, fmt);
+	/* FIXME: this vsnprintf() introduces *some* delays when
+	   running tests under valgrind/callgrind. Fixing this FIXME
+	   will have very small impact, so try this as last. */
+	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	va_end(ap);
+
+	const int n = fprintf(self->file_out, "%s %s", tag, va_buf);
+	fflush(self->file_out);
+
+	return n;
 }
 
 
