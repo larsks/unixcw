@@ -34,12 +34,13 @@
 
 
 
-
+#include "libcw_debug.h"
 #include "libcw_gen.h"
 #include "libcw_gen_tests.h"
 #include "libcw_debug.h"
 #include "libcw_utils.h"
 #include "test_framework.h"
+#include <cw_easy_rec.h>
 
 
 
@@ -1333,10 +1334,38 @@ cwt_retv test_cw_gen_enqueue_string(cw_test_executor_t * cte)
 
 
 
+/* This is where received characters will be appended. Given that input
+   string has up to 8 characters, I don't expect the receiver to require more
+   than 20 slots for received characters. */
+typedef struct callback_data {
+	char buffer[20 + 1];
+	int iter;
+	cw_test_executor_t * cte;
+} callback_data_t;
+
+
+
+
+static void callback(cw_easy_rec_data_t * erd, void * cdata)
+{
+	callback_data_t * data = (callback_data_t *) cdata;
+	if (erd->is_iws) {
+		data->cte->cte_log(data->cte, LOG_DEBUG, "received character ' '\n");
+		data->buffer[data->iter] = ' ';
+	} else {
+		data->cte->cte_log(data->cte, LOG_DEBUG, "received character '%c'\n", erd->character);
+		data->buffer[data->iter] = erd->character;
+	}
+	data->iter++;
+}
+
+
+
+
 /**
    @brief Test removing a character from end of enqueued characters
 
-   @reviewed on 2020-08-24
+   @reviewed on 2023-07-17
 */
 cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 {
@@ -1348,20 +1377,35 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 		return cwt_retv_err;
 	}
 
-	const int n = 4;
+	cw_easy_rec_t * easy_rec = cw_easy_rec_new();
+	cw_easy_rec_set_speed(easy_rec, cw_gen_get_speed(gen));
+	cw_gen_register_value_tracking_callback_internal(gen, cw_easy_rec_handle_libcw_keying_event, easy_rec);
+
+	callback_data_t data = { .buffer = { 0 }, .iter = 0, .cte = cte };
+	cw_easy_rec_register_receive_callback(easy_rec, callback, &data);
+	cw_easy_rec_start(easy_rec);
+
+	const char * input_string = "oooo" "ssss";
+
+	/* This test will attempt to remove zero to N characters from end of
+	   enqueued string. */
+#define REMOVED_CHARS_MAX 4
+
 	bool failure = false;
-	for (int to_remove = 0; to_remove <= n; to_remove++) {
+	for (int chars_to_remove = 0; chars_to_remove <= REMOVED_CHARS_MAX; chars_to_remove++) {
 		cw_gen_start(gen);
+		memset(&data, 0, sizeof (data));
+		data.cte = cte;
 
-		cte->log_info(cte, "You will now hear 'oooo' followed by %d 's' characters\n", n - to_remove);
-		cw_gen_enqueue_string(gen, "oooo" "ssss");
+		cte->log_info(cte, "You will now hear 'oooo' followed by %d 's' characters\n", REMOVED_CHARS_MAX - chars_to_remove);
+		cw_gen_enqueue_string(gen, input_string);
 
-		/* Remove N characters from end. */
-		for (int i = 0; i < to_remove; i++) {
+		/* Remove n characters from end. */
+		for (int i = 0; i < chars_to_remove; i++) {
 			cw_ret_t cwret = LIBCW_TEST_FUT(cw_gen_remove_last_character(gen));
 			if (!cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret,
 							    "remove last %d characters, removing %d-th character",
-							    to_remove, i)) {
+							    chars_to_remove, i)) {
 				failure = true;
 				break;
 			}
@@ -1370,13 +1414,34 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 		cw_gen_wait_for_queue_level(gen, 0);
 		cw_usleep_internal(1000 * 1000);
 		cw_gen_stop(gen);
+		// Clearing of receiver appears to be unnecessary.
+		//cw_easy_rec_clear(easy_rec);
 
 		if (failure) {
 			break;
 		}
+
+		/* The main part of the test: comparing enqueued string with what has
+		   been played and received. There are spaces at the end of strings
+		   because the generator adds "inter-word-space" after playing a
+		   string. */
+		{
+			const char * expected_results[REMOVED_CHARS_MAX + 1] = {
+				"oooo" "ssss" " ",
+				"oooo" "sss"  " ",
+				"oooo" "ss"   " ",
+				"oooo" "s"    " ",
+				"oooo" ""     " "
+			};
+
+			cte->expect_strcasecmp(cte, expected_results[chars_to_remove], data.buffer, "Removal of last %d character(s)", chars_to_remove);
+		}
 	}
 
+	cw_easy_rec_stop(easy_rec);
+
 	gen_destroy(&gen);
+	cw_easy_rec_delete(&easy_rec);
 
 	cte->expect_op_int(cte, false, "==", failure, "remove last character");
 

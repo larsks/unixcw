@@ -95,7 +95,7 @@ libcw_tests_SOURCES = \
 
 
 
-libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -DLIBCW_UNIT_TESTS
+libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_TESTS
 #libcw_tests_CFLAGS = -I../../
 
 # Target-specific linker flags (objects to link). Order is important:
