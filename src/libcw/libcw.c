@@ -687,7 +687,7 @@ int cw_send_character(char c)
 /**
    \brief Look up and send a given ASCII character as Morse code
 
-   "partial" means that the "end of character" delay is not appended
+   "partial" means that the inter-character-space is not appended
    to the Morse code sent by the function, to support the formation of
    combination characters.
 
