@@ -3,6 +3,7 @@
 
 
 
+#include <libcw_rec.h>
 #include "libcw2.h"
 #include "cw_rec_utils.h"
 
@@ -111,6 +112,12 @@ void cw_easy_rec_clear(cw_easy_rec_t * easy_rec);
    @return CW_FAILURE if function failed to set speed in receiver
 */
 cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed);
+
+
+
+
+cw_ret_t cw_easy_rec_set_tolerance(cw_easy_rec_t * rec, int tolerance);
+int cw_easy_rec_get_tolerance(const cw_easy_rec_t * easy_rec);
 
 
 

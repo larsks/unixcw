@@ -503,6 +503,29 @@ cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed)
 
 
 
+cw_ret_t cw_easy_rec_set_tolerance(cw_easy_rec_t * easy_rec, int tolerance)
+{
+	if (NULL == easy_rec) {
+		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		return CW_FAILURE;
+	}
+	return cw_rec_set_tolerance(easy_rec->rec, tolerance);
+}
+
+
+
+int cw_easy_rec_get_tolerance(const cw_easy_rec_t * easy_rec)
+{
+	if (NULL == easy_rec) {
+		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		return CW_FAILURE;
+	}
+	return cw_rec_get_tolerance(easy_rec->rec);
+}
+
+
+
+
 void cw_easy_rec_register_receive_callback(cw_easy_rec_t * easy_rec, cw_easy_rec_callback_t cb, void * data)
 {
 	easy_rec->callback = cb;
