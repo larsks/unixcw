@@ -231,6 +231,22 @@ cwt_retv cw_test_process_args(cw_test_executor_t * self, int argc, char * const 
 	if (argc == 1) {
 		/* Use defaults configured by
 		   cw_test_fill_default_sound_systems_and_topics(). */
+
+		/*
+		  TODO (acerion) 2023.07.28: use better source of seed.
+
+		  Quality of the source of seed doesn't have security implications.
+		  In situations where just want to have *some* uniqueness of seed,
+		  time(0) seems to be good enough on a system with up-to-date wall
+		  clock.
+
+		  But if the tests will be ever executed on embedded devices that
+		  perhaps won't have an NTP client or won't have battery-sustained
+		  real-time clock, the call to time(0) may be returning values from a
+		  small pool. The values would be somewhere from first hour of first
+		  day of January 1970. That would mean a decreased uniqueness of
+		  seed.
+		*/
 		self->random_seed = time(0);
 		srand48(self->random_seed);
 		return cwt_retv_ok;
@@ -243,6 +259,11 @@ cwt_retv cw_test_process_args(cw_test_executor_t * self, int argc, char * const 
 	if (self->config->test_random_seed > 0) {
 		self->random_seed = self->config->test_random_seed;
 	} else {
+		/*
+		  FIXME (acerion) 2023.07.28: remove duplication of the
+		  initialization. Just few lines above the random_seed field may have
+		  been initialized from time(0).
+		*/
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		self->random_seed = (long int) tv.tv_sec;
