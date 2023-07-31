@@ -103,6 +103,30 @@ typedef struct {
 
 
 
+typedef struct cw_rec_parameters_t {
+
+	int dot_duration_ideal;
+	int dot_duration_min;
+	int dot_duration_max;
+
+	int dash_duration_ideal;
+	int dash_duration_min;
+	int dash_duration_max;
+
+	int ims_duration_ideal;
+	int ims_duration_min;
+	int ims_duration_max;
+
+	int ics_duration_ideal;
+	int ics_duration_min;
+	int ics_duration_max;
+
+	int adaptive_threshold;
+} cw_rec_parameters_t;
+
+
+
+
 struct cw_rec_struct {
 	cw_rec_state_t state;
 
@@ -153,6 +177,9 @@ struct cw_rec_struct {
 
 
 	/* Receiver's low-level timing parameters */
+
+	/* TODO (acerion) 2023.07.27: replace with cw_rec_parameters_t the next
+	   time you will want to break binary compatibility. */
 
 	/* These are basic timing parameters which should be
 	   recalculated each time client code demands changing some

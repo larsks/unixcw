@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
- * Copyright (C) 2011-2021  Kamil Ignacak (acerion@wp.pl)
+ * Copyright (C) 2011-2023  Kamil Ignacak (acerion@wp.pl)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,6 +43,7 @@
 #include "libcw_gen_tests_state_callback.h"
 #include "gen/cw_gen_remove_last_character.h"
 #include "gen/cw_gen_enqueue_character_no_ics.h"
+#include "legacy/cw_get_receive_parameters.h"
 
 
 
@@ -153,6 +154,8 @@ cw_test_set_t cw_test_sets[] = {
 		{
 			/* This test does its own generator setup and deconfig. */
 			LIBCW_TEST_FUNCTION_INSERT(legacy_api_test_rec_poll, false),
+
+			LIBCW_TEST_FUNCTION_INSERT(legacy_api_test_cw_get_receive_parameters, g_is_quick),
 
 			LIBCW_TEST_FUNCTION_INSERT(NULL, true),
 		}

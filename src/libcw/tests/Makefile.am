@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
-# Copyright (C) 2011-2021  Kamil Ignacak (acerion@wp.pl)
+# Copyright (C) 2011-2023  Kamil Ignacak (acerion@wp.pl)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -68,6 +68,8 @@ modern_api_test_files = \
 
 
 legacy_api_test_files = \
+	legacy/cw_get_receive_parameters.c \
+	legacy/cw_get_receive_parameters.h \
 	libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h \
 	libcw_legacy_api_tests_rec_poll.c \
@@ -93,6 +95,7 @@ libcw_tests_SOURCES = \
 	$(functional_test_files) \
 	$(bug_test_files) \
 	$(test_framework_files) \
+	common.c common.h \
 	test_data.c \
 	test_sets.c \
 	test_main.c

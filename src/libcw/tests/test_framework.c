@@ -1142,6 +1142,9 @@ int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt
 
 	const char * tag = "[??]";
 	switch (severity) {
+	case LOG_ERR:
+		tag = "[EE]";
+		break;
 	case LOG_DEBUG:
 		tag = "[DD]";
 		break;
