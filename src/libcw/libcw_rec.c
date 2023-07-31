@@ -2056,11 +2056,13 @@ void cw_rec_sync_parameters_internal(cw_rec_t * rec)
 	} else {
 		/* Fixed speed receiving mode. */
 
-		int tolerance = (rec->dot_duration_ideal * rec->tolerance) / 100; /* [%] */
-		rec->dot_duration_min = rec->dot_duration_ideal - tolerance;
-		rec->dot_duration_max = rec->dot_duration_ideal + tolerance;
-		rec->dash_duration_min = rec->dash_duration_ideal - tolerance;
-		rec->dash_duration_max = rec->dash_duration_ideal + tolerance;
+		const int dot_margin = (rec->dot_duration_ideal * rec->tolerance) / 100; /* [microseconds] */
+		rec->dot_duration_min = rec->dot_duration_ideal - dot_margin;
+		rec->dot_duration_max = rec->dot_duration_ideal + dot_margin;
+		/* TODO (acerion) 2023.07.27: shouldn't calculations of dash duration
+		   range be using dash_margin? */
+		rec->dash_duration_min = rec->dash_duration_ideal - dot_margin;
+		rec->dash_duration_max = rec->dash_duration_ideal + dot_margin;
 
 		/* Make the inter-mark-space the same as the dot
 		   duration range. */
