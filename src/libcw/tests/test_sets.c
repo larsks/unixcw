@@ -42,6 +42,7 @@
 #include "libcw_gen_tests_debug_pcm_file_timings.h"
 #include "libcw_gen_tests_state_callback.h"
 #include "gen/cw_gen_remove_last_character.h"
+#include "gen/cw_gen_enqueue_character_no_ics.h"
 
 
 
@@ -52,8 +53,7 @@
 
 
 /* Whether a test is quick (completes in short time). */
-static const bool is_quick = true;
-static const bool is_not_quick = !is_quick;
+static const bool g_is_quick = true;
 
 
 
@@ -269,10 +269,11 @@ cw_test_set_t cw_test_sets[] = {
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_enqueue_string, false),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_remove_last_character, false),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_forever_internal, false),
+			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_enqueue_character_no_ics, !g_is_quick),
 
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_state_callback, false),
 #if LIBCW_WITH_DEV
-			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, is_not_quick),
+			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, !g_is_quick),
 #endif
 
 			LIBCW_TEST_FUNCTION_INSERT(NULL, true),

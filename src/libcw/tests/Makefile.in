@@ -129,7 +129,9 @@ am__libcw_tests_SOURCES_DIST = libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h libcw_legacy_api_tests_rec_poll.c \
 	libcw_legacy_api_tests_rec_poll.h libcw_data_tests.c \
 	libcw_data_tests.h gen/cw_gen_remove_last_character.c \
-	gen/cw_gen_remove_last_character.h libcw_gen_tests.c \
+	gen/cw_gen_remove_last_character.h \
+	gen/cw_gen_enqueue_character_no_ics.c \
+	gen/cw_gen_enqueue_character_no_ics.h libcw_gen_tests.c \
 	libcw_gen_tests.h libcw_gen_tests_state_callback.c \
 	libcw_gen_tests_state_callback.h libcw_rec_tests.c \
 	libcw_rec_tests.h libcw_utils_tests.c libcw_utils_tests.h \
@@ -145,6 +147,7 @@ am__objects_1 = libcw_tests-libcw_legacy_api_tests.$(OBJEXT) \
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = libcw_tests-libcw_data_tests.$(OBJEXT) \
 	gen/libcw_tests-cw_gen_remove_last_character.$(OBJEXT) \
+	gen/libcw_tests-cw_gen_enqueue_character_no_ics.$(OBJEXT) \
 	libcw_tests-libcw_gen_tests.$(OBJEXT) \
 	libcw_tests-libcw_gen_tests_state_callback.$(OBJEXT) \
 	libcw_tests-libcw_rec_tests.$(OBJEXT) \
@@ -203,6 +206,7 @@ am__depfiles_remade = ./$(DEPDIR)/libcw_tests-libcw_data_tests.Po \
 	./$(DEPDIR)/libcw_tests-test_framework.Po \
 	./$(DEPDIR)/libcw_tests-test_main.Po \
 	./$(DEPDIR)/libcw_tests-test_sets.Po \
+	gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po \
 	gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -615,6 +619,8 @@ modern_api_test_files = \
 	libcw_data_tests.h \
 	gen/cw_gen_remove_last_character.c \
 	gen/cw_gen_remove_last_character.h \
+	gen/cw_gen_enqueue_character_no_ics.c \
+	gen/cw_gen_enqueue_character_no_ics.h \
 	libcw_gen_tests.c \
 	libcw_gen_tests.h \
 	libcw_gen_tests_state_callback.c \
@@ -713,6 +719,8 @@ gen/$(DEPDIR)/$(am__dirstamp):
 	@: > gen/$(DEPDIR)/$(am__dirstamp)
 gen/libcw_tests-cw_gen_remove_last_character.$(OBJEXT):  \
 	gen/$(am__dirstamp) gen/$(DEPDIR)/$(am__dirstamp)
+gen/libcw_tests-cw_gen_enqueue_character_no_ics.$(OBJEXT):  \
+	gen/$(am__dirstamp) gen/$(DEPDIR)/$(am__dirstamp)
 
 libcw_tests$(EXEEXT): $(libcw_tests_OBJECTS) $(libcw_tests_DEPENDENCIES) $(EXTRA_libcw_tests_DEPENDENCIES) 
 	@rm -f libcw_tests$(EXEEXT)
@@ -741,6 +749,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-test_framework.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-test_main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcw_tests-test_sets.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -828,6 +837,20 @@ gen/libcw_tests-cw_gen_remove_last_character.obj: gen/cw_gen_remove_last_charact
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen/cw_gen_remove_last_character.c' object='gen/libcw_tests-cw_gen_remove_last_character.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen/libcw_tests-cw_gen_remove_last_character.obj `if test -f 'gen/cw_gen_remove_last_character.c'; then $(CYGPATH_W) 'gen/cw_gen_remove_last_character.c'; else $(CYGPATH_W) '$(srcdir)/gen/cw_gen_remove_last_character.c'; fi`
+
+gen/libcw_tests-cw_gen_enqueue_character_no_ics.o: gen/cw_gen_enqueue_character_no_ics.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen/libcw_tests-cw_gen_enqueue_character_no_ics.o -MD -MP -MF gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Tpo -c -o gen/libcw_tests-cw_gen_enqueue_character_no_ics.o `test -f 'gen/cw_gen_enqueue_character_no_ics.c' || echo '$(srcdir)/'`gen/cw_gen_enqueue_character_no_ics.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Tpo gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen/cw_gen_enqueue_character_no_ics.c' object='gen/libcw_tests-cw_gen_enqueue_character_no_ics.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen/libcw_tests-cw_gen_enqueue_character_no_ics.o `test -f 'gen/cw_gen_enqueue_character_no_ics.c' || echo '$(srcdir)/'`gen/cw_gen_enqueue_character_no_ics.c
+
+gen/libcw_tests-cw_gen_enqueue_character_no_ics.obj: gen/cw_gen_enqueue_character_no_ics.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen/libcw_tests-cw_gen_enqueue_character_no_ics.obj -MD -MP -MF gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Tpo -c -o gen/libcw_tests-cw_gen_enqueue_character_no_ics.obj `if test -f 'gen/cw_gen_enqueue_character_no_ics.c'; then $(CYGPATH_W) 'gen/cw_gen_enqueue_character_no_ics.c'; else $(CYGPATH_W) '$(srcdir)/gen/cw_gen_enqueue_character_no_ics.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Tpo gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen/cw_gen_enqueue_character_no_ics.c' object='gen/libcw_tests-cw_gen_enqueue_character_no_ics.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen/libcw_tests-cw_gen_enqueue_character_no_ics.obj `if test -f 'gen/cw_gen_enqueue_character_no_ics.c'; then $(CYGPATH_W) 'gen/cw_gen_enqueue_character_no_ics.c'; else $(CYGPATH_W) '$(srcdir)/gen/cw_gen_enqueue_character_no_ics.c'; fi`
 
 libcw_tests-libcw_gen_tests.o: libcw_gen_tests.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcw_tests-libcw_gen_tests.o -MD -MP -MF $(DEPDIR)/libcw_tests-libcw_gen_tests.Tpo -c -o libcw_tests-libcw_gen_tests.o `test -f 'libcw_gen_tests.c' || echo '$(srcdir)/'`libcw_gen_tests.c
@@ -1328,6 +1351,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libcw_tests-test_framework.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-test_main.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-test_sets.Po
+	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -1390,6 +1414,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libcw_tests-test_framework.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-test_main.Po
 	-rm -f ./$(DEPDIR)/libcw_tests-test_sets.Po
+	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
