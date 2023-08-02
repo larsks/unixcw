@@ -29,7 +29,7 @@
 
    @return Duration of element of type @p type.
 */
-int ideal_duration_of_element(cw_element_type_t type, cw_durations_t * durations);
+int ideal_duration_of_element(cw_element_type_t type, cw_gen_duration_parameters_t * durations);
 
 
 
@@ -42,7 +42,7 @@ int ideal_duration_of_element(cw_element_type_t type, cw_durations_t * durations
    @param[out] file File to which to print info on @p durations
    @param[in] durations Durations to print
 */
-void cw_durations_print(FILE * file, cw_durations_t * durations);
+void cw_durations_print(FILE * file, cw_gen_duration_parameters_t * durations);
 
 
 

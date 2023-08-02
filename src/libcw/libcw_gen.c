@@ -2156,16 +2156,16 @@ void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
    @param[in] gen generator from which to get durations
    @param[out] durations structure with generator's durations
 */
-void cw_gen_get_durations_internal(cw_gen_t * gen, cw_durations_t * durations)
+void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_duration_parameters_t * durations)
 {
 	cw_gen_get_timing_parameters_internal(gen,
-	                                      &durations->dot_usecs,
-	                                      &durations->dash_usecs,
-	                                      &durations->ims_usecs,
-	                                      &durations->ics_usecs,
-	                                      &durations->iws_usecs,
-	                                      &durations->additional_usecs,
-	                                      &durations->adjustment_usecs);
+	                                      &durations->dot_duration,
+	                                      &durations->dash_duration,
+	                                      &durations->ims_duration,
+	                                      &durations->ics_duration,
+	                                      &durations->iws_duration,
+	                                      &durations->additional_space_duration,
+	                                      &durations->adjustment_space_duration);
 }
 
 
