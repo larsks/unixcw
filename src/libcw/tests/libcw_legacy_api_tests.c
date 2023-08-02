@@ -45,6 +45,7 @@
 
 
 
+#include "common.h"
 #include "libcw.h"
 #include "libcw_debug.h"
 #include "libcw_tq.h"
@@ -81,111 +82,6 @@ static void test_helper_tq_callback(void * ptr);
 
 /* Helper function for iambic key tests. */
 static void legacy_api_test_iambic_key_paddles_common(cw_test_executor_t * cte, const int intended_dot_paddle, const int intended_dash_paddle, char character, int n_elements);
-
-static int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen);
-static int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor_t * cte);
-
-
-
-
-/**
-   @brief Setup test environment for a test of legacy function
-
-   @param start_gen whether a prepared generator should be started
-
-   @reviewed on 2020-10-04
-*/
-int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen)
-{
-	if (CW_SUCCESS != cw_generator_new(cte->current_gen_conf.sound_system, cte->current_gen_conf.sound_device)) {
-		cte->log_error(cte, "Can't create generator, stopping the test\n");
-		return cwt_retv_err;
-	}
-	if (start_gen) {
-		if (CW_SUCCESS != cw_generator_start()) {
-			cte->log_error(cte, "Can't start generator, stopping the test\n");
-			cw_generator_delete();
-			return cwt_retv_err;
-		}
-	}
-
-	cw_reset_send_receive_parameters();
-	cw_set_send_speed(30);
-	cw_set_receive_speed(30);
-	cw_disable_adaptive_receive();
-	cw_reset_receive_statistics();
-	cw_unregister_signal_handler(SIGUSR1);
-	errno = 0;
-
-	return cwt_retv_ok;
-}
-
-
-
-
-/**
-   @brief Deconfigure test environment after running a test of legacy function
-
-   @reviewed on 2020-10-04
-*/
-int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor_t * cte)
-{
-	sleep(1);
-	cw_generator_stop();
-	sleep(1);
-	cw_generator_delete();
-
-	return 0;
-}
-
-
-
-
-/**
-   @reviewed on 2019-10-13
-*/
-int legacy_api_test_low_level_gen_parameters(cw_test_executor_t * cte)
-{
-	cte->print_test_header(cte, __func__);
-	legacy_api_standalone_test_setup(cte, true);
-
-	int txdot_usecs = -1;
-	int txdash_usecs = -1;
-	int end_of_element_usecs = -1;
-	int end_of_character_usecs = -1;
-	int end_of_word_usecs = -1;
-	int additional_usecs = -1;
-	int adjustment_usecs = -1;
-
-	/* Print and verify default low level timing values. */
-	cw_reset_send_receive_parameters();
-	LIBCW_TEST_FUT(cw_get_send_parameters)(&txdot_usecs, &txdash_usecs,
-					       &end_of_element_usecs, &end_of_character_usecs,
-					       &end_of_word_usecs, &additional_usecs,
-					       &adjustment_usecs);
-	cte->log_info(cte,
-		      "cw_get_send_parameters():\n"
-		      "    %d, %d, %d, %d, %d, %d, %d\n",
-		      txdot_usecs, txdash_usecs, end_of_element_usecs,
-		      end_of_character_usecs,end_of_word_usecs, additional_usecs,
-		      adjustment_usecs);
-
-	cte->expect_op_int(cte, txdot_usecs,            ">=", 0, "send parameters: txdot_usecs");
-	cte->expect_op_int(cte, txdash_usecs,           ">=", 0, "send parameters: txdash_usecs");
-	cte->expect_op_int(cte, end_of_element_usecs,   ">=", 0, "send parameters: end_of_element_usecs");
-	cte->expect_op_int(cte, end_of_character_usecs, ">=", 0, "send parameters: end_of_character_usecs");
-	cte->expect_op_int(cte, end_of_word_usecs,      ">=", 0, "send parameters: end_of_word_usecs");
-	cte->expect_op_int(cte, additional_usecs,       ">=", 0, "send parameters: additional_usecs");
-	cte->expect_op_int(cte, adjustment_usecs,       ">=", 0, "send parameters: adjustment_usecs");
-
-	legacy_api_standalone_test_teardown(cte);
-	cte->print_test_footer(cte, __func__);
-
-	return 0;
-}
-
-
-
 
 /**
    @reviewed on 2019-10-13

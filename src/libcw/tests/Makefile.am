@@ -72,6 +72,8 @@ modern_api_test_files = \
 legacy_api_test_files = \
 	legacy/cw_get_receive_parameters.c \
 	legacy/cw_get_receive_parameters.h \
+	legacy/cw_get_send_parameters.c \
+	legacy/cw_get_send_parameters.h \
 	libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h \
 	libcw_legacy_api_tests_rec_poll.c \

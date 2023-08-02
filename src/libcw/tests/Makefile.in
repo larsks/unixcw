@@ -126,7 +126,9 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__libcw_tests_SOURCES_DIST = legacy/cw_get_receive_parameters.c \
-	legacy/cw_get_receive_parameters.h libcw_legacy_api_tests.c \
+	legacy/cw_get_receive_parameters.h \
+	legacy/cw_get_send_parameters.c \
+	legacy/cw_get_send_parameters.h libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h libcw_legacy_api_tests_rec_poll.c \
 	libcw_legacy_api_tests_rec_poll.h libcw_data_tests.c \
 	libcw_data_tests.h gen/cw_gen_remove_last_character.c \
@@ -148,6 +150,7 @@ am__libcw_tests_SOURCES_DIST = legacy/cw_get_receive_parameters.c \
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 =  \
 	legacy/libcw_tests-cw_get_receive_parameters.$(OBJEXT) \
+	legacy/libcw_tests-cw_get_send_parameters.$(OBJEXT) \
 	libcw_tests-libcw_legacy_api_tests.$(OBJEXT) \
 	libcw_tests-libcw_legacy_api_tests_rec_poll.$(OBJEXT)
 am__objects_2 = libcw_tests-libcw_data_tests.$(OBJEXT) \
@@ -216,7 +219,8 @@ am__depfiles_remade = ./$(DEPDIR)/libcw_tests-common.Po \
 	gen/$(DEPDIR)/libcw_tests-cw_gen_enqueue_character_no_ics.Po \
 	gen/$(DEPDIR)/libcw_tests-cw_gen_get_timing_parameters_internal.Po \
 	gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po \
-	legacy/$(DEPDIR)/libcw_tests-cw_get_receive_parameters.Po
+	legacy/$(DEPDIR)/libcw_tests-cw_get_receive_parameters.Po \
+	legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -650,6 +654,8 @@ modern_api_test_files = \
 legacy_api_test_files = \
 	legacy/cw_get_receive_parameters.c \
 	legacy/cw_get_receive_parameters.h \
+	legacy/cw_get_send_parameters.c \
+	legacy/cw_get_send_parameters.h \
 	libcw_legacy_api_tests.c \
 	libcw_legacy_api_tests.h \
 	libcw_legacy_api_tests_rec_poll.c \
@@ -733,6 +739,8 @@ legacy/$(DEPDIR)/$(am__dirstamp):
 	@: > legacy/$(DEPDIR)/$(am__dirstamp)
 legacy/libcw_tests-cw_get_receive_parameters.$(OBJEXT):  \
 	legacy/$(am__dirstamp) legacy/$(DEPDIR)/$(am__dirstamp)
+legacy/libcw_tests-cw_get_send_parameters.$(OBJEXT):  \
+	legacy/$(am__dirstamp) legacy/$(DEPDIR)/$(am__dirstamp)
 gen/$(am__dirstamp):
 	@$(MKDIR_P) gen
 	@: > gen/$(am__dirstamp)
@@ -779,6 +787,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gen/$(DEPDIR)/libcw_tests-cw_gen_get_timing_parameters_internal.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@legacy/$(DEPDIR)/libcw_tests-cw_get_receive_parameters.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -823,6 +832,20 @@ legacy/libcw_tests-cw_get_receive_parameters.obj: legacy/cw_get_receive_paramete
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='legacy/cw_get_receive_parameters.c' object='legacy/libcw_tests-cw_get_receive_parameters.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o legacy/libcw_tests-cw_get_receive_parameters.obj `if test -f 'legacy/cw_get_receive_parameters.c'; then $(CYGPATH_W) 'legacy/cw_get_receive_parameters.c'; else $(CYGPATH_W) '$(srcdir)/legacy/cw_get_receive_parameters.c'; fi`
+
+legacy/libcw_tests-cw_get_send_parameters.o: legacy/cw_get_send_parameters.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT legacy/libcw_tests-cw_get_send_parameters.o -MD -MP -MF legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Tpo -c -o legacy/libcw_tests-cw_get_send_parameters.o `test -f 'legacy/cw_get_send_parameters.c' || echo '$(srcdir)/'`legacy/cw_get_send_parameters.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Tpo legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='legacy/cw_get_send_parameters.c' object='legacy/libcw_tests-cw_get_send_parameters.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o legacy/libcw_tests-cw_get_send_parameters.o `test -f 'legacy/cw_get_send_parameters.c' || echo '$(srcdir)/'`legacy/cw_get_send_parameters.c
+
+legacy/libcw_tests-cw_get_send_parameters.obj: legacy/cw_get_send_parameters.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT legacy/libcw_tests-cw_get_send_parameters.obj -MD -MP -MF legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Tpo -c -o legacy/libcw_tests-cw_get_send_parameters.obj `if test -f 'legacy/cw_get_send_parameters.c'; then $(CYGPATH_W) 'legacy/cw_get_send_parameters.c'; else $(CYGPATH_W) '$(srcdir)/legacy/cw_get_send_parameters.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Tpo legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='legacy/cw_get_send_parameters.c' object='legacy/libcw_tests-cw_get_send_parameters.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o legacy/libcw_tests-cw_get_send_parameters.obj `if test -f 'legacy/cw_get_send_parameters.c'; then $(CYGPATH_W) 'legacy/cw_get_send_parameters.c'; else $(CYGPATH_W) '$(srcdir)/legacy/cw_get_send_parameters.c'; fi`
 
 libcw_tests-libcw_legacy_api_tests.o: libcw_legacy_api_tests.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcw_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcw_tests-libcw_legacy_api_tests.o -MD -MP -MF $(DEPDIR)/libcw_tests-libcw_legacy_api_tests.Tpo -c -o libcw_tests-libcw_legacy_api_tests.o `test -f 'libcw_legacy_api_tests.c' || echo '$(srcdir)/'`libcw_legacy_api_tests.c
@@ -1428,6 +1451,7 @@ distclean: distclean-am
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_get_timing_parameters_internal.Po
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po
 	-rm -f legacy/$(DEPDIR)/libcw_tests-cw_get_receive_parameters.Po
+	-rm -f legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1494,6 +1518,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_get_timing_parameters_internal.Po
 	-rm -f gen/$(DEPDIR)/libcw_tests-cw_gen_remove_last_character.Po
 	-rm -f legacy/$(DEPDIR)/libcw_tests-cw_get_receive_parameters.Po
+	-rm -f legacy/$(DEPDIR)/libcw_tests-cw_get_send_parameters.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

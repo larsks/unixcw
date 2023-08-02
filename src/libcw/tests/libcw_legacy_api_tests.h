@@ -41,7 +41,6 @@ int legacy_api_test_straight_key(cw_test_executor_t * cte);
 
 
 /* Other functions. */
-int legacy_api_test_low_level_gen_parameters(cw_test_executor_t * cte);
 int legacy_api_test_parameter_ranges(cw_test_executor_t * cte);
 
 // int legacy_api_cw_test_delayed_release(cw_test_executor_t * cte);

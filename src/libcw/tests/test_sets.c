@@ -45,6 +45,7 @@
 #include "gen/cw_gen_enqueue_character_no_ics.h"
 #include "gen/cw_gen_get_timing_parameters_internal.h"
 #include "legacy/cw_get_receive_parameters.h"
+#include "legacy/cw_get_send_parameters.h"
 
 
 
@@ -123,7 +124,7 @@ cw_test_set_t cw_test_sets[] = {
 		{ CW_AUDIO_NULL, CW_AUDIO_CONSOLE, CW_AUDIO_OSS, CW_AUDIO_ALSA, CW_AUDIO_PA, CW_AUDIO_NONE /* Guard. */ }, /* Sound systems. */
 
 		{
-			LIBCW_TEST_FUNCTION_INSERT(legacy_api_test_low_level_gen_parameters, true),
+			LIBCW_TEST_FUNCTION_INSERT(legacy_api_test_cw_get_send_parameters, g_is_quick),
 			LIBCW_TEST_FUNCTION_INSERT(legacy_api_test_parameter_ranges, true),
 			//LIBCW_TEST_FUNCTION_INSERT(legacy_api_cw_test_delayed_release, true),
 			//LIBCW_TEST_FUNCTION_INSERT(legacy_api_cw_test_signal_handling, true), /* FIXME - not sure why this test fails :( */
