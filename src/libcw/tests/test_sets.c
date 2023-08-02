@@ -43,6 +43,7 @@
 #include "libcw_gen_tests_state_callback.h"
 #include "gen/cw_gen_remove_last_character.h"
 #include "gen/cw_gen_enqueue_character_no_ics.h"
+#include "gen/cw_gen_get_timing_parameters_internal.h"
 #include "legacy/cw_get_receive_parameters.h"
 
 
@@ -263,7 +264,7 @@ cw_test_set_t cw_test_sets[] = {
 
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_set_tone_slope, true),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_tone_slope_shape_enums, true),
-			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_get_timing_parameters_internal, true),
+			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_get_timing_parameters_internal, g_is_quick),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_parameter_getters_setters, true),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_volume_functions, false),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_enqueue_primitives, false),

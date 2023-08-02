@@ -51,6 +51,8 @@ modern_api_test_files = \
 	gen/cw_gen_remove_last_character.h \
 	gen/cw_gen_enqueue_character_no_ics.c \
 	gen/cw_gen_enqueue_character_no_ics.h \
+	gen/cw_gen_get_timing_parameters_internal.c \
+	gen/cw_gen_get_timing_parameters_internal.h \
 	libcw_gen_tests.c \
 	libcw_gen_tests.h \
 	libcw_gen_tests_state_callback.c \

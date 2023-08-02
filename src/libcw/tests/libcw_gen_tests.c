@@ -651,60 +651,6 @@ static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__(
 
 
 /**
-   @reviewed on 2020-05-07
-*/
-cwt_retv test_cw_gen_get_timing_parameters_internal(cw_test_executor_t * cte)
-{
-	cte->print_test_header(cte, __func__);
-
-	int initial = -5;
-
-	int dot_duration = initial;
-	int dash_duration = initial;
-	int ims_duration = initial;
-	int ics_duration = initial;
-	int iws_duration = initial;
-	int additional_space_duration = initial;
-	int adjustment_space_duration = initial;
-
-	cw_gen_t * gen = cw_gen_new(&cte->current_gen_conf);
-	cw_gen_start(gen);
-
-
-	cw_gen_reset_parameters_internal(gen);
-	/* Reset requires resynchronization. */
-	cw_gen_sync_parameters_internal(gen);
-
-
-	LIBCW_TEST_FUT(cw_gen_get_timing_parameters_internal)(gen,
-							      &dot_duration,
-							      &dash_duration,
-							      &ims_duration,
-							      &ics_duration,
-							      &iws_duration,
-							      &additional_space_duration,
-							      &adjustment_space_duration);
-
-	bool failure = (dot_duration == initial)
-		|| (dash_duration == initial)
-		|| (ims_duration == initial)
-		|| (ics_duration == initial)
-		|| (iws_duration == initial)
-		|| (additional_space_duration == initial)
-		|| (adjustment_space_duration == initial);
-	cte->expect_op_int(cte, false, "==", failure, "get timing parameters");
-
-	cw_gen_delete(&gen);
-
-	cte->print_test_footer(cte, __func__);
-
-	return cwt_retv_ok;
-}
-
-
-
-
-/**
    @brief Test setting and getting of some basic parameters
 
    @reviewed on 2020-05-07
