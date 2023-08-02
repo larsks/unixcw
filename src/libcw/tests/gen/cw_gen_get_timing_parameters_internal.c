@@ -20,6 +20,7 @@
 
 
 
+#include "common.h"
 #include "libcw_gen.h"
 #include "cw_gen_get_timing_parameters_internal.h"
 
@@ -27,56 +28,97 @@
 
 
 /**
-   @reviewed on 2020-05-07
+   @brief Test cw_gen_get_timing_parameters_internal()
+
+   The tested function returns durations of elements used by cw generator.
+   The test verifies relations between the durations. These relations are
+   described in "man 7 cw" page distributed by unixcw:
+
+       The duration of a dash is three dots.
+       The time between each element (dot or dash) is one dot length.
+       The space between characters is three dot lengths.
+       The space between words is seven dot lengths.
+       The following formula calculates the dot period in microseconds from the Morse code speed in words per minute:
+          dot period = ( 1200000 / speed )
+
+   Notice that the tested function returns ideal durations. Whether libcw's
+   generator really uses them is another matter and it should be tested
+   separately.
+
+   @reviewedon 2023-08-02
+
+   @param cte test executor
+
+   @return cwt_retv_ok
 */
 cwt_retv test_cw_gen_get_timing_parameters_internal(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, __func__);
 
-	int initial = -5;
-
-	int dot_duration = initial;
-	int dash_duration = initial;
-	int ims_duration = initial;
-	int ics_duration = initial;
-	int iws_duration = initial;
-	int additional_space_duration = initial;
-	int adjustment_space_duration = initial;
-
 	cw_gen_t * gen = cw_gen_new(&cte->current_gen_conf);
 	cw_gen_start(gen);
 
+	bool success = true;
+	for (int speed = CW_SPEED_MIN; speed <= CW_SPEED_MAX; speed++) {
 
-	cw_gen_reset_parameters_internal(gen);
-	/* Reset requires resynchronization. */
-	cw_gen_sync_parameters_internal(gen);
+		/* FIXME (acerion) 2023.08.01. Trying to call legacy API here
+		   (cw_set_send_speed()) results in segmentation fault. It's expected
+		   that calling legacy API in program using modern API won't have
+		   impact on a 'gen', but we should not get a sigsegv. Investigate
+		   this. */
+		cw_gen_set_speed(gen, speed);
+
+		cw_gen_duration_parameters_t params = {
+			.dot_duration = -1,
+			.dash_duration = -1,
+			.ims_duration = -1,
+			.ics_duration = -1,
+			.iws_duration = -1,
+			.additional_space_duration = -1,
+			.adjustment_space_duration = -1,
+		};
+
+		LIBCW_TEST_FUT(cw_gen_get_timing_parameters_internal)
+			(gen,
+			 &params.dot_duration,
+			 &params.dash_duration,
+			 &params.ims_duration,
+			 &params.ics_duration,
+			 &params.iws_duration,
+			 &params.additional_space_duration,
+			 &params.adjustment_space_duration);
+
+		cte->cte_log(cte, LOG_DEBUG,
+		             "generator's sending parameters @ %02d:\n"
+		             "    dot duration = %07d\n"
+		             "   dash duration = %07d\n"
+		             "    ims duration = %07d\n"
+		             "    ics duration = %07d\n"
+		             "    iws duration = %07d\n"
+		             "additional space duration = %07d\n"
+		             "adjustment space duration = %07d\n",
+		             speed,
+		             params.dot_duration,
+		             params.dash_duration,
+		             params.ims_duration,
+		             params.ics_duration,
+		             params.iws_duration,
+		             params.additional_space_duration,
+		             params.adjustment_space_duration);
 
 
-	LIBCW_TEST_FUT(cw_gen_get_timing_parameters_internal)(gen,
-							      &dot_duration,
-							      &dash_duration,
-							      &ims_duration,
-							      &ics_duration,
-							      &iws_duration,
-							      &additional_space_duration,
-							      &adjustment_space_duration);
+		success = success && (cwt_retv_ok == test_gen_params_relations(cte, &params, speed));
+	}
 
-	bool failure = (dot_duration == initial)
-		|| (dash_duration == initial)
-		|| (ims_duration == initial)
-		|| (ics_duration == initial)
-		|| (iws_duration == initial)
-		|| (additional_space_duration == initial)
-		|| (adjustment_space_duration == initial);
-	cte->expect_op_int(cte, false, "==", failure, "get timing parameters");
+	const bool final_success = cte->expect_op_int(cte, success, "==", true, "Getting generator parameters");
 
 	cw_gen_delete(&gen);
-
 	cte->print_test_footer(cte, __func__);
 
-	return cwt_retv_ok;
+	if (final_success) {
+		return cwt_retv_ok;
+	} else {
+		return cwt_retv_err;
+	}
 }
-
-
-
 
