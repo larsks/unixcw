@@ -154,10 +154,17 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 
 	cw_easy_rec_t * easy_rec = cw_easy_rec_new();
 	cw_easy_rec_set_speed(easy_rec, cw_gen_get_speed(gen));
-	/* 15%; few times lower than the default. With relatively low and
-	   constant generator speed this should be enough. With 10% and
-	   PulseAudio I already experienced problems. */
+
+	/*
+	  15%; few times lower than the default. With relatively low and constant
+	  generator speed this should be enough. With 10% and PulseAudio I
+	  already experienced problems.
+
+	  TODO: the value of tolerance should be different for different sound
+	  systems.
+	*/
 	cw_easy_rec_set_tolerance(easy_rec, 15);
+
 	cw_gen_register_value_tracking_callback_internal(gen, cw_easy_rec_handle_libcw_keying_event, easy_rec);
 
 	callback_data_t data = { .buffer = { 0 }, .iter = 0, .cte = cte };
