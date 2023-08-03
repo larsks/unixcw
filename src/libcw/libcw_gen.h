@@ -68,8 +68,13 @@ typedef struct {
 
 
 
-/* This is internal struct that probably won't be made public, and won't be
-   used outside of libcw. */
+/**
+   \struct Structure used by function doing calculation of basic durations of
+   a generator
+
+   This is internal struct that probably won't be made public, and won't be
+   used outside of libcw.
+*/
 typedef struct cw_gen_durations_t {
 	int unit_duration;
 	int weighting_duration;

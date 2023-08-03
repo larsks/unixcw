@@ -2902,7 +2902,7 @@ cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
    length. This means that the function should be called for events
    from iambic keyer.
 
-   @p symbol may be an ims, and the ims will be enqueued. But of the symbol
+   @p symbol may be an ims, and the ims will be enqueued. But if the symbol
    is dot or dash, the function won't append ims after the dot or dash -
    hence "no_ims" in function's name.
 
