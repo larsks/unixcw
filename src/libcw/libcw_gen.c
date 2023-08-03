@@ -2196,7 +2196,7 @@ void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_duration_parameters_t 
 */
 cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 {
-	cw_ret_t status = CW_FAILURE;
+	cw_ret_t cwret = CW_FAILURE;
 
 	/* Synchronize low-level timings if required. */
 	cw_gen_sync_parameters_internal(gen);
@@ -2207,18 +2207,18 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 		cw_tone_t tone;
 		CW_TONE_INIT(&tone, gen->frequency, gen->dot_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		tone.is_first = is_first;
-		status = cw_tq_enqueue_internal(gen->tq, &tone);
+		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 	} else if (mark == CW_DASH_REPRESENTATION) {
 		cw_tone_t tone;
 		CW_TONE_INIT(&tone, gen->frequency, gen->dash_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		tone.is_first = is_first;
-		status = cw_tq_enqueue_internal(gen->tq, &tone);
+		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 	} else {
 		errno = EINVAL;
-		status = CW_FAILURE;
+		cwret = CW_FAILURE;
 	}
 
-	if (CW_SUCCESS != status) {
+	if (CW_SUCCESS != cwret) {
 		return CW_FAILURE;
 	}
 
