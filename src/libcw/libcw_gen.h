@@ -481,7 +481,7 @@ void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_duration_parameters_t 
 
 /* Generator's 'enqueue' primitives. */
 cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first);
-cw_ret_t cw_gen_enqueue_2u_ics_internal(cw_gen_t * gen);
+cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen);
 cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen);
 cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character);
 

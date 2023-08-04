@@ -574,7 +574,7 @@ int cw_send_dash(void)
 */
 int cw_send_character_space(void)
 {
-	return cw_gen_enqueue_2u_ics_internal(cw_generator);
+	return cw_gen_enqueue_ics_internal(cw_generator);
 }
 
 

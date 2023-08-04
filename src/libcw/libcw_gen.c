@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
-  Copyright (C) 2011-2021  Kamil Ignacak (acerion@wp.pl)
+  Copyright (C) 2011-2023  Kamil Ignacak (acerion@wp.pl)
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
@@ -2225,25 +2225,22 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 	/* Send the inter-mark-space. */
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, 0, gen->ims_duration, CW_SLOPE_MODE_NO_SLOPES);
-	if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
-		return CW_FAILURE;
-	} else {
-		return CW_SUCCESS;
-	}
+	cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	return cwret;
 }
 
 
 
 
 /**
-   @brief Enqueue 2-Unit inter-character-space
+   @brief Enqueue inter-character-space
 
-   The function enqueues space of length 2 Units. The function is intended to
-   be used after inter-mark-space has already been enqueued.
+   The function enqueues enough space to form 3-Unit inter-character-space.
 
-   In such situation standard inter-mark-space (one Unit) and two
-   Units enqueued by this function form a full standard
-   inter-character-space (three Units).
+   The function can be called even when inter-mark-space has already been
+   enqueued. In such situation standard inter-mark-space (one Unit) will be
+   followed by just two Units to form a full standard inter-character-space
+   (three Units).
 
    Inter-character adjustment space is added at the end.
 
@@ -2256,15 +2253,18 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
    @return CW_SUCCESS on success
    @return CW_FAILURE on failure
 */
-cw_ret_t cw_gen_enqueue_2u_ics_internal(cw_gen_t * gen)
+cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen)
 {
 	/* Synchronize low-level timing parameters. */
 	cw_gen_sync_parameters_internal(gen);
 
-	/* Enqueue standard inter-character-space, plus any additional inter-character gap. */
+	int duration = gen->ics_duration;
+
+	/* Enqueue ics with calculated duration, plus any additional inter-character gap. */
 	cw_tone_t tone;
-	CW_TONE_INIT(&tone, 0, gen->ics_duration + gen->additional_space_duration, CW_SLOPE_MODE_NO_SLOPES);
-	return cw_tq_enqueue_internal(gen->tq, &tone);
+	CW_TONE_INIT(&tone, 0, duration + gen->additional_space_duration, CW_SLOPE_MODE_NO_SLOPES);
+	const cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	return cwret;
 }
 
 
@@ -2342,6 +2342,7 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 	   it's large enough to safely divide it by small integer
 	   value. */
 
+	int duration = gen->iws_duration;
 	int enqueued = 0;
 
 	cw_tone_t tone;
@@ -2355,7 +2356,7 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 #else
 	const int n = 2; /* "small integer value" - used to have more tones per inter-word-space. */
 #endif
-	CW_TONE_INIT(&tone, 0, gen->iws_duration / n, CW_SLOPE_MODE_NO_SLOPES);
+	CW_TONE_INIT(&tone, 0, duration / n, CW_SLOPE_MODE_NO_SLOPES);
 	for (int i = 0; i < n; i++) {
 		if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
 			return CW_FAILURE;
@@ -2367,7 +2368,7 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 	   separate tone. Add value of gen->adjustment_space_duration to
 	   'duration' and enqueue resulting duration above. See how
 	   'additional_space_duration' is added to ics duration in
-	   cw_gen_enqueue_2u_ics_internal(). */
+	   cw_gen_enqueue_ics_internal(). */
 	if (gen->adjustment_space_duration > 0) {
 		CW_TONE_INIT(&tone, 0, gen->adjustment_space_duration, CW_SLOPE_MODE_NO_SLOPES);
 		if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
@@ -2412,10 +2413,9 @@ cw_ret_t cw_gen_enqueue_representation(cw_gen_t * gen, const char * representati
 		}
 	}
 
-	/* This function will add additional 2 Units. Together with 1 Unit of
-	   inter-mark-space added after last Mark, it will form a full 3-Unit
-	   inter-character-space. */
-	if (CW_SUCCESS != cw_gen_enqueue_2u_ics_internal(gen)) {
+	/* This function will enqueue just a right amount of space after the last
+	   inter-mark-space to form a 3-unit inter-character-space. */
+	if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
 		return CW_FAILURE;
 	}
 
@@ -2552,9 +2552,9 @@ cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character)
 		return CW_FAILURE;
 	}
 
-	/* This function will add additional 2 Units. Together with previous
-	   1 Unit, it will form a full 3-Unit inter-character-space. */
-	if (CW_SUCCESS != cw_gen_enqueue_2u_ics_internal(gen)) {
+	/* This function will add enough units afer the inter-mark-space to form
+	   a full 3-Unit inter-character-space. */
+	if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
 		return CW_FAILURE;
 	}
 
@@ -2842,6 +2842,8 @@ cw_ret_t cw_gen_enqueue_sk_begin_mark_internal(cw_gen_t * gen)
 */
 cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
 {
+	cw_ret_t cwret = CW_FAILURE;
+
 	if (gen->sound_system == CW_AUDIO_CONSOLE) {
 		/* FIXME: I think that enqueueing tone is not just a
 		   matter of generating it using generator, but also a
@@ -2855,14 +2857,13 @@ cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
 		   buzzer from generating a sound to being silent. */
 		cw_tone_t tone;
 		CW_TONE_INIT(&tone, 0, gen->quantum_duration, CW_SLOPE_MODE_NO_SLOPES);
-		return cw_tq_enqueue_internal(gen->tq, &tone);
+		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 	} else {
 		/* For soundcards a falling slope with volume from max
 		   to zero should be enough, but... */
 		cw_tone_t tone;
 		CW_TONE_INIT(&tone, gen->frequency, gen->tone_slope.duration, CW_SLOPE_MODE_FALLING_SLOPE);
-		cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
-
+		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 		if (CW_SUCCESS == cwret) {
 			/* ... but on some occasions, on some
 			   platforms, some sound systems may need to
@@ -2882,9 +2883,8 @@ cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
 			tone.is_forever = true;
 			cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 		}
-
-		return cwret;
 	}
+	return cwret;
 }
 
 
@@ -2937,7 +2937,8 @@ cw_ret_t cw_gen_enqueue_ik_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
 		break;
 	}
 
-	return cw_tq_enqueue_internal(gen->tq, &tone);
+	const cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	return cwret;
 }
 
 
