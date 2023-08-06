@@ -53,16 +53,19 @@ enum { CW_SYMBOL_IMS = ' ' };
 
 
 
-/* This is a structure that may be used in the future outside of libcw. It is
-   used in libcw tests. */
+/**
+   @brief Parameters describing timing of different elements (marks and
+   spaces) produced by a generator
+*/
 typedef struct {
-	int dot_duration;
-	int dash_duration;
-	int ims_duration;
-	int ics_duration;
-	int iws_duration;
-	int additional_space_duration;
-	int adjustment_space_duration;
+	int unit_duration;  /**< Duration of basic timing unit, derived from generator's sending speed. [microseconds] */
+	int dot_duration;   /**< Duration of a dot Mark. [microseconds] */
+	int dash_duration;  /**< Duration of a dash Mark. [microseconds] */
+	int ims_duration;   /**< Duration of inter-mark-space (i.e. the Space). [microseconds] */
+	int ics_duration;   /**< Duration of inter-character-space. [microseconds] */
+	int iws_duration;   /**< Duration of inter-word-space. [microseconds] */
+	int additional_space_duration; /**< Duration of additional space at the end of a character. [microseconds] */
+	int adjustment_space_duration; /**< Duration of adjustment space at the end of a word. [microseconds] */
 } cw_gen_durations_t;
 
 
@@ -132,15 +135,7 @@ struct cw_gen_struct {
 
 	   Be sure to read comment in cw_gen_sync_parameters_internal() on
 	   calculation of values of these parameters. */
-	int unit_duration;  /* Duration of basic timing unit, derived from generator's sending speed. [microseconds] */
-	int dot_duration;   /* Duration of a dot Mark. [microseconds] */
-	int dash_duration;  /* Duration of a dash Mark. [microseconds] */
-	int ims_duration;   /* Duration of inter-mark-space (i.e. the Space). [microseconds] */
-	int ics_duration;   /* Duration of inter-character-space. [microseconds] */
-	int iws_duration;   /* Duration of inter-word-space. [microseconds] */
-
-	int additional_space_duration; /* Duration of additional space at the end of a character. [microseconds] */
-	int adjustment_space_duration; /* Duration of adjustment space at the end of a word. [microseconds] */
+	cw_gen_durations_t durations;
 
 
 
