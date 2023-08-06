@@ -345,7 +345,7 @@ static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * stri
 		const double diff_percent = 100.0 * (duration_actual - duration_expected) / duration_expected;
 		fprintf(stderr, "[DEBUG] string = %12.2f, wav = %12.2f, diff = %7.3f%%, threshold = %.1f%%\n",
 		        string_element->duration, wav_element->duration, diff_percent, threshold);
-		if (diff_percent > threshold) {
+		if (fabs(diff_percent) > threshold) {
 			durations_mismatch++;
 		}
 	}

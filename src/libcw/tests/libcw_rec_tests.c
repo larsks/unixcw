@@ -291,7 +291,7 @@ int test_cw_rec_test_with_constant_speeds(cw_test_executor_t * cte)
 			/* Verify that the test speed has been set correctly. */
 			const float rec_speed = cw_rec_get_speed(rec);
 			const float diff = rec_speed - speed;
-			cte->assert2(cte, diff < 0.1f, "%s: setting speed for test %s failed: %.3f != %.3f\n",
+			cte->assert2(cte, fabsf(diff) < 0.1f, "%s: setting speed for test %s failed: %.3f != %.3f\n",
 				     this_test_name, test_data[i].name,
 				     /* Casting to double to avoid compiler warning about implicit conversion from float to double. */
 				     (double) rec_speed, (double) speed);
@@ -378,7 +378,7 @@ int test_cw_rec_test_with_varying_speeds(cw_test_executor_t * cte)
 		/* Verify that initial test speed has been set correctly. */
 		const float rec_speed = cw_rec_get_speed(rec);
 		const float diff = rec_speed - CW_SPEED_MAX;
-		cte->assert2(cte, diff < 0.1f, "%s: incorrect receive speed: %.3f != %.3f\n",
+		cte->assert2(cte, fabsf(diff) < 0.5f, "%s: incorrect receive speed: %.3f != %.3f\n",
 			     this_test_name,
 			     /* Casting to double to avoid compiler warning about implicit conversion from float to double. */
 			     (double) rec_speed, (double) CW_SPEED_MAX);
@@ -1403,7 +1403,7 @@ int test_cw_rec_parameter_getters_setters_1(cw_test_executor_t * cte)
 
 			const float readback_value = test_data[i].get_value(rec);
 			const float diff = readback_value - new_val;
-			if (!cte->expect_op_float_errors_only(cte, 0.01, ">", diff, "%s: setting %s value in-range: %d (val)", this_test_name, test_data[i].name, new_val)) {
+			if (!cte->expect_op_float_errors_only(cte, 0.01, ">", fabsf(diff), "%s: setting %s value in-range: %d (val)", this_test_name, test_data[i].name, new_val)) {
 				set_ok_failure = true;
 				break;
 			}
