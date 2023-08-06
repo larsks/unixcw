@@ -86,7 +86,7 @@ typedef struct test_data_t {
 
 static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string);
 static int get_elements_from_wav_file(const char * path, cw_elements_t * elements);
-static void elements_set_ideal_durations(cw_elements_t * elements, cw_durations_t * durations);
+static void elements_set_ideal_durations(cw_elements_t * elements, cw_gen_duration_parameters_t * durations);
 static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_elements_t * wav_elements);
 static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * string_elements, cw_elements_t * wav_elements);
 
@@ -164,7 +164,7 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 
 
 
-void elements_set_ideal_durations(cw_elements_t * elements, cw_durations_t * durations)
+void elements_set_ideal_durations(cw_elements_t * elements, cw_gen_duration_parameters_t * durations)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		elements->array[i].duration = ideal_duration_of_element(elements->array[i].type, durations);
@@ -185,7 +185,7 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 
 	/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
 	   wpm speed [microseconds]. */
-	cw_durations_t durations = { 0 };
+	cw_gen_duration_parameters_t durations = { 0 };
 	cw_gen_get_durations_internal(gen, &durations);
 	cw_durations_print(stderr, &durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
