@@ -28,7 +28,7 @@
 /**
    Get ideal (expected) duration of given element (dot, dash, spaces)
 */
-int ideal_duration_of_element(cw_element_type_t type, cw_gen_duration_parameters_t * durations)
+int ideal_duration_of_element(cw_element_type_t type, cw_gen_durations_t * durations)
 {
 	switch (type) {
 	case cw_element_type_dot:
@@ -51,7 +51,7 @@ int ideal_duration_of_element(cw_element_type_t type, cw_gen_duration_parameters
 
 
 
-void cw_durations_print(FILE * file, cw_gen_duration_parameters_t * durations)
+void cw_durations_print(FILE * file, cw_gen_durations_t * durations)
 {
 	fprintf(file, "[INFO ] dot duration        = %7d us\n", durations->dot_duration);
 	fprintf(file, "[INFO ] dash duration       = %7d us\n", durations->dash_duration);

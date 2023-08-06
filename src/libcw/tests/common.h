@@ -46,7 +46,7 @@ int test_rec_params_relations(cw_test_executor_t * cte, const cw_rec_parameters_
    @return cwt_retv_ok if test was executed to the end
    @return cwt_retv_err if test was interrupted
 */
-cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_duration_parameters_t * params, int speed);
+cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed);
 
 
 

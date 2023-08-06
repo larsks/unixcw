@@ -63,7 +63,7 @@ typedef struct {
 	int iws_duration;
 	int additional_space_duration;
 	int adjustment_space_duration;
-} cw_gen_duration_parameters_t;
+} cw_gen_durations_t;
 
 
 
@@ -465,7 +465,7 @@ void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
 					   int * iws_duration,
 					   int * additional_space_duration,
 					   int * adjustment_space_duration);
-void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_duration_parameters_t * durations);
+void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_durations_t * durations);
 
 
 

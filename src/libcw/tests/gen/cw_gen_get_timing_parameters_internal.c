@@ -68,7 +68,7 @@ cwt_retv test_cw_gen_get_timing_parameters_internal(cw_test_executor_t * cte)
 		   this. */
 		cw_gen_set_speed(gen, speed);
 
-		cw_gen_duration_parameters_t params = {
+		cw_gen_durations_t params = {
 			.dot_duration = -1,
 			.dash_duration = -1,
 			.ims_duration = -1,

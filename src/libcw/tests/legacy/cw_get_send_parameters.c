@@ -18,7 +18,7 @@ int legacy_api_test_cw_get_send_parameters(cw_test_executor_t * cte)
 
 		cw_set_send_speed(speed);
 
-		cw_gen_duration_parameters_t params = {
+		cw_gen_durations_t params = {
 			.dot_duration = -1,
 			.dash_duration = -1,
 			.ims_duration = -1,

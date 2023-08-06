@@ -133,7 +133,7 @@ int test_rec_params_relations(cw_test_executor_t * cte, const cw_rec_parameters_
 
 
 
-cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_duration_parameters_t * params, int speed)
+cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed)
 {
 	/* Let's hope that those divisions (one when calculating dot duration
 	   in gen, and the other here) work out correctly. */
