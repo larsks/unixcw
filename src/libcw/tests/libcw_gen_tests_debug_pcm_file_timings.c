@@ -134,10 +134,14 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
-	/* Test string that will be played by test. Length of string may have
-	   impact on required value of ELEMENTS_COUNT_MAX. */
-	//static const char * const g_input_string = "one two three four";
-	const char * const input_string = " abc ";
+	/*
+	  Test string that will be played by test. Length of string may have
+	  impact on required value of ELEMENTS_COUNT_MAX.
+
+	  Make sure to include some inter-word-spaces in the text.
+	*/
+	const char * const input_string = " The fox over the lazy dog";
+	//const char * const input_string = " abc ";
 
 
 	cwt_retv retv = cwt_retv_ok;
@@ -331,13 +335,6 @@ static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * stri
 			states_mismatch++;
 			continue;
 		}
-
-		if (string_element->type != cw_element_type_dot && string_element->type != cw_element_type_dash) {
-			/* For now let's focus on elements that are correct in current
-			   rev. of code. */
-			continue;
-		}
-
 
 		const double threshold = 1.0; /* 1% of difference is still allowed. */
 		const double duration_expected = string_element->duration;
