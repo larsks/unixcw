@@ -2781,8 +2781,6 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
 	  adjustment, and the length of a Dash as three Dot lengths.
 	  The weighting adjustment is by adding or subtracting a
 	  length based on 50 % as a neutral weighting.
-
-	  TODO: use cw_gen_calculate_durations_internal() here.
 	*/
 	gen->unit_duration = CW_DOT_CALIBRATION / gen->send_speed;
 	const int weighting_duration = (2 * (gen->weighting - 50) * gen->unit_duration) / 100;
@@ -3488,13 +3486,16 @@ cw_ret_t cw_gen_pick_device_name_internal(const char * alternative_device_name, 
 
 
 
-void cw_gen_calculate_durations_internal(cw_gen_durations_t * durations, int speed, int weighting)
+int cw_gen_get_shortest_dot_duration_internal(void)
 {
-	durations->unit_duration = CW_DOT_CALIBRATION / speed;
-	durations->weighting_duration = (2 * (weighting - 50) * durations->unit_duration) / 100;
-	durations->dot_duration = durations->unit_duration + durations->weighting_duration;
+	const int speed = CW_SPEED_MAX;
+	const int weighting = CW_WEIGHTING_MIN;
 
-	return;
+	const int unit_duration = CW_DOT_CALIBRATION / speed;
+	const int weighting_duration = (2 * (weighting - 50) * unit_duration) / 100;
+	const int dot_duration = unit_duration + weighting_duration;
+
+	return dot_duration;
 }
 
 

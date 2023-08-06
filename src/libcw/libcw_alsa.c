@@ -1335,14 +1335,13 @@ static void cw_alsa_get_intended_period_size_internal(const cw_gen_t * gen, snd_
 		/* TODO: maybe we could calculate the period size for
 		   *current* speed and re-configure ALSA hw buffer
 		   every time the speed changes? */
-		cw_gen_durations_t durations = { 0 };
-		cw_gen_calculate_durations_internal(&durations, CW_SPEED_MAX, CW_WEIGHTING_MIN);
+		const int shortest_dot_duration = cw_gen_get_shortest_dot_duration_internal();
 		cw_debug_msg (&cw_debug_object, CW_DEBUG_SOUND_SYSTEM, CW_DEBUG_DEBUG,
-			      MSG_PREFIX "shortest dot = %d [us]", durations.dot_duration);
+			      MSG_PREFIX "shortest dot = %d [us]", shortest_dot_duration);
 
 		/* Now calculate count of ALSA frames that will be
 		   needed to play that shortest dot. */
-		const uint64_t n_alsa_frames_smallest = gen->sample_rate * durations.dot_duration / 1000000;
+		const uint64_t n_alsa_frames_smallest = gen->sample_rate * shortest_dot_duration / 1000000;
 		cw_debug_msg (&cw_debug_object, CW_DEBUG_SOUND_SYSTEM, CW_DEBUG_DEBUG,
 			      MSG_PREFIX "n_samples for shortest dot = %"PRIu64" [samples]", n_alsa_frames_smallest);
 
