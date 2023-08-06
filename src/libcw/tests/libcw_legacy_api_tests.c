@@ -1619,7 +1619,7 @@ cwt_retv legacy_api_test_gen_remove_last_character(cw_test_executor_t * cte)
 
 		   Some cases of buffer underrun have been fixed with calls
 		   to snd_pcm_drain(), but perhaps not all of them. */
-		cw_usleep_internal(1000 * 1000);
+		cw_usleep_internal(1 * CW_USECS_PER_SEC);
 
 		if (failure) {
 			break;

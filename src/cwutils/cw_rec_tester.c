@@ -441,7 +441,7 @@ static void * cw_rec_tester_receiver_input_generator_fn(void * arg_tester)
 
 	/* Wait for all characters to be played out. */
 	cw_tq_wait_for_level_internal(tester->gen->tq, 0);
-	cw_usleep_internal(1000 * 1000);
+	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 
 	cw_gen_delete(&tester->gen); /* TODO (2022.01.03) if we are doing delete() in this function, then should we also do new() here? */
 	tester->generating_in_progress = false;

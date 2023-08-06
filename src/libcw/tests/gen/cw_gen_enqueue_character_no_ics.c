@@ -193,7 +193,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 		}
 
 		cw_gen_wait_for_queue_level(gen, 0);
-		cw_usleep_internal(1000 * 1000);
+		cw_usleep_internal(1 * CW_USECS_PER_SEC);
 
 		// Clearing of receiver appears to be unnecessary.
 		//cw_easy_rec_clear(easy_rec);
