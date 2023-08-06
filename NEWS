@@ -1,3 +1,11 @@
+version 3.6.1 / 2023-xx-yy
+
+  libcw:
+
+  - Fixing 'cw timing' problem
+    Commit faa8c85052b30a788672568cab083791f0043b78
+
+
 version 3.6.0 / 2021-01-17
 
   libcw:
