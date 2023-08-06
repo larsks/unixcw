@@ -34,6 +34,7 @@
 
 
 
+#include "common.h"
 #include "libcw_debug.h"
 #include "libcw_gen.h"
 #include "libcw_gen_tests.h"
@@ -54,54 +55,6 @@ extern const char * test_invalid_strings[];
 
 static cwt_retv test_cw_gen_new_start_stop_delete_sub(cw_test_executor_t * cte, const char * function_name, bool do_new, bool do_start, bool do_stop, bool do_delete);
 static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, int seconds);
-
-
-
-
-/**
-   @brief Prepare new generator, possibly with parameter values passed through command line
-
-   Test helper function.
-
-   @reviewed on 2020-05-07
-
-   @return cwt_retv_ok on success
-   @return cwt_retv_err on failure
-*/
-cwt_retv gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
-{
-	*gen = cw_gen_new(&cte->current_gen_conf);
-	if (!*gen) {
-		cte->log_error(cte, "Can't create generator, stopping the test\n");
-		return cwt_retv_err;
-	}
-
-	cw_gen_reset_parameters_internal(*gen);
-	cw_gen_sync_parameters_internal(*gen);
-	cw_gen_set_speed(*gen, cte->config->send_speed);
-	cw_gen_set_frequency(*gen, cte->config->frequency);
-
-	return cwt_retv_ok;
-}
-
-
-
-
-/**
-   @brief Delete @param gen, set the pointer to NULL
-
-   Test helper function.
-
-   @reviewed on 2020-05-07
-*/
-void gen_destroy(cw_gen_t ** gen)
-{
-	if (NULL != gen) {
-		if (NULL != *gen) {
-			cw_gen_delete(gen);
-		}
-	}
-}
 
 
 
@@ -954,7 +907,7 @@ cwt_retv test_cw_gen_enqueue_primitives(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (cwt_retv_ok != gen_setup(cte, &gen)) {
+	if (0 != helper_gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1027,7 +980,7 @@ cwt_retv test_cw_gen_enqueue_primitives(cw_test_executor_t * cte)
 		cte->expect_op_int(cte, false, "==", failure, "enqueue iws internal()");
 	}
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1053,7 +1006,7 @@ cwt_retv test_cw_gen_enqueue_representations(cw_test_executor_t * cte)
 	   representation represents a supported character. */
 
 	cw_gen_t * gen = NULL;
-	if (cwt_retv_ok != gen_setup(cte, &gen)) {
+	if (0 != helper_gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1118,7 +1071,7 @@ cwt_retv test_cw_gen_enqueue_representations(cw_test_executor_t * cte)
 	   way. */
 	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 #endif
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1140,7 +1093,7 @@ cwt_retv test_cw_gen_enqueue_character(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (cwt_retv_ok != gen_setup(cte, &gen)) {
+	if (0 != helper_gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1195,7 +1148,7 @@ cwt_retv test_cw_gen_enqueue_character(cw_test_executor_t * cte)
 	}
 
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1217,7 +1170,7 @@ cwt_retv test_cw_gen_enqueue_string(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (cwt_retv_ok != gen_setup(cte, &gen)) {
+	if (0 != helper_gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1268,7 +1221,7 @@ cwt_retv test_cw_gen_enqueue_string(cw_test_executor_t * cte)
 		cte->expect_op_int(cte, false, "==", failure, "enqueue string(<invalid>)");
 	}
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 

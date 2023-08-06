@@ -29,59 +29,98 @@
 
 
 
+#include <errno.h>
+#include <signal.h>
+
+#include "../libcw_gen.h"
+#include "../libcw_rec.h"
+#include "../libcw_utils.h"
 #include "common.h"
 
 
 
 
-/**
-   @brief Setup test environment for a test of legacy function
-
-   @param start_gen whether a prepared generator should be started
-
-   @reviewed on 2020-10-04
-*/
 int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen)
 {
 	if (CW_SUCCESS != cw_generator_new(cte->current_gen_conf.sound_system, cte->current_gen_conf.sound_device)) {
 		cte->log_error(cte, "Can't create generator, stopping the test\n");
-		return cwt_retv_err;
+		return -1;
 	}
 	if (start_gen) {
 		if (CW_SUCCESS != cw_generator_start()) {
 			cte->log_error(cte, "Can't start generator, stopping the test\n");
 			cw_generator_delete();
-			return cwt_retv_err;
+			return -1;
 		}
 	}
 
 	cw_reset_send_receive_parameters();
-	cw_set_send_speed(30);
-	cw_set_receive_speed(30);
+
+	if (CW_SUCCESS != cw_set_send_speed(cte->config->send_speed)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator speed %d\n", __func__, __LINE__, cte->config->send_speed);
+	}
+	if (CW_SUCCESS != cw_set_frequency(cte->config->frequency)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator frequency %d\n", __func__, __LINE__, cte->config->frequency);
+	}
+	if (CW_SUCCESS != cw_set_volume(cte->config->volume)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator volume %d\n", __func__, __LINE__, cte->config->volume);
+	}
+
 	cw_disable_adaptive_receive();
 	cw_reset_receive_statistics();
 	cw_unregister_signal_handler(SIGUSR1);
 	errno = 0;
 
-	return cwt_retv_ok;
+	return 0;
 }
 
 
 
 
-/**
-   @brief Deconfigure test environment after running a test of legacy function
-
-   @reviewed on 2020-10-04
-*/
 int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor_t * cte)
 {
-	sleep(1);
+	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 	cw_generator_stop();
-	sleep(1);
+	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 	cw_generator_delete();
 
 	return 0;
+}
+
+
+
+
+int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
+{
+	*gen = cw_gen_new(&cte->current_gen_conf);
+	if (!*gen) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, stopping the test\n", __func__, __LINE__);
+		return -1;
+	}
+	cw_gen_reset_parameters_internal(*gen);
+	if (CW_SUCCESS != cw_gen_set_speed(*gen, cte->config->send_speed)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting speed %d\n", __func__, __LINE__, cte->config->send_speed);
+		return -1;
+	}
+	if (CW_SUCCESS != cw_gen_set_frequency(*gen, cte->config->frequency)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting frequency %d\n", __func__, __LINE__, cte->config->frequency);
+		return -1;
+	}
+	if (CW_SUCCESS != cw_gen_set_volume(*gen, cte->config->volume)) {
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting volume %d\n", __func__, __LINE__, cte->config->volume);
+		return -1;
+	}
+	cw_gen_sync_parameters_internal(*gen);
+
+	return 0;
+}
+
+
+
+
+void helper_gen_destroy(cw_gen_t ** gen)
+{
+	cw_gen_delete(gen); /* This function sets **gen to NULL. */
 }
 
 

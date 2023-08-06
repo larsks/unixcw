@@ -26,6 +26,7 @@
 
 #include <cw_easy_rec.h>
 
+#include "common.h"
 #include "libcw.h"
 #include "libcw2.h"
 #include "libcw_debug.h"
@@ -76,7 +77,7 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s", __func__);
 
 	cw_gen_t * gen = NULL;
-	if (cwt_retv_ok != gen_setup(cte, &gen)) {
+	if (0 != helper_gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -144,7 +145,7 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 
 	cw_easy_rec_stop(easy_rec);
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 	cw_easy_rec_delete(&easy_rec);
 
 	cte->expect_op_int(cte, false, "==", failure, "remove last character");

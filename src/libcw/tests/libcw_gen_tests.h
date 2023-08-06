@@ -30,9 +30,6 @@ int test_cw_gen_enqueue_representations(cw_test_executor_t * cte);
 int test_cw_gen_enqueue_character(cw_test_executor_t * cte);
 int test_cw_gen_enqueue_string(cw_test_executor_t * cte);
 
-cwt_retv gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
-void gen_destroy(cw_gen_t ** gen);
-
 
 
 

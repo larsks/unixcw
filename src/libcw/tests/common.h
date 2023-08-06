@@ -51,8 +51,54 @@ cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durati
 
 
 
+/**
+   @brief Setup test environment for a test of legacy function
+
+   @param start_gen whether a prepared generator should be started
+
+   @reviewed on 2020-10-04
+
+   @return 0 on success
+   @return -1 on failure
+*/
 int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen);
+
+
+
+
+/**
+   @brief Deconfigure test environment after running a test of legacy function
+
+   @reviewed on 2020-10-04
+*/
 int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor_t * cte);
+
+
+
+
+/**
+   @brief Prepare new generator, possibly with parameter values passed through command line
+
+   Test helper function.
+
+   @reviewed on 2023-08-06
+
+   @return 0 on success
+   @return -1 on failure
+*/
+int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
+
+
+
+
+/**
+   @brief Delete @param gen, set the pointer to NULL
+
+   Test helper function.
+
+   @reviewed on 2023-08-06
+*/
+void helper_gen_destroy(cw_gen_t ** gen);
 
 
 

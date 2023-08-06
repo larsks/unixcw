@@ -36,7 +36,7 @@
 
 
 
-
+#include "common.h"
 #include "libcw_utils.h"
 #include "libcw_tq.h"
 #include "libcw_tq_internal.h"
@@ -56,39 +56,10 @@ static int test_cw_tq_enqueue_internal(cw_test_executor_t * cte, cw_tone_queue_t
 static int test_cw_tq_dequeue_internal(cw_test_executor_t * cte, cw_tone_queue_t * tq);
 
 
-static void gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
-static void gen_destroy(cw_gen_t ** gen);
 static void enqueue_tone_low_level(cw_test_executor_t * cte, cw_tone_queue_t * tq, const cw_tone_t * tone);
 static cw_tone_queue_t * test_cw_tq_capacity_test_init(cw_test_executor_t * cte, size_t capacity, size_t high_water_mark, int head_shift);
 static void test_helper_tq_callback(void * data);
 static cwt_retv test_helper_fill_queue(cw_test_executor_t * cte, cw_tone_queue_t * tq, size_t count);
-
-
-
-
-static void gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
-{
-	*gen = cw_gen_new(&cte->current_gen_conf);
-	if (!*gen) {
-		cte->log_error(cte, "Can't create generator, stopping the test\n");
-		return;
-	}
-
-	cw_gen_reset_parameters_internal(*gen);
-	cw_gen_sync_parameters_internal(*gen);
-	cw_gen_set_speed(*gen, 30);
-	cw_gen_set_volume(*gen, 70);
-
-	return;
-}
-
-
-
-
-static void gen_destroy(cw_gen_t ** gen)
-{
-	cw_gen_delete(gen);
-}
 
 
 
@@ -1208,7 +1179,10 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	gen_setup(cte, &gen);
+	if (0 != helper_gen_setup(cte, &gen)) {
+		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
+		return -1;
+	}
 	/* Notice that we start the generator later. */
 
 	int freq_min, freq_max;
@@ -1354,7 +1328,7 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 	cte->expect_op_int(cte, CW_SUCCESS, "==", cwret, "tq gen operations A: final wait for level 0");
 
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1375,7 +1349,10 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 {
 	cw_gen_t * gen = NULL;
-	gen_setup(cte, &gen);
+	if (0 != helper_gen_setup(cte, &gen)) {
+		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
+		return -1;
+	}
 	const size_t capacity = cw_tq_capacity_internal(gen->tq);
 	const int level = lrand48() % (capacity / 2);
 
@@ -1466,7 +1443,7 @@ int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 	cw_tq_enqueue_internal(gen->tq, &tone);
 	cw_tq_wait_for_level_internal(gen->tq, 0);
 
-	gen_destroy(&gen);
+	helper_gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1669,7 +1646,10 @@ int test_cw_tq_callback(cw_test_executor_t * cte)
 
 	for (int i = 1; i < loops; i++) { /* TODO: the test doesn't work for i == 0. This needs to be communicated in documentation. */
 
-		gen_setup(cte, &gen);
+		if (0 != helper_gen_setup(cte, &gen)) {
+			cte->log_error(cte, "%s:%d: Failed to create generator in iteration %d\n", __func__, __LINE__, i);
+			return -1;
+		}
 
 		struct cw_callback_struct test_data;
 		memset(&test_data, 0, sizeof (test_data));
@@ -1731,7 +1711,7 @@ int test_cw_tq_callback(cw_test_executor_t * cte)
 		}
 
 		cw_tq_flush_internal(gen->tq);
-		gen_destroy(&gen);
+		helper_gen_destroy(&gen);
 	}
 
 	cte->expect_op_int(cte, false, "==", register_failure, "registering low level callback");
