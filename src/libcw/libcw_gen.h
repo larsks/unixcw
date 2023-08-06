@@ -149,6 +149,7 @@ struct cw_gen_struct {
 
 	   Be sure to read comment in cw_gen_sync_parameters_internal() on
 	   calculation of values of these parameters. */
+	int unit_duration;  /* Duration of basic timing unit, derived from generator's sending speed. [microseconds] */
 	int dot_duration;   /* Duration of a dot Mark. [microseconds] */
 	int dash_duration;  /* Duration of a dash Mark. [microseconds] */
 	int ims_duration;   /* Duration of inter-mark-space (i.e. the Space). [microseconds] */
@@ -461,6 +462,13 @@ struct cw_gen_struct {
 	cw_pa_data_t pa_data;
 #endif
 
+	/*
+	  Count of units of space enqueued in generator.
+	  When enqueueing ims, ics or iws, increase the counter accordingly.
+	  When enqueueing a mark (dot or dash), reset the counter.
+	  On errors reset the counter.
+	*/
+	int space_units_count;
 };
 
 

@@ -111,6 +111,10 @@
 /* Measuring how long some thread operations take. */
 #define LIBCW_GEN_DEBUG_THREAD_TIMING   1
 
+#define UNITS_PER_IMS 1
+#define UNITS_PER_ICS 3
+#define UNITS_PER_IWS 7
+
 
 
 
@@ -397,6 +401,8 @@ cw_ret_t cw_gen_silence_internal(cw_gen_t * gen)
 	CW_TONE_INIT(&tone, 0, gen->quantum_duration, CW_SLOPE_MODE_NO_SLOPES);
 	tone.debug_id = 'd';
 	cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	/* Reset on stopping of the generator. */
+	gen->space_units_count = 0;
 	cw_gen_wait_for_queue_level(gen, 0);
 	cw_gen_wait_for_end_of_current_tone(gen);
 
@@ -435,6 +441,8 @@ cw_ret_t cw_gen_silence_internal(cw_gen_t * gen)
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, 0, gen->quantum_duration, CW_SLOPE_MODE_NO_SLOPES);
 	cw_ret_t status = cw_tq_enqueue_internal(gen->tq, &tone);
+	/* Reset on stopping of the generator. */
+	gen->space_units_count = 0;
 
 	if (gen->sound_system == CW_AUDIO_NULL
 	    || gen->sound_system == CW_AUDIO_OSS
@@ -2208,14 +2216,20 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 		CW_TONE_INIT(&tone, gen->frequency, gen->dot_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		tone.is_first = is_first;
 		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+		/* Enqueueing a mark means resetting of spaces counter. */
+		gen->space_units_count = 0;
 	} else if (mark == CW_DASH_REPRESENTATION) {
 		cw_tone_t tone;
 		CW_TONE_INIT(&tone, gen->frequency, gen->dash_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		tone.is_first = is_first;
 		cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+		/* Enqueueing a mark means resetting of spaces counter. */
+		gen->space_units_count = 0;
 	} else {
 		errno = EINVAL;
 		cwret = CW_FAILURE;
+		/* Reset on error. */
+		gen->space_units_count = 0;
 	}
 
 	if (CW_SUCCESS != cwret) {
@@ -2226,6 +2240,8 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, 0, gen->ims_duration, CW_SLOPE_MODE_NO_SLOPES);
 	cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	/* Enqueueing an ims. Record this fact in space units counter. */
+	gen->space_units_count = UNITS_PER_IMS;
 	return cwret;
 }
 
@@ -2245,7 +2261,7 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
    Inter-character adjustment space is added at the end.
 
    @internal
-   @reviewed 2020-08-06
+   @reviewed 2023-08-06
    @endinternal
 
    @param[in] gen generator in which to enqueue the space
@@ -2258,12 +2274,49 @@ cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen)
 	/* Synchronize low-level timing parameters. */
 	cw_gen_sync_parameters_internal(gen);
 
-	int duration = gen->ics_duration;
+	/* The ics enqueued here should be shorter by already enqueued/played
+	   spaces. Calculate the duration of shorter ics depending on what kind
+	   of spaces were already enqueued before. */
+	int ics_duration = 0;
+	switch (gen->space_units_count) {
+	case 0:
+		/* It's possible that dot or dash was enqueued without ims with
+		   cw_gen_enqueue_ik_symbol_no_ims_internal(), or maybe the count was
+		   reset on error, so enqueue ics with its full duration. */
+		ics_duration = gen->ics_duration;
+		break;
+	case UNITS_PER_IMS:
+		/* This ics is appended after already enqueued ims. Duration of the
+		   tone that we enqueue here should be shorter by ims. The ims and
+		   current shortened tone will together form 3-units ics. */
+		ics_duration = gen->ics_duration - (UNITS_PER_IMS * gen->unit_duration);
+		break;
+	case UNITS_PER_ICS:
+	case UNITS_PER_IWS:
+		/* libcw API provides functions for enqueueing ics or iws, so it's
+		   possible that application will enqueue multiple ics spaces or mix
+		   of ics and iws. So enqueue this ics in its full length. */
+		ics_duration = gen->ics_duration;
+		break;
+	default:
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_PARAMETERS, CW_DEBUG_ERROR,
+		              MSG_PREFIX "Unexpected count of space units in 'enqueue ics': %d", gen->space_units_count);
+		ics_duration = gen->ics_duration;
+		break;
+	}
+
+	/* Failsafe. */
+	if (ics_duration < 0) {
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_PARAMETERS, CW_DEBUG_ERROR,
+		              MSG_PREFIX "Negative value of ics duration: %d", ics_duration);
+		ics_duration = gen->ics_duration;
+	}
 
 	/* Enqueue ics with calculated duration, plus any additional inter-character gap. */
 	cw_tone_t tone;
-	CW_TONE_INIT(&tone, 0, duration + gen->additional_space_duration, CW_SLOPE_MODE_NO_SLOPES);
+	CW_TONE_INIT(&tone, 0, ics_duration + gen->additional_space_duration, CW_SLOPE_MODE_NO_SLOPES);
 	const cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	gen->space_units_count = UNITS_PER_ICS;
 	return cwret;
 }
 
@@ -2289,7 +2342,7 @@ cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen)
    Inter-word adjustment space is added at the end.
 
    @internal
-   @reviewed 2020-08-06
+   @reviewed 2023-08-06
    @endinternal
 
    @param[in] gen generator in which to enqueue the space
@@ -2301,6 +2354,49 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 {
 	/* Synchronize low-level timing parameters. */
 	cw_gen_sync_parameters_internal(gen);
+
+	/* The iws enqueued here should be shorter by already enqueued/played
+	   spaces. Calculate the duration of shorter iws depending on what kind
+	   of spaces were already enqueued before. */
+	int iws_duration = 0;
+	switch (gen->space_units_count) {
+	case 0:
+		/* We may get here when we only begin to play some string, or when
+		   some reset of space_units_count was done, or when previous
+		   element was an iws. This iws should have full duration. */
+		iws_duration = gen->iws_duration;
+		break;
+	case UNITS_PER_IMS:
+		/* This iws is appended after already enqueued ims (e.g. at the end
+		   of a word, when ' ' space character is played). Duration of the
+		   tone that we enqueue here should be shorter by ims. The ims and
+		   current shortened tone will together form 7-unit iws. */
+		iws_duration = gen->iws_duration - (UNITS_PER_IMS * gen->unit_duration);
+		break;
+	case UNITS_PER_ICS:
+		/* This iws is appended after already enqueued ics. Duration of the
+		   tone that we enqueue here should be shorter by ics. The ics and
+		   current shortened tone will together form 7-unit iws. */
+		iws_duration = gen->iws_duration - (UNITS_PER_ICS * gen->unit_duration);
+		break;
+	case UNITS_PER_IWS:
+		/* This is probably a situation when application wants to enqueue two
+		   or more ' ' characters. Enqueue full duration of inter-word-space. */
+		iws_duration = gen->iws_duration;
+		break;
+	default:
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_PARAMETERS, CW_DEBUG_ERROR,
+		              MSG_PREFIX "Unexpected count of space units in 'enqueue iws': %d", gen->space_units_count);
+		iws_duration = gen->iws_duration;
+		break;
+	};
+
+	/* Failsafe. */
+	if (iws_duration < 0) {
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_PARAMETERS, CW_DEBUG_ERROR,
+		              MSG_PREFIX "Negative value of iws duration: %d", iws_duration);
+		iws_duration = gen->iws_duration;
+	}
 
 	/* Send silence for the word delay period, plus any adjustment
 	   that may be needed at end of word. Make it in two tones,
@@ -2342,9 +2438,7 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 	   it's large enough to safely divide it by small integer
 	   value. */
 
-	int duration = gen->iws_duration;
 	int enqueued = 0;
-
 	cw_tone_t tone;
 #if 0
 	/* This section is incorrect. Enable this section only for
@@ -2356,9 +2450,11 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 #else
 	const int n = 2; /* "small integer value" - used to have more tones per inter-word-space. */
 #endif
-	CW_TONE_INIT(&tone, 0, duration / n, CW_SLOPE_MODE_NO_SLOPES);
+	CW_TONE_INIT(&tone, 0, iws_duration / n, CW_SLOPE_MODE_NO_SLOPES);
 	for (int i = 0; i < n; i++) {
 		if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
+			/* Reset on error. */
+			gen->space_units_count = 0;
 			return CW_FAILURE;
 		}
 		enqueued++;
@@ -2372,6 +2468,8 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 	if (gen->adjustment_space_duration > 0) {
 		CW_TONE_INIT(&tone, 0, gen->adjustment_space_duration, CW_SLOPE_MODE_NO_SLOPES);
 		if (CW_SUCCESS != cw_tq_enqueue_internal(gen->tq, &tone)) {
+			/* Reset on error. */
+			gen->space_units_count = 0;
 			return CW_FAILURE;
 		}
 		enqueued++;
@@ -2381,6 +2479,10 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 		      MSG_PREFIX "enqueued %d tones per iws, tq len = %zu",
 		      enqueued, cw_tq_length_internal(gen->tq));
 
+	/* We don't really need to store the information that UNITS_PER_IWS units
+	   have been enqueued. It's safe to reset the counter here and let the
+	   next 'enqueue space' call start from zero. */
+	gen->space_units_count = 0;
 	return CW_SUCCESS;
 }
 
@@ -2552,10 +2654,13 @@ cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character)
 		return CW_FAILURE;
 	}
 
-	/* This function will add enough units afer the inter-mark-space to form
-	   a full 3-Unit inter-character-space. */
-	if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
-		return CW_FAILURE;
+	/* In the context of this function adding ics after freshly enqueued iws
+	   doesn't make sense: iws should not be followed by ics. */
+	if (' ' != character) {
+		/* This function will add enough units to form a full 3-Unit inter-character-space. */
+		if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
+			return CW_FAILURE;
+		}
 	}
 
 	return CW_SUCCESS;
@@ -2679,43 +2784,30 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
 
 	  TODO: use cw_gen_calculate_durations_internal() here.
 	*/
-	const int unit_duration = CW_DOT_CALIBRATION / gen->send_speed;
-	const int weighting_duration = (2 * (gen->weighting - 50) * unit_duration) / 100;
-	gen->dot_duration = unit_duration + weighting_duration;
+	gen->unit_duration = CW_DOT_CALIBRATION / gen->send_speed;
+	const int weighting_duration = (2 * (gen->weighting - 50) * gen->unit_duration) / 100;
+	gen->dot_duration = gen->unit_duration + weighting_duration;
 	gen->dash_duration = 3 * gen->dot_duration;
 
-	/* In proper Morse code timing the following three rules are given:
-	   1. Duration of inter-mark-space is one Unit, perhaps adjusted.
-	   2. Duration of inter-character-space is three Units total.
-	   3. Duration of inter-word-space is seven Units total.
+	/*
+	  The duration of inter-mark-space is adjusted by 28/22 times
+	  weighting length to keep PARIS calibration correctly
+	  timed (PARIS has 22 full units, and 28 empty ones).
+	  Inter-mark-space and end of character delays take
+	  weightings into account.
+	*/
+	const int w = (28 * weighting_duration) / 22;
 
-	   ics_duration and iws_duration variables are
-	   *additional* durations.  Notice how they are calculated
-	   below. They aren't full 3 units and 7 units.
-	   inter-character-space: is 2 Units, which takes into account
-	   preceding one inter-mark-space added after a Mark,
-	   inter-word-space: is 5 Units, which takes into account preceding
-	   inter-character-space.
-
-	   So these two durations are *additional* ones, i.e. in addition to
-	   (already existing) inter-mark-space or inter-character-space.
-	   Whether this is good or bad idea to calculate them like this is a
-	   separate topic. Just be aware of this fact.
-
-	   TODO: make sure that we never add inter-word-space after
-	   inter-character-space which was added after inter-mark-space. That
-	   would sum up to 8 Units total, and a proper inter-word-space is 7
-	   Units.
-
-	   The duration of inter-mark-space is adjusted by 28/22 times
-	   weighting length to keep PARIS calibration correctly
-	   timed (PARIS has 22 full units, and 28 empty ones).
-	   Inter-mark-space and end of character delays take
-	   weightings into account. */
-	gen->ims_duration = unit_duration - (28 * weighting_duration) / 22;
-	gen->ics_duration = 3 * unit_duration - gen->ims_duration;
-	gen->iws_duration = 7 * unit_duration - gen->ics_duration;
-	gen->additional_space_duration = gen->gap * unit_duration;
+	/*
+	  In proper Morse code timing the following three rules are given:
+	  1. Duration of inter-mark-space is one Unit, perhaps adjusted.
+	  2. Duration of inter-character-space is three Units total.
+	  3. Duration of inter-word-space is seven Units total.
+	*/
+	gen->ims_duration = 1 * gen->unit_duration - w;
+	gen->ics_duration = 3 * gen->unit_duration + w;
+	gen->iws_duration = 7 * gen->unit_duration - w;
+	gen->additional_space_duration = gen->gap * gen->unit_duration;
 
 	/* For "Farnsworth", there also needs to be an adjustment
 	   delay added to the end of words, otherwise the rhythm is
@@ -2789,6 +2881,8 @@ cw_ret_t cw_gen_enqueue_sk_begin_mark_internal(cw_gen_t * gen)
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, gen->frequency, gen->tone_slope.duration, CW_SLOPE_MODE_RISING_SLOPE);
 	cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	/* Enqueueing a mark, so reset counter of enqueued space units. */
+	gen->space_units_count = 0;
 	if (cwret != CW_SUCCESS) {
 		cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_TONE_QUEUE, CW_DEBUG_ERROR,
 			      MSG_PREFIX "enqueue begin mark: failed to enqueue rising slope: '%s'", strerror(errno));
@@ -2806,6 +2900,8 @@ cw_ret_t cw_gen_enqueue_sk_begin_mark_internal(cw_gen_t * gen)
 	CW_TONE_INIT(&tone, gen->frequency, gen->quantum_duration, CW_SLOPE_MODE_NO_SLOPES);
 	tone.is_forever = true;
 	cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	/* Enqueueing a mark, so reset counter of enqueued space units. */
+	gen->space_units_count = 0;
 	if (cwret != CW_SUCCESS) {
 		cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_TONE_QUEUE, CW_DEBUG_ERROR,
 			      MSG_PREFIX "enqueue begin mark: failed to enqueue forever tone: '%s'", strerror(errno));
@@ -2884,6 +2980,12 @@ cw_ret_t cw_gen_enqueue_sk_begin_space_internal(cw_gen_t * gen)
 			cwret = cw_tq_enqueue_internal(gen->tq, &tone);
 		}
 	}
+
+	/* The function enqueues 'space', this 'space' means just 'silence'.
+	   Reset space unit counts because no meaningful 'space units' have been
+	   enqueued. */
+	gen->space_units_count = 0;
+
 	return cwret;
 }
 
@@ -2923,17 +3025,25 @@ cw_ret_t cw_gen_enqueue_ik_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
 	switch (symbol) {
 	case CW_DOT_REPRESENTATION:
 		CW_TONE_INIT(&tone, gen->frequency, gen->dot_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
+		/* Enqueueing a mark means resetting of spaces counter. */
+		gen->space_units_count = 0;
 		break;
 
 	case CW_DASH_REPRESENTATION:
 		CW_TONE_INIT(&tone, gen->frequency, gen->dash_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
+		/* Enqueueing a mark means resetting of spaces counter. */
+		gen->space_units_count = 0;
 		break;
 
 	case CW_SYMBOL_IMS:
 		CW_TONE_INIT(&tone, 0, gen->ims_duration, CW_SLOPE_MODE_NO_SLOPES);
+		/* Enqueueing an ims. Record this fact in space units counter. */
+		gen->space_units_count = UNITS_PER_IMS;
 		break;
 	default:
-		cw_assert (0, MSG_PREFIX "unknown key symbol '%d'", symbol);
+		cw_assert (0, MSG_PREFIX "unknown iambic keyer symbol '%d'", symbol);
+		/* Reset on error. */
+		gen->space_units_count = 0;
 		break;
 	}
 
