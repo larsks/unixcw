@@ -111,6 +111,12 @@
 /* Measuring how long some thread operations take. */
 #define LIBCW_GEN_DEBUG_THREAD_TIMING   1
 
+/*
+  In proper Morse code timing the following three rules are given:
+  1. Duration of inter-mark-space is one Unit, perhaps adjusted.
+  2. Duration of inter-character-space is three Units total.
+  3. Duration of inter-word-space is seven Units total.
+*/
 #define UNITS_PER_IMS 1
 #define UNITS_PER_ICS 3
 #define UNITS_PER_IWS 7
@@ -2797,15 +2803,9 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
 	*/
 	const int w = (28 * weighting_duration) / 22;
 
-	/*
-	  In proper Morse code timing the following three rules are given:
-	  1. Duration of inter-mark-space is one Unit, perhaps adjusted.
-	  2. Duration of inter-character-space is three Units total.
-	  3. Duration of inter-word-space is seven Units total.
-	*/
-	gen->durations.ims_duration = 1 * gen->durations.unit_duration - w;
-	gen->durations.ics_duration = 3 * gen->durations.unit_duration + w;
-	gen->durations.iws_duration = 7 * gen->durations.unit_duration - w;
+	gen->durations.ims_duration = UNITS_PER_IMS * gen->durations.unit_duration - w;
+	gen->durations.ics_duration = UNITS_PER_ICS * gen->durations.unit_duration + w;
+	gen->durations.iws_duration = UNITS_PER_IWS * gen->durations.unit_duration - w;
 	gen->durations.additional_space_duration = gen->gap * gen->durations.unit_duration;
 
 	/* For "Farnsworth", there also needs to be an adjustment
