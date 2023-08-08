@@ -14,6 +14,25 @@
 
 
 
+/*
+  Type for dots, dashes and spaces of different types.
+
+  Use cw_element_type_get_representation() to get printable representation of
+  the type, or write your own code for getting representation of the type if
+  you need to (or just print plain integers).
+*/
+typedef enum {
+	cw_element_type_none = 0,
+	cw_element_type_dot,
+	cw_element_type_dash,
+	cw_element_type_ims,
+	cw_element_type_ics,
+	cw_element_type_iws
+} cw_element_type_t;
+
+
+
+
 /* Yet another type for representing marks and spaces (and closed/open). */
 typedef enum cw_state_t {
 	cw_state_space,
