@@ -69,6 +69,8 @@ int legacy_api_test_cw_get_receive_parameters(cw_test_executor_t * cte)
 		return -1;
 	}
 
+	legacy_api_standalone_test_setup(cte, false);
+
 	const int orig_tolerance = cw_get_tolerance();
 	const int tolerances[] = { CW_TOLERANCE_MIN, CW_TOLERANCE_INITIAL, CW_TOLERANCE_MAX };
 	const size_t n_tolerances = sizeof (tolerances) / sizeof (tolerances[0]);
@@ -110,6 +112,7 @@ int legacy_api_test_cw_get_receive_parameters(cw_test_executor_t * cte)
 		cte->cte_log(cte, LOG_ERR, "Failed to restore original tolerance of receiver\n");
 		return -1;
 	}
+	legacy_api_standalone_test_teardown(cte);
 
 	cte->print_test_footer(cte, __func__);
 

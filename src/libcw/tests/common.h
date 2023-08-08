@@ -56,7 +56,7 @@ cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durati
 
    @param start_gen whether a prepared generator should be started
 
-   @reviewed on 2020-10-04
+   @reviewed on 2023-08-07
 
    @return 0 on success
    @return -1 on failure

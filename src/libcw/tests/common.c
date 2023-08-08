@@ -54,17 +54,28 @@ int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen)
 		}
 	}
 
+	/* Reset all parameters to defaults. Recalculate duration parameters
+	   based on defaults. */
 	cw_reset_send_receive_parameters();
 
+	if (CW_SUCCESS != cw_set_gap(0)) { /* This function sets gap in both generator and receiver. */
+		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting gen/rec gap\n", __func__, __LINE__);
+		return -1;
+	}
 	if (CW_SUCCESS != cw_set_send_speed(cte->config->send_speed)) {
 		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator speed %d\n", __func__, __LINE__, cte->config->send_speed);
+		return -1;
 	}
 	if (CW_SUCCESS != cw_set_frequency(cte->config->frequency)) {
 		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator frequency %d\n", __func__, __LINE__, cte->config->frequency);
+		return -1;
 	}
 	if (CW_SUCCESS != cw_set_volume(cte->config->volume)) {
 		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator volume %d\n", __func__, __LINE__, cte->config->volume);
+		return -1;
 	}
+	/* Duration parameters have been recalculated internally on new values of
+	   gap and speed, in calls to set_gap() or set_speed(). */
 
 	cw_disable_adaptive_receive();
 	cw_reset_receive_statistics();
