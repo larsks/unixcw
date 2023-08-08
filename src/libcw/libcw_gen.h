@@ -338,11 +338,11 @@ struct cw_gen_struct {
 
 	bool sound_device_is_open;
 
-
+#if CW_DEV_RAW_SINK
 	/* Output file descriptor for debug data (console, OSS, ALSA,
 	   PulseAudio). */
 	int dev_raw_sink;
-#if CW_DEV_RAW_SINK
+
 	/* Test code would like to know the path to the sink file, therefore the
 	   path is a member of generator type. The value is set by generator. */
 	char dev_raw_sink_path[256];

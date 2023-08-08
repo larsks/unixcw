@@ -599,7 +599,10 @@ cw_gen_t * cw_gen_new(const cw_gen_config_t * gen_conf)
 	/* Sound system. */
 	{
 		/* gen->sound_system = sound_system; */ /* We handle this field below. */
+
+#if CW_DEV_RAW_SINK
 		gen->dev_raw_sink = -1;
+#endif
 
 		/* Sound system - console. */
 		gen->console.sound_sink_fd = -1;
