@@ -1,6 +1,6 @@
 # Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
 # Copyright (C) 2011-2023  Kamil Ignacak (acerion@wp.pl)
-#
+
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -12,9 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
+# with this program. If not, see <https://www.gnu.org/licenses/>.
 
 # -include $(top_builddir)/Makefile.inc
 
