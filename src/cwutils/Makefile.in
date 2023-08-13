@@ -665,7 +665,7 @@ SUBDIRS = lib
 cw_dictionary_tests_SOURCES = dictionary.c memory.c i18n.c cw_config.c cw_common.c
 
 # target-specific preprocessor flags (#defs and include dirs)
-cw_dictionary_tests_CPPFLAGS = $(AM_CPPFLAGS) -DCW_DICTIONARY_UNIT_TESTS
+cw_dictionary_tests_CPPFLAGS = $(AM_CPPFLAGS) -DCW_DICTIONARY_UNIT_TESTS -I${top_srcdir}/src/
 
 # Target-specific linker flags (objects to link).
 cw_dictionary_tests_LDADD = -L$(top_builddir)/src/libcw/.libs -lcw $(INTL_LIB)

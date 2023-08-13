@@ -16,15 +16,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
--include $(top_builddir)/Makefile.inc
+# -include $(top_builddir)/Makefile.inc
 
 # program(s) to be built in current dir
 bin_PROGRAMS = cwcp
 
 # source code files used to build cwcp program
 cwcp_SOURCES = cwcp.c
+
 # target-specific preprocessor flags (#defs and include dirs)
-#cwcp_CPPFLAGS = -I$(top_srcdir)/src/cwutils/ -I$(top_srcdir)/src/libcw/
+cwcp_CPPFLAGS = -I$(top_srcdir)/src/ -I$(top_srcdir)/src/libcw/
+
 # Target-specific linker flags (objects to link). Order is important:
 # first static library then dynamic. Otherwise linker may not find
 # symbols from the dynamic library.

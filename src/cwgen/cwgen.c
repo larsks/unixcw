@@ -35,11 +35,10 @@
 # include <strings.h>
 #endif
 
-#include "cwutils/i18n.h"
-#include "cwutils/cw_cmdline.h"
-#include "cwutils/cw_copyright.h"
-#include "memory.h"
-
+#include <cwutils/i18n.h>
+#include <cwutils/cw_cmdline.h>
+#include <cwutils/cw_copyright.h>
+#include <cwutils/memory.h>
 
 
 

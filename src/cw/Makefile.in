@@ -32,6 +32,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+# -include $(top_builddir)/Makefile.inc
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -122,7 +124,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_cw_OBJECTS = cw.$(OBJEXT)
+am_cw_OBJECTS = cw-cw.$(OBJEXT)
 cw_OBJECTS = $(am_cw_OBJECTS)
 am__DEPENDENCIES_1 =
 cw_DEPENDENCIES = $(top_builddir)/src/cwutils/lib_cw.a \
@@ -146,7 +148,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/cw.Po
+am__depfiles_remade = ./$(DEPDIR)/cw-cw.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -365,8 +367,10 @@ top_srcdir = @top_srcdir@
 
 # source code files used to build cw program
 cw_SOURCES = cw.c cw.h
+
 # target-specific preprocessor flags (#defs and include dirs)
-# cw_CPPFLAGS = -I$(top_srcdir)/src/cwutils -I$(top_srcdir)/src/libcw/
+cw_CPPFLAGS = -I$(top_srcdir)/src/ -I$(top_srcdir)/src/libcw/
+
 # Target-specific linker flags (objects to link). Order is important:
 # first static library then dynamic. Otherwise linker may not find
 # symbols from the dynamic library.
@@ -471,7 +475,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw-cw.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -502,6 +506,20 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+cw-cw.o: cw.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cw-cw.o -MD -MP -MF $(DEPDIR)/cw-cw.Tpo -c -o cw-cw.o `test -f 'cw.c' || echo '$(srcdir)/'`cw.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw-cw.Tpo $(DEPDIR)/cw-cw.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw.c' object='cw-cw.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cw-cw.o `test -f 'cw.c' || echo '$(srcdir)/'`cw.c
+
+cw-cw.obj: cw.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cw-cw.obj -MD -MP -MF $(DEPDIR)/cw-cw.Tpo -c -o cw-cw.obj `if test -f 'cw.c'; then $(CYGPATH_W) 'cw.c'; else $(CYGPATH_W) '$(srcdir)/cw.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw-cw.Tpo $(DEPDIR)/cw-cw.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw.c' object='cw-cw.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cw-cw.obj `if test -f 'cw.c'; then $(CYGPATH_W) 'cw.c'; else $(CYGPATH_W) '$(srcdir)/cw.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -679,7 +697,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/cw.Po
+		-rm -f ./$(DEPDIR)/cw-cw.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -725,7 +743,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/cw.Po
+		-rm -f ./$(DEPDIR)/cw-cw.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -765,8 +783,6 @@ uninstall-man: uninstall-man1
 
 .PRECIOUS: Makefile
 
-
--include $(top_builddir)/Makefile.inc
 
 # Test targets.
 # This test target will be invoked when creating deb package.

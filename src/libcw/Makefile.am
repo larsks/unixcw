@@ -81,7 +81,7 @@ libcw_la_CFLAGS = -rdynamic
 #
 # $(LIBCW_NDEBUG) activates asserts in base libcw for dev builds, and
 # deactivates asserts in base libcw for regular builds.
-libcw_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBCW_NDEBUG)
+libcw_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBCW_NDEBUG) -I${top_srcdir}/src/
 
 
 

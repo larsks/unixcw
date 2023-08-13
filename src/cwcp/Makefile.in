@@ -32,6 +32,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+# -include $(top_builddir)/Makefile.inc
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -122,7 +124,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_cwcp_OBJECTS = cwcp.$(OBJEXT)
+am_cwcp_OBJECTS = cwcp-cwcp.$(OBJEXT)
 cwcp_OBJECTS = $(am_cwcp_OBJECTS)
 am__DEPENDENCIES_1 =
 cwcp_DEPENDENCIES = $(top_builddir)/src/cwutils/lib_cwcp.a \
@@ -146,7 +148,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/cwcp.Po
+am__depfiles_remade = ./$(DEPDIR)/cwcp-cwcp.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -365,8 +367,10 @@ top_srcdir = @top_srcdir@
 
 # source code files used to build cwcp program
 cwcp_SOURCES = cwcp.c
+
 # target-specific preprocessor flags (#defs and include dirs)
-#cwcp_CPPFLAGS = -I$(top_srcdir)/src/cwutils/ -I$(top_srcdir)/src/libcw/
+cwcp_CPPFLAGS = -I$(top_srcdir)/src/ -I$(top_srcdir)/src/libcw/
+
 # Target-specific linker flags (objects to link). Order is important:
 # first static library then dynamic. Otherwise linker may not find
 # symbols from the dynamic library.
@@ -469,7 +473,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cwcp.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cwcp-cwcp.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -500,6 +504,20 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+cwcp-cwcp.o: cwcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwcp-cwcp.o -MD -MP -MF $(DEPDIR)/cwcp-cwcp.Tpo -c -o cwcp-cwcp.o `test -f 'cwcp.c' || echo '$(srcdir)/'`cwcp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwcp-cwcp.Tpo $(DEPDIR)/cwcp-cwcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cwcp.c' object='cwcp-cwcp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwcp-cwcp.o `test -f 'cwcp.c' || echo '$(srcdir)/'`cwcp.c
+
+cwcp-cwcp.obj: cwcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwcp-cwcp.obj -MD -MP -MF $(DEPDIR)/cwcp-cwcp.Tpo -c -o cwcp-cwcp.obj `if test -f 'cwcp.c'; then $(CYGPATH_W) 'cwcp.c'; else $(CYGPATH_W) '$(srcdir)/cwcp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwcp-cwcp.Tpo $(DEPDIR)/cwcp-cwcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cwcp.c' object='cwcp-cwcp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwcp-cwcp.obj `if test -f 'cwcp.c'; then $(CYGPATH_W) 'cwcp.c'; else $(CYGPATH_W) '$(srcdir)/cwcp.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -677,7 +695,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/cwcp.Po
+		-rm -f ./$(DEPDIR)/cwcp-cwcp.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -723,7 +741,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/cwcp.Po
+		-rm -f ./$(DEPDIR)/cwcp-cwcp.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -763,8 +781,6 @@ uninstall-man: uninstall-man1
 
 .PRECIOUS: Makefile
 
-
--include $(top_builddir)/Makefile.inc
 
 # Test targets.
 # This test target will be invoked when creating deb package.

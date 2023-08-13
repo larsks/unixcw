@@ -36,7 +36,8 @@ xcwcp_SOURCES = \
 nodist_xcwcp_SOURCES = moc_application.cc
 
 # target-specific preprocessor flags (#defs and include dirs)
-xcwcp_CPPFLAGS = $(AM_CPPFLAGS) $(AC_QT5_CFLAGS) $(AC_CFLAG_PIC)
+xcwcp_CPPFLAGS = -I$(top_srcdir)/src/ -I$(top_srcdir)/src/libcw/ $(AC_QT5_CFLAGS) $(AC_CFLAG_PIC)
+
 # Target-specific linker flags (objects to link). Order is important:
 # first static library then dynamic. Otherwise linker may not find
 # symbols from the dynamic library.

@@ -29,7 +29,7 @@ libcwutils_a_SOURCES = \
 	elements_detect.c elements_detect.h \
 	element_stats.c element_stats.h
 
-libcwutils_a_CPPFLAGS = -I$(top_srcdir)/src/libcw/
+libcwutils_a_CPPFLAGS = -I$(top_srcdir)/src/libcw/  -I${top_srcdir}/src/
 
 
 
