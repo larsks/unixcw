@@ -1,0 +1,188 @@
+#+TODO: TODO STARTED | DONE SKIPPED
+
+Based on https://cdw.sourceforge.net/documentation/release_checklist/release_checklist.html
+
+
+* DONE Do the actual coding
+
+Do whatever you planned to do for given release. Add, update, remove
+features, fix bugs, refactor.
+
+* DONE Stop coding
+
+Regardless of what you did: fixing bugs, refactoring, adding features,
+reviewing code, you need to be able to say "This is where I need to stop".
+Constant making changes in code won't help you "freeze" your code and make a
+release.
+
+* STARTED Review changes - quality check
+
+Review changes in code, documentation and other files to catch and fix
+problems, and to do last-minute necessary minor improvements.
+
+Review all changes done since previous release.
+Update comments and other documentation (and/or add missing items)
+Update @reviewedon tags in functions' top-level comments while doing the review.
+Don't be afraid to do refactoring if you notice opportunities or necessity to do so.
+Do fix any problems that you find during the review.
+Note down (in README.dev.org) any problems that won't be fixed in this release.
+
+* TODO Review changes: documentation and test scenarios template
+1. Review changes in code, documentation and other files. Based on that, make
+   necessary changes to:
+   - qa/test_scenarios/template.org: add, remove or update test cases
+   - package documentation (NEWS/README/README.dev.org/man pages/installation
+     instructions, other)
+2. Review changes noted down in commit log. Based on that, make necessary
+   changes to:
+   - qa/test_scenarios/template.org: add, remove or update test cases
+   - package documentation (NEWS/README/README.dev.org/man pages/installation
+     instructions, other)
+
+* TODO Come up with new version numbers
+
+Based on scope of changes that you did, come up with new version of unixcw
+package (configure.ac/AC_INIT) and of libcw library
+(configure.ac/LIBCW_VERSION).
+
+For libcw library remember to obey the rules from
+http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html.
+
+Use the new version numbers in NEWS and README files.
+
+* TODO New test scenarios document
+
+Make a properly named copy of qa/test_scenarios/template.org. The name of the
+copy should reflect new version number of the package.
+
+* TODO Synchronize with Debian
+** TODO Get *debian.tar.xz archive
+
+Go to https://packages.debian.org/sid/cw, Download *debian.tar.xz archive.
+
+** TODO Evaluate patches from the archive
+
+You may want to apply them to the package. Update NEWS file with information
+that the patches were applied. This will let Debian team know about it
+because it may affect their workflow.
+
+** TODO Merge debian/
+
+Merge current version of files from debian/ dir in the archive into project's
+repo. Let the configuration of the package in the repo be in sync with
+Debian.
+
+** TODO Run qa/build_debian_packages.sh
+
+Run qa/build_debian_packages.sh to confirm that Debian packages can be built
+more or less correctly. Fix any issues you will find.
+
+** TODO Fix compiler warnings
+
+While running qa/build_debian_packages.sh, pay attention to compiler
+warnings. Debian's build scripts may use different complier flags.
+
+* TODO Do the testing per test scenarios
+
+Test your software using test scenarios that you have created. See if you
+need to repeat some tests on different software/hardware platforms. Write
+down bugs that you have found and fixed, you may want to check for them when
+testing next release, to see if you haven't reintroduced them.
+
+The test scenarios describe both manual and automatic tests.
+
+
+* TODO Localization
+
+If you use gettext or any other tool to facilitate localization of your
+application then generate new file with strings intended for translation,
+spell check it, make sure that all cryptic strings have explanatory comment,
+re-generate the file again if needed.
+
+I'm using gettext and friends in cdw, and I have prepared a small script that
+invokes xgettext, the script is:
+
+    #!/bin/bash
+    xgettext src/*.c src/external_tools/*.c --no-wrap --keyword=_ --keyword=gettext_noop --add-comments=2TRANS: -o po/cdw.pot
+
+All translatable strings are called by "gettext_noop()" or "_()" functions
+("_()" is just an alias for "gettext()").
+
+* TODO Update your website files
+
+If your project has a homepage, update content of website files so that the
+website informs visitors about new release, latest changes and new features.
+Do this now, you may want to reuse some content from files updated in point
+9. Test your website offline if you can. Don't put updated website files
+online yet, there is still some testing to do.
+
+Make sure that contact information available on your website is correct.
+
+* TODO Prepare release archive
+
+Prepare tar.gz archive with source code tree that you want to release and
+distribute. If you are using Autotools check "make dist" target, it is very
+convenient.
+
+* TODO Make final test using code from release archive
+
+  1. extract the archive in some temporary directory, outside of your regular
+     development directory;
+
+  2. make a standard build using extracted source code tree, just as any
+     regular user would do;
+
+  3. if your program has any unit tests that can be run by user, run them and
+     make sure that all tests are passed;
+
+  4. run the program that you have just built, check that program starts
+     correctly, that all basic functions are running as expected, that there
+     is no crash or error that would discourage user who is checking your
+     program;
+
+* TODO Make final sanity check test using code from repository
+
+  1. do an anonymous checkout of full source code tree from source code
+     management (SCM) repository. This is to check if your SCM repository is
+     accessible to regular users.
+
+  2. make a standard build using checked out source code tree, just as any
+     regular user would do. This is to make sure that build process will be
+     successful: that there are no source code files or build system files
+     missing in repository.
+
+  You don't have to run tests or run the software and check if it works
+  correctly here. You have already did this in point 12, and code in SCM
+  should be the same as in your release archive.
+
+* TODO Update statuses of issues in issue tracker
+
+If you run any sort of bug or issue tracker, or feature request list, and
+there are any issues affected or addressed by current release, update
+statuses of these items: close them, comment them, update them. Don't let
+fixed bugs be still open in your bug tracking system.
+
+* TODO Publish your release archive with your program
+
+Whether you are using sourceforge.net, tigris.org, Alioth, your own website,
+or any other means of publishing archive with your program, publish an
+archive file with source code of your software.
+
+* TODO Update your website
+
+Now that archive with program is available, you can publish your updated
+website as well. Test the website to make sure that all pages are accessible.
+
+* TODO Tag release in SCM repository
+
+If your source code management repository supports tags, you may want to tag
+this specific snapshot with name of release. If you are SCM wizard, you
+should know what to do in such situations anyway :)
+
+* TODO Advertise your software
+
+Make sure that people around the world know about new release of your
+software. Check sites like freshmeat.net, your local Linux Users Group
+website, or your local Linux fans page. See if you can post an announcement
+there.
+
