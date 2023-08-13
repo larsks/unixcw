@@ -346,7 +346,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 
 
 
-void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_receiver_t * easy_rec, bool use_ranger)
+void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger)
 {
 	cw_rec_tester_init_text_buffers(tester, 1);
 	/* Using Null sound system because this generator is only
@@ -383,9 +383,9 @@ static void test_callback_func(void * arg, int key_state)
 	   libcw receiver will process the new state and we will later
 	   try to poll a character or space from it. */
 
-	cw_easy_receiver_t * easy_rec = (cw_easy_receiver_t *) arg;
+	cw_easy_legacy_receiver_t * easy_rec = (cw_easy_legacy_receiver_t *) arg;
 	//fprintf(stderr, "Callback function, key state = %d\n", key_state);
-	cw_easy_receiver_sk_event(easy_rec, key_state);
+	cw_easy_legacy_receiver_sk_event(easy_rec, key_state);
 }
 
 

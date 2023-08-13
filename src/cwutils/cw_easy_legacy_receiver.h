@@ -1,5 +1,5 @@
-#ifndef H_CW_REC_UTILS
-#define H_CW_REC_UTILS
+#ifndef H_CW_EASY_LEGACY_RECEIVER
+#define H_CW_EASY_LEGACY_RECEIVER
 
 
 
@@ -20,7 +20,7 @@ extern "C"
 
 
 
-struct cw_easy_receiver_t {
+struct cw_easy_legacy_receiver_t {
 	/* Timer for measuring length of dots and dashes.
 
 	   Initial value of the timestamp is created by xcwcp's receiver on
@@ -61,7 +61,7 @@ struct cw_easy_receiver_t {
 
 	void * rec_tester;
 };
-typedef struct cw_easy_receiver_t cw_easy_receiver_t;
+typedef struct cw_easy_legacy_receiver_t cw_easy_legacy_receiver_t;
 
 
 
@@ -84,20 +84,20 @@ typedef struct cw_rec_data_t {
 
 
 
-cw_easy_receiver_t * cw_easy_receiver_new(void);
-void cw_easy_receiver_delete(cw_easy_receiver_t ** easy_rec);
-void cw_easy_receiver_start(cw_easy_receiver_t * easy_rec);
+cw_easy_legacy_receiver_t * cw_easy_legacy_receiver_new(void);
+void cw_easy_legacy_receiver_delete(cw_easy_legacy_receiver_t ** easy_rec);
+void cw_easy_legacy_receiver_start(cw_easy_legacy_receiver_t * easy_rec);
 
-bool cw_easy_receiver_poll_character(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd);
-bool cw_easy_receiver_poll_iws(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd);
+bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
+bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
 #if 0
-bool cw_easy_receiver_poll_data(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd);
+bool cw_easy_legacy_receiver_poll_data(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
 #endif
 
-int cw_easy_receiver_get_libcw_errno(const cw_easy_receiver_t * easy_rec);
-void cw_easy_receiver_clear_libcw_errno(cw_easy_receiver_t * easy_rec);
-bool cw_easy_receiver_is_pending_inter_word_space(const cw_easy_receiver_t * easy_rec);
-void cw_easy_receiver_clear(cw_easy_receiver_t * easy_rec);
+int cw_easy_legacy_receiver_get_libcw_errno(const cw_easy_legacy_receiver_t * easy_rec);
+void cw_easy_legacy_receiver_clear_libcw_errno(cw_easy_legacy_receiver_t * easy_rec);
+bool cw_easy_legacy_receiver_is_pending_inter_word_space(const cw_easy_legacy_receiver_t * easy_rec);
+void cw_easy_legacy_receiver_clear(cw_easy_legacy_receiver_t * easy_rec);
 
 
 
@@ -107,7 +107,7 @@ void cw_easy_receiver_clear(cw_easy_receiver_t * easy_rec);
 
    \param is_down
 */
-void cw_easy_receiver_sk_event(cw_easy_receiver_t * easy_rec, bool is_down);
+void cw_easy_legacy_receiver_sk_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down);
 
 /**
    \brief Handle event on left paddle of iambic keyer
@@ -115,7 +115,7 @@ void cw_easy_receiver_sk_event(cw_easy_receiver_t * easy_rec, bool is_down);
    \param is_down
    \param is_reverse_paddles
 */
-void cw_easy_receiver_ik_left_event(cw_easy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles);
+void cw_easy_legacy_receiver_ik_left_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles);
 
 /**
    \brief Handle event on right paddle of iambic keyer
@@ -123,13 +123,13 @@ void cw_easy_receiver_ik_left_event(cw_easy_receiver_t * easy_rec, bool is_down,
    \param is_down
    \param is_reverse_paddles
 */
-void cw_easy_receiver_ik_right_event(cw_easy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles);
+void cw_easy_legacy_receiver_ik_right_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles);
 
 
 
 
 /* CW library keying event handler. */
-void cw_easy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_state);
+void cw_easy_legacy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_state);
 
 
 
@@ -141,5 +141,5 @@ void cw_easy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_st
 
 
 
-#endif // #ifndef H_CW_REC_UTILS
+#endif // #ifndef H_CW_EASY_LEGACY_RECEIVER
 

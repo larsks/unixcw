@@ -44,7 +44,7 @@
    A set of wrappers around receiver API from libcw2.h that hides some
    complexities, and makes using the receiver much easier.
 
-   This file is different from cw_rec_utils.c in that it is a wrapper around
+   This file is different from cw_easy_legacy_receiver.c in that it is a wrapper around
    modern (non-legacy) receiver API. With this API we can have more than one
    easy receiver at a time, in a single process.
 */

@@ -54,11 +54,11 @@ void Receiver::poll(const Mode *current_mode)
 		return;
 	}
 
-	if (cw_easy_receiver_get_libcw_errno(easy_rec) != 0) {
+	if (cw_easy_legacy_receiver_get_libcw_errno(easy_rec) != 0) {
 		poll_report_error();
 	}
 
-	if (cw_easy_receiver_is_pending_inter_word_space(easy_rec)) {
+	if (cw_easy_legacy_receiver_is_pending_inter_word_space(easy_rec)) {
 
 		/**
 		   If we received a character on an earlier poll, check again to see
@@ -68,12 +68,12 @@ void Receiver::poll(const Mode *current_mode)
 		/* Check if receiver received the pending inter-word
 		   space. */
 		cw_rec_data_t erd = { };
-		if (cw_easy_receiver_poll_iws(easy_rec, &erd)) {
+		if (cw_easy_legacy_receiver_poll_iws(easy_rec, &erd)) {
 			//fprintf(stderr, "End of word '%c'\n\n", c);
 			textarea->append(' ');
 		}
 
-		if (!cw_easy_receiver_is_pending_inter_word_space(easy_rec)) {
+		if (!cw_easy_legacy_receiver_is_pending_inter_word_space(easy_rec)) {
 			/* We received the pending space. After it the
 			   receiver may have received another
 			   character.  Try to get it too. */
@@ -204,7 +204,7 @@ void Receiver::handle_mouse_event(QMouseEvent *event, bool is_reverse_paddles)
 */
 void Receiver::sk_event(bool is_down)
 {
-	cw_easy_receiver_sk_event(this->easy_rec, is_down);
+	cw_easy_legacy_receiver_sk_event(this->easy_rec, is_down);
 	return;
 }
 
@@ -220,7 +220,7 @@ void Receiver::sk_event(bool is_down)
 */
 void Receiver::ik_left_event(bool is_down, bool is_reverse_paddles)
 {
-	cw_easy_receiver_ik_left_event(this->easy_rec, is_down, is_reverse_paddles);
+	cw_easy_legacy_receiver_ik_left_event(this->easy_rec, is_down, is_reverse_paddles);
 	return;
 }
 
@@ -236,7 +236,7 @@ void Receiver::ik_left_event(bool is_down, bool is_reverse_paddles)
 */
 void Receiver::ik_right_event(bool is_down, bool is_reverse_paddles)
 {
-	cw_easy_receiver_ik_right_event(this->easy_rec, is_down, is_reverse_paddles);
+	cw_easy_legacy_receiver_ik_right_event(this->easy_rec, is_down, is_reverse_paddles);
 	return;
 }
 
@@ -248,7 +248,7 @@ void Receiver::ik_right_event(bool is_down, bool is_reverse_paddles)
 */
 void Receiver::clear()
 {
-	cw_easy_receiver_clear(easy_rec);
+	cw_easy_legacy_receiver_clear(easy_rec);
 	return;
 }
 
@@ -263,7 +263,7 @@ void Receiver::poll_report_error()
 {
 	/* Handle any receive errors detected on tone end but delayed until here. */
 
-	switch (cw_easy_receiver_get_libcw_errno(easy_rec)) {
+	switch (cw_easy_legacy_receiver_get_libcw_errno(easy_rec)) {
 	case ENOMEM:
 		app->show_status(_("Representation buffer too small"));
 		break;
@@ -281,7 +281,7 @@ void Receiver::poll_report_error()
 		break;
 	}
 
-	cw_easy_receiver_clear_libcw_errno(easy_rec);
+	cw_easy_legacy_receiver_clear_libcw_errno(easy_rec);
 
 	return;
 }
@@ -296,7 +296,7 @@ void Receiver::poll_report_error()
 void Receiver::poll_character()
 {
 	cw_rec_data_t erd = { };
-	if (cw_easy_receiver_poll_character(this->easy_rec, &erd)) {
+	if (cw_easy_legacy_receiver_poll_character(this->easy_rec, &erd)) {
 		/* Receiver stores full, well formed
 		   character. Display it. */
 		textarea->append(erd.character);

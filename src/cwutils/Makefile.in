@@ -152,14 +152,15 @@ lib_libcw_tests_a_OBJECTS = $(am_lib_libcw_tests_a_OBJECTS)
 lib_rec_tests_a_AR = $(AR) $(ARFLAGS)
 lib_rec_tests_a_LIBADD =
 am_lib_rec_tests_a_OBJECTS = cw_rec_tester.$(OBJEXT) \
-	cw_rec_utils.$(OBJEXT) test_framework_tools.$(OBJEXT)
+	cw_easy_legacy_receiver.$(OBJEXT) \
+	test_framework_tools.$(OBJEXT)
 lib_rec_tests_a_OBJECTS = $(am_lib_rec_tests_a_OBJECTS)
 lib_xcwcp_a_AR = $(AR) $(ARFLAGS)
 lib_xcwcp_a_LIBADD =
 am__lib_xcwcp_a_SOURCES_DIST = cw_copyright.h i18n.c i18n.h \
 	cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c \
 	memory.h cw_common.c cw_common.h dictionary.c dictionary.h \
-	cw_words.h cw_rec_utils.c cw_rec_utils.h \
+	cw_words.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h \
 	test_framework_tools.c test_framework_tools.h
 @WITH_XCWCP_REC_TEST_TRUE@am__objects_1 = lib_xcwcp_a-test_framework_tools.$(OBJEXT)
 am_lib_xcwcp_a_OBJECTS = lib_xcwcp_a-i18n.$(OBJEXT) \
@@ -167,7 +168,7 @@ am_lib_xcwcp_a_OBJECTS = lib_xcwcp_a-i18n.$(OBJEXT) \
 	lib_xcwcp_a-cw_cmdline.$(OBJEXT) lib_xcwcp_a-memory.$(OBJEXT) \
 	lib_xcwcp_a-cw_common.$(OBJEXT) \
 	lib_xcwcp_a-dictionary.$(OBJEXT) \
-	lib_xcwcp_a-cw_rec_utils.$(OBJEXT) $(am__objects_1)
+	lib_xcwcp_a-cw_easy_legacy_receiver.$(OBJEXT) $(am__objects_1)
 lib_xcwcp_a_OBJECTS = $(am_lib_xcwcp_a_OBJECTS)
 am_cw_dictionary_tests_OBJECTS =  \
 	cw_dictionary_tests-dictionary.$(OBJEXT) \
@@ -208,12 +209,13 @@ am__depfiles_remade = ./$(DEPDIR)/cw_cmdline.Po \
 	./$(DEPDIR)/cw_dictionary_tests-dictionary.Po \
 	./$(DEPDIR)/cw_dictionary_tests-i18n.Po \
 	./$(DEPDIR)/cw_dictionary_tests-memory.Po \
+	./$(DEPDIR)/cw_easy_legacy_receiver.Po \
 	./$(DEPDIR)/cw_easy_rec.Po ./$(DEPDIR)/cw_rec_tester.Po \
-	./$(DEPDIR)/cw_rec_utils.Po ./$(DEPDIR)/dictionary.Po \
-	./$(DEPDIR)/i18n.Po ./$(DEPDIR)/lib_xcwcp_a-cw_cmdline.Po \
+	./$(DEPDIR)/dictionary.Po ./$(DEPDIR)/i18n.Po \
+	./$(DEPDIR)/lib_xcwcp_a-cw_cmdline.Po \
 	./$(DEPDIR)/lib_xcwcp_a-cw_common.Po \
 	./$(DEPDIR)/lib_xcwcp_a-cw_config.Po \
-	./$(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po \
+	./$(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po \
 	./$(DEPDIR)/lib_xcwcp_a-dictionary.Po \
 	./$(DEPDIR)/lib_xcwcp_a-i18n.Po \
 	./$(DEPDIR)/lib_xcwcp_a-memory.Po \
@@ -681,11 +683,12 @@ lib_cwcp_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmd
 lib_xcwcp_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c \
 	cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h \
 	cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h \
-	cw_rec_utils.c cw_rec_utils.h $(am__append_1)
+	cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h \
+	$(am__append_1)
 @WITH_XCWCP_REC_TEST_TRUE@lib_xcwcp_a_CPPFLAGS = -DXCWCP_WITH_REC_TEST
 lib_cwgen_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h
 lib_libcw_tests_a_SOURCES = cw_easy_rec.c cw_easy_rec.h cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h
-lib_rec_tests_a_SOURCES = cw_rec_tester.c cw_rec_tester.h cw_rec_utils.c cw_rec_utils.h test_framework_tools.c test_framework_tools.h
+lib_rec_tests_a_SOURCES = cw_rec_tester.c cw_rec_tester.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h test_framework_tools.c test_framework_tools.h
 
 # Test targets; no self-test, but make sure all is built.
 #check: all
@@ -791,15 +794,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-dictionary.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-i18n.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-memory.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_easy_legacy_receiver.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_easy_rec.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_rec_tester.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_rec_utils.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dictionary.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i18n.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-cw_cmdline.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-cw_common.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-cw_config.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-dictionary.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-i18n.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_xcwcp_a-memory.Po@am__quote@ # am--include-marker
@@ -921,19 +924,19 @@ lib_xcwcp_a-dictionary.obj: dictionary.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lib_xcwcp_a-dictionary.obj `if test -f 'dictionary.c'; then $(CYGPATH_W) 'dictionary.c'; else $(CYGPATH_W) '$(srcdir)/dictionary.c'; fi`
 
-lib_xcwcp_a-cw_rec_utils.o: cw_rec_utils.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lib_xcwcp_a-cw_rec_utils.o -MD -MP -MF $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Tpo -c -o lib_xcwcp_a-cw_rec_utils.o `test -f 'cw_rec_utils.c' || echo '$(srcdir)/'`cw_rec_utils.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Tpo $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_rec_utils.c' object='lib_xcwcp_a-cw_rec_utils.o' libtool=no @AMDEPBACKSLASH@
+lib_xcwcp_a-cw_easy_legacy_receiver.o: cw_easy_legacy_receiver.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lib_xcwcp_a-cw_easy_legacy_receiver.o -MD -MP -MF $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Tpo -c -o lib_xcwcp_a-cw_easy_legacy_receiver.o `test -f 'cw_easy_legacy_receiver.c' || echo '$(srcdir)/'`cw_easy_legacy_receiver.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Tpo $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_easy_legacy_receiver.c' object='lib_xcwcp_a-cw_easy_legacy_receiver.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lib_xcwcp_a-cw_rec_utils.o `test -f 'cw_rec_utils.c' || echo '$(srcdir)/'`cw_rec_utils.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lib_xcwcp_a-cw_easy_legacy_receiver.o `test -f 'cw_easy_legacy_receiver.c' || echo '$(srcdir)/'`cw_easy_legacy_receiver.c
 
-lib_xcwcp_a-cw_rec_utils.obj: cw_rec_utils.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lib_xcwcp_a-cw_rec_utils.obj -MD -MP -MF $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Tpo -c -o lib_xcwcp_a-cw_rec_utils.obj `if test -f 'cw_rec_utils.c'; then $(CYGPATH_W) 'cw_rec_utils.c'; else $(CYGPATH_W) '$(srcdir)/cw_rec_utils.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Tpo $(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_rec_utils.c' object='lib_xcwcp_a-cw_rec_utils.obj' libtool=no @AMDEPBACKSLASH@
+lib_xcwcp_a-cw_easy_legacy_receiver.obj: cw_easy_legacy_receiver.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lib_xcwcp_a-cw_easy_legacy_receiver.obj -MD -MP -MF $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Tpo -c -o lib_xcwcp_a-cw_easy_legacy_receiver.obj `if test -f 'cw_easy_legacy_receiver.c'; then $(CYGPATH_W) 'cw_easy_legacy_receiver.c'; else $(CYGPATH_W) '$(srcdir)/cw_easy_legacy_receiver.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Tpo $(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_easy_legacy_receiver.c' object='lib_xcwcp_a-cw_easy_legacy_receiver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lib_xcwcp_a-cw_rec_utils.obj `if test -f 'cw_rec_utils.c'; then $(CYGPATH_W) 'cw_rec_utils.c'; else $(CYGPATH_W) '$(srcdir)/cw_rec_utils.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lib_xcwcp_a-cw_easy_legacy_receiver.obj `if test -f 'cw_easy_legacy_receiver.c'; then $(CYGPATH_W) 'cw_easy_legacy_receiver.c'; else $(CYGPATH_W) '$(srcdir)/cw_easy_legacy_receiver.c'; fi`
 
 lib_xcwcp_a-test_framework_tools.o: test_framework_tools.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(lib_xcwcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lib_xcwcp_a-test_framework_tools.o -MD -MP -MF $(DEPDIR)/lib_xcwcp_a-test_framework_tools.Tpo -c -o lib_xcwcp_a-test_framework_tools.o `test -f 'test_framework_tools.c' || echo '$(srcdir)/'`test_framework_tools.c
@@ -1400,15 +1403,15 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-dictionary.Po
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-i18n.Po
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-memory.Po
+	-rm -f ./$(DEPDIR)/cw_easy_legacy_receiver.Po
 	-rm -f ./$(DEPDIR)/cw_easy_rec.Po
 	-rm -f ./$(DEPDIR)/cw_rec_tester.Po
-	-rm -f ./$(DEPDIR)/cw_rec_utils.Po
 	-rm -f ./$(DEPDIR)/dictionary.Po
 	-rm -f ./$(DEPDIR)/i18n.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_cmdline.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_common.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_config.Po
-	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po
+	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-dictionary.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-i18n.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-memory.Po
@@ -1468,15 +1471,15 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-dictionary.Po
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-i18n.Po
 	-rm -f ./$(DEPDIR)/cw_dictionary_tests-memory.Po
+	-rm -f ./$(DEPDIR)/cw_easy_legacy_receiver.Po
 	-rm -f ./$(DEPDIR)/cw_easy_rec.Po
 	-rm -f ./$(DEPDIR)/cw_rec_tester.Po
-	-rm -f ./$(DEPDIR)/cw_rec_utils.Po
 	-rm -f ./$(DEPDIR)/dictionary.Po
 	-rm -f ./$(DEPDIR)/i18n.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_cmdline.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_common.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_config.Po
-	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_rec_utils.Po
+	-rm -f ./$(DEPDIR)/lib_xcwcp_a-cw_easy_legacy_receiver.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-dictionary.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-i18n.Po
 	-rm -f ./$(DEPDIR)/lib_xcwcp_a-memory.Po

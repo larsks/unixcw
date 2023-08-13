@@ -57,7 +57,7 @@
 
 #include "cwutils/i18n.h"
 #include "cwutils/cw_copyright.h"
-#include "cwutils/cw_rec_utils.h"
+#include "cwutils/cw_easy_legacy_receiver.h"
 
 
 
@@ -186,7 +186,7 @@ void Application::libcw_keying_event_static(void * easy_receiver, int key_state)
 
 		//fprintf(stderr, "calling callback, stage 1 (key = %d)\n", key_state);
 
-		cw_easy_receiver_handle_libcw_keying_event(easy_receiver, key_state);
+		cw_easy_legacy_receiver_handle_libcw_keying_event(easy_receiver, key_state);
 	}
 
 	return;
@@ -1111,7 +1111,7 @@ void Application::make_auxiliaries_end(void)
 	   code. */
 	cw_register_keying_callback(libcw_keying_event_static, receiver->easy_rec);
 
-	cw_easy_receiver_start(receiver->easy_rec);
+	cw_easy_legacy_receiver_start(receiver->easy_rec);
 
 	QString label("Output: ");
 	label += cw_generator_get_audio_system_label();

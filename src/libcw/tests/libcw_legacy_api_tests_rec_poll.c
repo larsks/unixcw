@@ -36,7 +36,7 @@
 
 #include <cwutils/cw_common.h>
 #include <cwutils/cw_rec_tester.h>
-#include <cwutils/cw_rec_utils.h>
+#include <cwutils/cw_easy_legacy_receiver.h>
 
 
 
@@ -79,7 +79,7 @@
 
 
 static cw_rec_tester_t g_tester;
-static cw_easy_receiver_t g_easy_rec;
+static cw_easy_legacy_receiver_t g_easy_rec;
 static cw_test_executor_t * g_cte;
 
 
@@ -89,17 +89,17 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 
 
 /* Main poll function and its helpers. */
-void receiver_poll_receiver(cw_easy_receiver_t * easy_rec);
-void receiver_poll_report_error(cw_easy_receiver_t * easy_rec);
-void receiver_poll_character_c_r(cw_easy_receiver_t * easy_rec);
-void receiver_poll_character_r_c(cw_easy_receiver_t * easy_rec);
-void receiver_poll_space_c_r(cw_easy_receiver_t * easy_rec);
-void receiver_poll_space_r_c(cw_easy_receiver_t * easy_rec);
+void receiver_poll_receiver(cw_easy_legacy_receiver_t * easy_rec);
+void receiver_poll_report_error(cw_easy_legacy_receiver_t * easy_rec);
+void receiver_poll_character_c_r(cw_easy_legacy_receiver_t * easy_rec);
+void receiver_poll_character_r_c(cw_easy_legacy_receiver_t * easy_rec);
+void receiver_poll_space_c_r(cw_easy_legacy_receiver_t * easy_rec);
+void receiver_poll_space_r_c(cw_easy_legacy_receiver_t * easy_rec);
 
-static int easy_rec_test_on_character_c_r(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
-static int easy_rec_test_on_character_r_c(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
-static int easy_rec_test_on_space_r_c(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
-static int easy_rec_test_on_space_c_r(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
+static int easy_rec_test_on_character_c_r(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
+static int easy_rec_test_on_character_r_c(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
+static int easy_rec_test_on_space_r_c(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
+static int easy_rec_test_on_space_c_r(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer);
 
 
 
@@ -108,7 +108,7 @@ static int easy_rec_test_on_space_c_r(cw_easy_receiver_t * easy_rec, cw_rec_data
    \brief Poll the CW library receive buffer and handle anything found
    in the buffer
 */
-void receiver_poll_receiver(cw_easy_receiver_t * easy_rec)
+void receiver_poll_receiver(cw_easy_legacy_receiver_t * easy_rec)
 {
 	if (easy_rec->libcw_receive_errno != 0) {
 		receiver_poll_report_error(easy_rec);
@@ -156,7 +156,7 @@ void receiver_poll_receiver(cw_easy_receiver_t * easy_rec)
 /**
    \brief Handle any error registered when handling a libcw keying event
 */
-void receiver_poll_report_error(cw_easy_receiver_t * easy_rec)
+void receiver_poll_report_error(cw_easy_legacy_receiver_t * easy_rec)
 {
 	easy_rec->libcw_receive_errno = 0;
 
@@ -174,7 +174,7 @@ void receiver_poll_report_error(cw_easy_receiver_t * easy_rec)
 
    @reviewed TODO
 */
-void receiver_poll_character_c_r(cw_easy_receiver_t * easy_rec)
+void receiver_poll_character_c_r(cw_easy_legacy_receiver_t * easy_rec)
 {
 	/* Don't use easy_rec->main_timer - it is used exclusively for
 	   marking initial "key down" events. Use local throw-away
@@ -277,7 +277,7 @@ void receiver_poll_character_c_r(cw_easy_receiver_t * easy_rec)
 
    @reviewed TODO
 */
-void receiver_poll_character_r_c(cw_easy_receiver_t * easy_rec)
+void receiver_poll_character_r_c(cw_easy_legacy_receiver_t * easy_rec)
 {
 	/* Don't use easy_rec->main_timer - it is used exclusively for
 	   marking initial "key down" events. Use local throw-away
@@ -374,7 +374,7 @@ void receiver_poll_character_r_c(cw_easy_receiver_t * easy_rec)
 
    @reviewed TODO
 */
-void receiver_poll_space_c_r(cw_easy_receiver_t * easy_rec)
+void receiver_poll_space_c_r(cw_easy_legacy_receiver_t * easy_rec)
 {
 	/* Recheck the receive buffer for end of word. */
 
@@ -432,7 +432,7 @@ void receiver_poll_space_c_r(cw_easy_receiver_t * easy_rec)
 
    @reviewed TODO
 */
-void receiver_poll_space_r_c(cw_easy_receiver_t * easy_rec)
+void receiver_poll_space_r_c(cw_easy_legacy_receiver_t * easy_rec)
 {
 	/* Recheck the receive buffer for end of word. */
 
@@ -530,7 +530,7 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	   paddles are pressed, but (since it doesn't receive timing
 	   parameters) it won't be able to identify entered Morse
 	   code. */
-	cw_register_keying_callback(cw_easy_receiver_handle_libcw_keying_event, &g_easy_rec);
+	cw_register_keying_callback(cw_easy_legacy_receiver_handle_libcw_keying_event, &g_easy_rec);
 	gettimeofday(&g_easy_rec.main_timer, NULL);
 	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", easy_rec.main_timer.tv_sec, easy_rec.main_timer.tv_usec);
 
@@ -599,7 +599,7 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 
 
 
-static int easy_rec_test_on_character_c_r(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
+static int easy_rec_test_on_character_c_r(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
 {
 	int test_cwret = CW_SUCCESS;
 	cw_rec_data_t test = { 0 };
@@ -658,7 +658,7 @@ static int easy_rec_test_on_character_c_r(cw_easy_receiver_t * easy_rec, cw_rec_
 
 
 
-static int easy_rec_test_on_character_r_c(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
+static int easy_rec_test_on_character_r_c(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
 {
 	int test_cwret = CW_SUCCESS;
 	cw_rec_data_t test = { 0 };
@@ -717,7 +717,7 @@ static int easy_rec_test_on_character_r_c(cw_easy_receiver_t * easy_rec, cw_rec_
 
 
 
-static int easy_rec_test_on_space_r_c(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
+static int easy_rec_test_on_space_r_c(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
 {
 	int test_cwret = CW_SUCCESS;
 	cw_rec_data_t test = { 0 };
@@ -771,7 +771,7 @@ static int easy_rec_test_on_space_r_c(cw_easy_receiver_t * easy_rec, cw_rec_data
 
 
 
-static int easy_rec_test_on_space_c_r(cw_easy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
+static int easy_rec_test_on_space_c_r(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd, const struct timeval * timer)
 {
 	int test_cwret = CW_SUCCESS;
 	cw_rec_data_t test = { 0 };

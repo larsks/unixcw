@@ -25,7 +25,7 @@
 
 
 
-#include "cwutils/cw_rec_utils.h"
+#include "cwutils/cw_easy_legacy_receiver.h"
 #include "cwutils/cw_rec_tester.h"
 
 
@@ -55,9 +55,9 @@ namespace cw {
 		Receiver(Application *a, TextArea *t) :
 		app (a),
 		textarea (t)
-			{ easy_rec = cw_easy_receiver_new(); }
+			{ easy_rec = cw_easy_legacy_receiver_new(); }
 
-		~Receiver() { cw_easy_receiver_delete(&easy_rec); }
+		~Receiver() { cw_easy_legacy_receiver_delete(&easy_rec); }
 
 		/* Poll timeout handler. */
 		void poll(const Mode *current_mode);
@@ -85,7 +85,7 @@ namespace cw {
 		void stop_test_code();
 		cw_rec_tester_t rec_tester = {};
 #endif
-		cw_easy_receiver_t * easy_rec = nullptr;
+		cw_easy_legacy_receiver_t * easy_rec = nullptr;
 
 	private:
 		Application *app = nullptr;
