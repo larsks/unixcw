@@ -25,40 +25,48 @@
 
 
 
-/**
-   Get ideal (expected) duration of given element (dot, dash, spaces)
-*/
-int ideal_duration_of_element(cw_element_type_t type, cw_gen_durations_t * durations)
+int cw_element_type_to_duration(cw_element_type_t type, const cw_gen_durations_t * durations, int * duration)
 {
 	switch (type) {
 	case cw_element_type_dot:
-		return durations->dot_duration;
+		*duration = durations->dot_duration;
+		return 0;
+
 	case cw_element_type_dash:
-		return durations->dash_duration;
+		*duration = durations->dash_duration;
+		return 0;
+
 	case cw_element_type_ims:
-		return durations->ims_duration;
+		*duration = durations->ims_duration;
+		return 0;
+
 	case cw_element_type_ics:
-		return durations->ics_duration;
+		*duration = durations->ics_duration;
+		return 0;
+
 	case cw_element_type_iws:
-		return durations->iws_duration;
+		*duration = durations->iws_duration;
+		return 0;
+
 	case cw_element_type_none:
 	default:
 		fprintf(stderr, "[ERROR] Unexpected element type '%c'\n", type);
-		return 3210; /* Some recognizable integer. TODO: use -1*/
+		return -1;
 	}
 }
 
 
 
 
-void cw_durations_print(FILE * file, cw_gen_durations_t * durations)
+void cw_gen_durations_print(FILE * file, const cw_gen_durations_t * durations)
 {
-	fprintf(file, "[INFO ] dot duration        = %7d us\n", durations->dot_duration);
-	fprintf(file, "[INFO ] dash duration       = %7d us\n", durations->dash_duration);
-	fprintf(file, "[INFO ] ims duration        = %7d us\n", durations->ims_duration);
-	fprintf(file, "[INFO ] ics duration        = %7d us\n", durations->ics_duration);
-	fprintf(file, "[INFO ] iws duration        = %7d us\n", durations->iws_duration);
-	fprintf(file, "[INFO ] additional duration = %7d us\n", durations->additional_space_duration);
-	fprintf(file, "[INFO ] adjustment duration = %7d us\n", durations->adjustment_space_duration);
+#define CWPRIduration "7d"
+	fprintf(file, "[INFO ] dot duration        = %" CWPRIduration " us\n", durations->dot_duration);
+	fprintf(file, "[INFO ] dash duration       = %" CWPRIduration " us\n", durations->dash_duration);
+	fprintf(file, "[INFO ] ims duration        = %" CWPRIduration " us\n", durations->ims_duration);
+	fprintf(file, "[INFO ] ics duration        = %" CWPRIduration " us\n", durations->ics_duration);
+	fprintf(file, "[INFO ] iws duration        = %" CWPRIduration " us\n", durations->iws_duration);
+	fprintf(file, "[INFO ] additional duration = %" CWPRIduration " us\n", durations->additional_space_duration);
+	fprintf(file, "[INFO ] adjustment duration = %" CWPRIduration " us\n", durations->adjustment_space_duration);
 }
 

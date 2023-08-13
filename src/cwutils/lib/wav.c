@@ -17,32 +17,51 @@
 
 
 
-
+#include <limits.h>
 #include <stdio.h>
 #include <unistd.h>
+
+#include <libcw.h>
 
 #include "wav.h"
 
 
 
 
-#define FILE_HEADER_SIZE 44 /* 44 bytes per spec. */
+#define FILE_HEADER_SIZE 44 /* Size of header of wav file: 44 bytes per spec. */
 
 
 
 
-int read_wav_header(int fd, wav_header_t * header)
+/**
+   \file wav.c
+
+   Code related to wav sound files.
+
+   libcw may be generating raw sample files on some occasions, but for test
+   code and test tools it's easier to work with files that have a header with
+   meta-information.
+
+   unixcw's test tools and test code may use functions from this file to
+   operate on the wav sound files.
+
+*/
+
+
+
+
+int wav_read_header(int fd, wav_header_t * header)
 {
 	fprintf(stderr, "[INFO ] Reading %zd bytes of header\n", sizeof (wav_header_t));
-	int n = read(fd, header, sizeof (wav_header_t));
+	ssize_t n = read(fd, header, sizeof (wav_header_t));
 
 	if (FILE_HEADER_SIZE != sizeof (wav_header_t)) {
 		fprintf(stderr, "[ERROR] Header struct has wrong size %zd\n", sizeof (wav_header_t));
 		return -1;
 	}
 
-	if (n != sizeof (wav_header_t)) {
-		fprintf(stderr, "[ERROR] Wrong read size for header: %d != %zd\n", n, sizeof (wav_header_t));
+	if (n != (ssize_t) sizeof (wav_header_t)) {
+		fprintf(stderr, "[ERROR] Wrong read size for header: %zd != %zd\n", n, sizeof (wav_header_t));
 		return -1;
 	}
 
@@ -66,6 +85,35 @@ int read_wav_header(int fd, wav_header_t * header)
 
 
 
+void wav_validate_header(const wav_header_t * header, bool * valid)
+{
+	/*
+	  libcw produces wav files with one channel, and the other code from
+	  cwutils/lib also expects one channel.
+	*/
+	if (CW_AUDIO_CHANNELS != header->number_of_channels) {
+		fprintf(stderr, "[ERROR] wav header contains unexpected count of channels: %d (expected %d)\n",
+		        header->number_of_channels, CW_AUDIO_CHANNELS);
+		*valid = false;
+		return;
+	}
 
+	/*
+	  libcw uses unit16_t as type of sample values.
+
+	  TODO (acerion) 2023.08.09: Calculation with sizeof and CHAR_BIT may not
+	  be true if int16_t integer is represented by e.g. 32-bit integer on
+	  some platform.
+	*/
+	const uint16_t expected_bps = sizeof (cw_sample_t) * CHAR_BIT;
+	if (expected_bps != header->bits_per_sample) {
+		fprintf(stderr, "[ERROR] wav header contains unexpected value of bits per sample: count of channels: %d (expected 16 / %hu)\n",
+		        header->bits_per_sample, expected_bps);
+		*valid = false;
+		return;
+	}
+
+	*valid = true;
+}
 
 

@@ -23,8 +23,10 @@
 
 
 
-void element_stats_update(cw_element_stats_t * stats, int element_duration)
+void cw_element_stats_update(cw_element_stats_t * stats, int element_duration)
 {
+	/* TODO (acerion) 2023.08.12: check for possible overflow. */
+
 	stats->duration_total += element_duration;
 	stats->count++;
 	stats->duration_avg = stats->duration_total / stats->count;
@@ -40,7 +42,7 @@ void element_stats_update(cw_element_stats_t * stats, int element_duration)
 
 
 
-void element_stats_calculate_divergences(const cw_element_stats_t * stats, cw_element_stats_divergences_t * divergences, int duration_expected)
+void cw_element_stats_calculate_divergences(const cw_element_stats_t * stats, cw_element_stats_divergences_t * divergences, int duration_expected)
 {
 	divergences->min = 100.0 * (stats->duration_min - duration_expected) / (1.0 * duration_expected);
 	divergences->avg = 100.0 * (stats->duration_avg - duration_expected) / (1.0 * duration_expected);
@@ -49,4 +51,13 @@ void element_stats_calculate_divergences(const cw_element_stats_t * stats, cw_el
 
 
 
+
+void cw_element_stats_init(cw_element_stats_t * stats)
+{
+	stats->duration_min = INT_MAX;
+	stats->duration_avg = 0;
+	stats->duration_max = INT_MIN;
+	stats->duration_total = 0;
+	stats->count = 0;
+}
 

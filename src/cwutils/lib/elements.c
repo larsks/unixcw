@@ -20,9 +20,19 @@
 
 #include <stdlib.h>
 
-#include <libcw_data.h>
-
 #include "elements.h"
+
+
+
+
+/**
+   \file elements.c
+
+   A linear collection of CW elements (dots and dashes).
+
+   The elements may have been detected in a wav file or in a string - you can
+   use functions from elements_detect.c file for that purpose.
+*/
 
 
 
@@ -31,9 +41,9 @@ void cw_elements_print_to_file(FILE * file, cw_elements_t * elements)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		if (cw_state_mark == elements->array[i].state) {
-			fprintf(file, "mark:   %11.2fus, '%c'\n", (double) elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
+			fprintf(file, "mark:   %11.2fus, '%c'\n", elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
 		} else {
-			fprintf(file, "space:  %11.2fus, '%c'\n", (double) elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
+			fprintf(file, "space:  %11.2fus, '%c'\n", elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
 		}
 	}
 }
@@ -61,78 +71,6 @@ int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_el
 	} else {
 		return 0; /* Not strictly an error, so return success. */
 	}
-}
-
-
-
-
-int cw_elements_from_string(const char * string, cw_elements_t * elements)
-{
-	size_t e = 0;
-
-	int s = 0;
-	while (string[s] != '\0') {
-
-		if (string[s] == ' ') {
-			/* ' ' character is represented by iws. This is a special case
-			   because this character doesn't have its "natural"
-			   representation in form of dots and dashes. */
-			if (e > 0 && (elements->array[e - 1].type == cw_element_type_ims || elements->array[e - 1].type == cw_element_type_ics)) {
-				/* Overwrite last end-of-element. */
-				elements->array[e - 1].type = cw_element_type_iws;
-				elements->array[e - 1].state = cw_state_space;
-				/* No need to increment 'e' as we are not adding new element. */
-			} else {
-				elements->array[e].type = cw_element_type_iws;
-				elements->array[e].state = cw_state_space;
-				e++;
-			}
-		} else {
-			/* Regular (non-space) character has its Morse representation.
-			   Get the representation, and copy each dot/dash into
-			   'elements'. Add ims after each dot/dash. */
-			const char * representation = cw_character_to_representation_internal(string[s]);
-			int r = 0;
-			while (representation[r] != '\0') {
-				switch (representation[r]) {
-				case '.':
-					elements->array[e].type = cw_element_type_dot;
-					elements->array[e].state = cw_state_mark;
-					break;
-				case '-':
-					elements->array[e].type = cw_element_type_dash;
-					elements->array[e].state = cw_state_mark;
-					break;
-				default:
-					break;
-				};
-				r++;
-				e++;
-				elements->array[e].type = cw_element_type_ims;
-				elements->array[e].state = cw_state_space;
-				e++;
-
-			}
-			/* Turn ims after last mark (the last mark in character) into ics. */
-			elements->array[e - 1].type = cw_element_type_ics;
-			elements->array[e - 1].state = cw_state_space;
-		}
-		s++;
-	}
-
-	if (e > elements->max_count) {
-		fprintf(stderr, "[ERROR] Count of elements (%zd) exceeds available space (%zd)\n", e, elements->max_count);
-		return -1;
-	}
-	elements->curr_count = e;
-
-#if 0 /* For debugging only. */
-	for (int i = 0; i < elements->curr_count; i++) {
-		fprintf(stderr, "[DEBUG] Initialized element %3d with type '%c'\n", i, cw_element_type_get_representation(elements->array[i].type));
-	}
-#endif
-
-	return 0;
 }
 
 

@@ -30,7 +30,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
+
+# -include $(top_builddir)/Makefile.inc
 
 VPATH = @srcdir@
 am__is_gnu_make = { \
@@ -127,9 +128,10 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libcwutils_a_AR = $(AR) $(ARFLAGS)
 libcwutils_a_LIBADD =
-am_libcwutils_a_OBJECTS = wav.$(OBJEXT) misc.$(OBJEXT) \
-	elements.$(OBJEXT) elements_detect.$(OBJEXT) \
-	element_stats.$(OBJEXT)
+am_libcwutils_a_OBJECTS = libcwutils_a-wav.$(OBJEXT) \
+	libcwutils_a-misc.$(OBJEXT) libcwutils_a-elements.$(OBJEXT) \
+	libcwutils_a-elements_detect.$(OBJEXT) \
+	libcwutils_a-element_stats.$(OBJEXT)
 libcwutils_a_OBJECTS = $(am_libcwutils_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -146,16 +148,18 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/element_stats.Po \
-	./$(DEPDIR)/elements.Po ./$(DEPDIR)/elements_detect.Po \
-	./$(DEPDIR)/misc.Po ./$(DEPDIR)/wav.Po
+am__depfiles_remade = ./$(DEPDIR)/libcwutils_a-element_stats.Po \
+	./$(DEPDIR)/libcwutils_a-elements.Po \
+	./$(DEPDIR)/libcwutils_a-elements_detect.Po \
+	./$(DEPDIR)/libcwutils_a-misc.Po \
+	./$(DEPDIR)/libcwutils_a-wav.Po
 am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
@@ -350,7 +354,7 @@ libcwutils_a_SOURCES = \
 	elements_detect.c elements_detect.h \
 	element_stats.c element_stats.h
 
-libcwutils_CPPFLAGS = $(AM_CPPFLAGS)
+libcwutils_a_CPPFLAGS = -I$(top_srcdir)/src/libcw/
 all: all-am
 
 .SUFFIXES:
@@ -399,11 +403,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/element_stats.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elements.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elements_detect.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wav.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcwutils_a-element_stats.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcwutils_a-elements.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcwutils_a-elements_detect.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcwutils_a-misc.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcwutils_a-wav.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -434,6 +438,76 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+libcwutils_a-wav.o: wav.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-wav.o -MD -MP -MF $(DEPDIR)/libcwutils_a-wav.Tpo -c -o libcwutils_a-wav.o `test -f 'wav.c' || echo '$(srcdir)/'`wav.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-wav.Tpo $(DEPDIR)/libcwutils_a-wav.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wav.c' object='libcwutils_a-wav.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-wav.o `test -f 'wav.c' || echo '$(srcdir)/'`wav.c
+
+libcwutils_a-wav.obj: wav.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-wav.obj -MD -MP -MF $(DEPDIR)/libcwutils_a-wav.Tpo -c -o libcwutils_a-wav.obj `if test -f 'wav.c'; then $(CYGPATH_W) 'wav.c'; else $(CYGPATH_W) '$(srcdir)/wav.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-wav.Tpo $(DEPDIR)/libcwutils_a-wav.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wav.c' object='libcwutils_a-wav.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-wav.obj `if test -f 'wav.c'; then $(CYGPATH_W) 'wav.c'; else $(CYGPATH_W) '$(srcdir)/wav.c'; fi`
+
+libcwutils_a-misc.o: misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-misc.o -MD -MP -MF $(DEPDIR)/libcwutils_a-misc.Tpo -c -o libcwutils_a-misc.o `test -f 'misc.c' || echo '$(srcdir)/'`misc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-misc.Tpo $(DEPDIR)/libcwutils_a-misc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='misc.c' object='libcwutils_a-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-misc.o `test -f 'misc.c' || echo '$(srcdir)/'`misc.c
+
+libcwutils_a-misc.obj: misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-misc.obj -MD -MP -MF $(DEPDIR)/libcwutils_a-misc.Tpo -c -o libcwutils_a-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-misc.Tpo $(DEPDIR)/libcwutils_a-misc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='misc.c' object='libcwutils_a-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-misc.obj `if test -f 'misc.c'; then $(CYGPATH_W) 'misc.c'; else $(CYGPATH_W) '$(srcdir)/misc.c'; fi`
+
+libcwutils_a-elements.o: elements.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-elements.o -MD -MP -MF $(DEPDIR)/libcwutils_a-elements.Tpo -c -o libcwutils_a-elements.o `test -f 'elements.c' || echo '$(srcdir)/'`elements.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-elements.Tpo $(DEPDIR)/libcwutils_a-elements.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='elements.c' object='libcwutils_a-elements.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-elements.o `test -f 'elements.c' || echo '$(srcdir)/'`elements.c
+
+libcwutils_a-elements.obj: elements.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-elements.obj -MD -MP -MF $(DEPDIR)/libcwutils_a-elements.Tpo -c -o libcwutils_a-elements.obj `if test -f 'elements.c'; then $(CYGPATH_W) 'elements.c'; else $(CYGPATH_W) '$(srcdir)/elements.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-elements.Tpo $(DEPDIR)/libcwutils_a-elements.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='elements.c' object='libcwutils_a-elements.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-elements.obj `if test -f 'elements.c'; then $(CYGPATH_W) 'elements.c'; else $(CYGPATH_W) '$(srcdir)/elements.c'; fi`
+
+libcwutils_a-elements_detect.o: elements_detect.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-elements_detect.o -MD -MP -MF $(DEPDIR)/libcwutils_a-elements_detect.Tpo -c -o libcwutils_a-elements_detect.o `test -f 'elements_detect.c' || echo '$(srcdir)/'`elements_detect.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-elements_detect.Tpo $(DEPDIR)/libcwutils_a-elements_detect.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='elements_detect.c' object='libcwutils_a-elements_detect.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-elements_detect.o `test -f 'elements_detect.c' || echo '$(srcdir)/'`elements_detect.c
+
+libcwutils_a-elements_detect.obj: elements_detect.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-elements_detect.obj -MD -MP -MF $(DEPDIR)/libcwutils_a-elements_detect.Tpo -c -o libcwutils_a-elements_detect.obj `if test -f 'elements_detect.c'; then $(CYGPATH_W) 'elements_detect.c'; else $(CYGPATH_W) '$(srcdir)/elements_detect.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-elements_detect.Tpo $(DEPDIR)/libcwutils_a-elements_detect.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='elements_detect.c' object='libcwutils_a-elements_detect.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-elements_detect.obj `if test -f 'elements_detect.c'; then $(CYGPATH_W) 'elements_detect.c'; else $(CYGPATH_W) '$(srcdir)/elements_detect.c'; fi`
+
+libcwutils_a-element_stats.o: element_stats.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-element_stats.o -MD -MP -MF $(DEPDIR)/libcwutils_a-element_stats.Tpo -c -o libcwutils_a-element_stats.o `test -f 'element_stats.c' || echo '$(srcdir)/'`element_stats.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-element_stats.Tpo $(DEPDIR)/libcwutils_a-element_stats.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='element_stats.c' object='libcwutils_a-element_stats.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-element_stats.o `test -f 'element_stats.c' || echo '$(srcdir)/'`element_stats.c
+
+libcwutils_a-element_stats.obj: element_stats.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcwutils_a-element_stats.obj -MD -MP -MF $(DEPDIR)/libcwutils_a-element_stats.Tpo -c -o libcwutils_a-element_stats.obj `if test -f 'element_stats.c'; then $(CYGPATH_W) 'element_stats.c'; else $(CYGPATH_W) '$(srcdir)/element_stats.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcwutils_a-element_stats.Tpo $(DEPDIR)/libcwutils_a-element_stats.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='element_stats.c' object='libcwutils_a-element_stats.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcwutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcwutils_a-element_stats.obj `if test -f 'element_stats.c'; then $(CYGPATH_W) 'element_stats.c'; else $(CYGPATH_W) '$(srcdir)/element_stats.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -566,11 +640,11 @@ clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/element_stats.Po
-	-rm -f ./$(DEPDIR)/elements.Po
-	-rm -f ./$(DEPDIR)/elements_detect.Po
-	-rm -f ./$(DEPDIR)/misc.Po
-	-rm -f ./$(DEPDIR)/wav.Po
+		-rm -f ./$(DEPDIR)/libcwutils_a-element_stats.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-elements.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-elements_detect.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-misc.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-wav.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -616,11 +690,11 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/element_stats.Po
-	-rm -f ./$(DEPDIR)/elements.Po
-	-rm -f ./$(DEPDIR)/elements_detect.Po
-	-rm -f ./$(DEPDIR)/misc.Po
-	-rm -f ./$(DEPDIR)/wav.Po
+		-rm -f ./$(DEPDIR)/libcwutils_a-element_stats.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-elements.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-elements_detect.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-misc.Po
+	-rm -f ./$(DEPDIR)/libcwutils_a-wav.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -657,13 +731,6 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-
--include $(top_builddir)/Makefile.inc
-
-# Target-specific linker flags (objects to link). Order is important:
-# first static libraries then dynamic. Otherwise linker may not find
-# symbols from the dynamic library.
-#libcwutils_LDADD = $(top_builddir)/src/cwutils/lib_libcw_tests.a
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

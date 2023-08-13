@@ -16,7 +16,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
--include $(top_builddir)/Makefile.inc
+# -include $(top_builddir)/Makefile.inc
 
 
 noinst_LIBRARIES = libcwutils.a
@@ -31,14 +31,7 @@ libcwutils_a_SOURCES = \
 	elements_detect.c elements_detect.h \
 	element_stats.c element_stats.h
 
+libcwutils_a_CPPFLAGS = -I$(top_srcdir)/src/libcw/
 
-
-libcwutils_CPPFLAGS = $(AM_CPPFLAGS)
-
-
-# Target-specific linker flags (objects to link). Order is important:
-# first static libraries then dynamic. Otherwise linker may not find
-# symbols from the dynamic library.
-#libcwutils_LDADD = $(top_builddir)/src/cwutils/lib_libcw_tests.a
 
 

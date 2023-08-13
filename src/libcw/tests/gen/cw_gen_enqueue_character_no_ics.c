@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <cw_easy_rec.h>
+#include <cwutils/cw_easy_rec.h>
 
 #include "common.h"
 #include "libcw.h"
@@ -51,7 +51,7 @@ typedef struct callback_data {
 
 
 
-static void callback(cw_easy_rec_data_t * erd, void * cdata)
+static void callback(void * cdata, cw_easy_rec_data_t * erd)
 {
 	callback_data_t * data = (callback_data_t *) cdata;
 	if (erd->is_iws) {

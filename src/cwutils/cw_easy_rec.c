@@ -67,9 +67,13 @@ struct cw_easy_rec_t {
 	struct timeval main_timer;
 
 	/* Safety flag to ensure that we keep the library in sync with keyer
-	   events. Without, there's a chance that of a on-off event, one half
+	   events. Without it, there's a chance that of a on-off event, one half
 	   will go to one application instance, and the other to another
-	   instance. */
+	   instance.
+
+	   TODO (acerion) 2023.08.12: this struct is used outside of xcwcp and
+	   its instances, and is meant to be thread-safe. Does the above comment
+	   about instances still make sense? Do we still need this member? */
 	bool tracked_key_state;
 
 	/* Flag indicating if receive polling has received a character, and
@@ -89,6 +93,7 @@ struct cw_easy_rec_t {
 
 
 
+
 static bool cw_easy_rec_poll_data_internal(cw_easy_rec_t * easy_rec, cw_easy_rec_data_t * erd);
 static bool cw_easy_rec_poll_character_internal(cw_easy_rec_t * easy_rec, cw_easy_rec_data_t * erd);
 static bool cw_easy_rec_poll_iws_internal(cw_easy_rec_t * easy_rec, cw_easy_rec_data_t * erd);
@@ -100,11 +105,13 @@ cw_easy_rec_t * cw_easy_rec_new(void)
 {
 	cw_easy_rec_t * easy_rec = (cw_easy_rec_t *) calloc(1, sizeof (cw_easy_rec_t));
 	if (NULL == easy_rec) {
+		fprintf(stderr, "[ERROR] Failed to allocate new easy rec\n");
 		return NULL;
 	}
 	easy_rec->rec = cw_rec_new();
 	if (NULL == easy_rec->rec) {
 		free(easy_rec);
+		fprintf(stderr, "[ERROR] Failed to allocate new receiver in easy rec\n");
 		return NULL;
 	}
 
@@ -132,36 +139,10 @@ void cw_easy_rec_delete(cw_easy_rec_t ** easy_rec)
 
 
 
-/**
-   \brief Handler for the keying callback from the CW library
-   indicating that the state of a key has changed.
-
-   The "key" is libcw's internal key structure. It's state is updated
-   by libcw when e.g. one iambic keyer paddle is constantly
-   pressed. It is also updated in other situations. In any case: the
-   function is called whenever state of this key changes.
-
-   Notice that the description above talks about a key, not about a
-   receiver. Key's states need to be interpreted by receiver, which is
-   a separate task. Key and receiver are separate concepts. This
-   function connects them.
-
-   This function, called on key state changes, calls receiver
-   functions to ensure that receiver does "receive" the key state
-   changes.
-
-   This function is called in signal handler context, and it takes
-   care to call only functions that are safe within that context.  In
-   particular, it goes out of its way to deliver results by setting
-   flags that are later handled by receive polling.
-
-   To be registered in generator with
-   cw_gen_register_value_tracking_callback_internal()
-*/
 void cw_easy_rec_handle_libcw_keying_event(void * easy_receiver, int key_state)
 {
 	if (NULL == easy_receiver) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return;
 	}
 
@@ -242,6 +223,18 @@ void cw_easy_rec_handle_libcw_keying_event(void * easy_receiver, int key_state)
 
 
 
+/**
+   @brief Main polling loop of a receiver
+
+   The loop tries to periodically poll data from easy receiver. On successful
+   poll, a call to cw_easy_rec_t::callback is performed.
+
+   The loop is running as long as cw_easy_rec_t::run_thread is true.
+
+   @reviewedon 2023.08.12
+
+   @param[in/out] arg Easy receiver
+*/
 static void * thread_fn(void * arg)
 {
 	cw_easy_rec_t * easy_rec = (cw_easy_rec_t *) arg;
@@ -250,7 +243,9 @@ static void * thread_fn(void * arg)
 		cw_easy_rec_data_t erd = { 0 };
 		if (cw_easy_rec_poll_data_internal(easy_rec, &erd)) {
 			if (easy_rec->callback) {
-				easy_rec->callback(&erd, easy_rec->callback_data);
+				/* This may pass the data to application that is using the
+				   receiver. */
+				easy_rec->callback(easy_rec->callback_data, &erd);
 			}
 		}
 	}
@@ -264,7 +259,7 @@ static void * thread_fn(void * arg)
 void cw_easy_rec_start(cw_easy_rec_t * easy_rec)
 {
 	if (NULL == easy_rec) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return;
 	}
 	gettimeofday(&easy_rec->main_timer, NULL);
@@ -278,7 +273,7 @@ void cw_easy_rec_start(cw_easy_rec_t * easy_rec)
 void cw_easy_rec_stop(cw_easy_rec_t * easy_rec)
 {
 	if (NULL == easy_rec) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return;
 	}
 	easy_rec->run_thread = false;
@@ -290,6 +285,8 @@ void cw_easy_rec_stop(cw_easy_rec_t * easy_rec)
 
 /**
    \brief Poll given easy receiver for character or inter-word-space
+
+   @reviewedon 2023.08.12
 
    @param[in] easy_rec Easy receiver to poll
    @param[out] erd Variable to store result of polling
@@ -316,7 +313,7 @@ static bool cw_easy_rec_poll_data_internal(cw_easy_rec_t * easy_rec, cw_easy_rec
 			if (cw_easy_rec_poll_character_internal(easy_rec, erd)) {
 				/* This 'notice' log is used to help detecting the situation
 				   described in above TODO. */
-				fprintf(stderr, "[NN] Easy rec: unexpected successful poll of character after a space has been polled\n");
+				fprintf(stderr, "[WARN ] Easy rec: unexpected successful poll of character after a space has been polled\n");
 			}
 			return true; /* A space has been polled successfully. */
 		}
@@ -479,7 +476,7 @@ bool cw_easy_rec_is_pending_inter_word_space(const cw_easy_rec_t * easy_rec)
 void cw_easy_rec_clear(cw_easy_rec_t * easy_rec)
 {
 	if (NULL == easy_rec) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return;
 	}
 	cw_rec_reset_state(easy_rec->rec);
@@ -494,7 +491,7 @@ void cw_easy_rec_clear(cw_easy_rec_t * easy_rec)
 cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed)
 {
 	if (NULL == easy_rec) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return CW_FAILURE;
 	}
 	return cw_rec_set_speed(easy_rec->rec, speed);
@@ -506,7 +503,7 @@ cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed)
 cw_ret_t cw_easy_rec_set_tolerance(cw_easy_rec_t * easy_rec, int tolerance)
 {
 	if (NULL == easy_rec) {
-		fprintf(stderr, "[EE] %s:%d: NULL argument\n", __func__, __LINE__);
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
 		return CW_FAILURE;
 	}
 	return cw_rec_set_tolerance(easy_rec->rec, tolerance);

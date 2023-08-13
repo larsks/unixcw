@@ -37,7 +37,7 @@ extern "C" {
 
 
 
-#include <libcw.h>
+#include "libcw/libcw.h"
 #include "libcw/libcw2.h"
 
 

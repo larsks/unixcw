@@ -34,6 +34,7 @@
 #include "libcw_gen.h"
 #include "libcw_utils.h"
 #include "cwutils/lib/elements.h"
+#include "cwutils/lib/elements_detect.h"
 #include "cwutils/lib/element_stats.h"
 #include "cwutils/lib/misc.h"
 
@@ -261,7 +262,8 @@ static void gen_callback_fn(void * callback_arg, int state)
 	}
 
 	if (execute_nonessential) {
-		const int prev_duration_expected = ideal_duration_of_element(prev_element->type, callback_data->durations);
+		int prev_duration_expected = 0;
+		cw_element_type_to_duration(prev_element->type, callback_data->durations, &prev_duration_expected);
 		const double divergence = 100.0 * (prev_element->duration - prev_duration_expected) / (1.0 * prev_duration_expected);
 
 #if 0 /* For debugging only. */
@@ -338,7 +340,7 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	   wpm speed [microseconds]. */
 	cw_gen_durations_t durations = { 0 };
 	cw_gen_get_durations_internal(gen, &durations);
-	cw_durations_print(stderr, &durations);
+	cw_gen_durations_print(stderr, &durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
@@ -349,9 +351,9 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 		fprintf(stderr, "[ERROR] Failed to allocate string elements for string '%s'\n", input_string);
 		exit(EXIT_FAILURE);
 	}
-	if (0 != cw_elements_from_string(input_string, elements)) {
+	if (0 != cw_elements_detect_from_string(input_string, elements)) {
 		/* This is treated as developer's error, therefore we exit. Developer
-		   should ensure that cw_elements_from_string() work correctly for valid
+		   should ensure that cw_elements_detect_from_string() work correctly for valid
 		   input strings. */
 		fprintf(stderr, "[ERROR] Failed to get elements from input string '%s'\n", input_string);
 		exit(EXIT_FAILURE);
@@ -388,12 +390,16 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 */
 static void calculate_test_results(const cw_elements_t * elements, test_data_t * test_data, const cw_gen_durations_t * durations)
 {
-	const int initial = 1000000000;
-	cw_element_stats_t stats_dot  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
-	cw_element_stats_t stats_dash = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
-	cw_element_stats_t stats_ims  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
-	cw_element_stats_t stats_ics  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
-	cw_element_stats_t stats_iws  = { .duration_min = initial, .duration_avg = 0, .duration_max = 0, .duration_total = 0, .count = 0 };
+	cw_element_stats_t stats_dot;
+	cw_element_stats_t stats_dash;
+	cw_element_stats_t stats_ims;
+	cw_element_stats_t stats_ics;
+	cw_element_stats_t stats_iws;
+	cw_element_stats_init(&stats_dot);
+	cw_element_stats_init(&stats_dash);
+	cw_element_stats_init(&stats_ims);
+	cw_element_stats_init(&stats_ics);
+	cw_element_stats_init(&stats_iws);
 
 	/* Skip first and last element. The way the test is structured may impact
 	   correctness of values of these elements. TODO: make the elements
@@ -401,19 +407,19 @@ static void calculate_test_results(const cw_elements_t * elements, test_data_t *
 	for (size_t i = 1; i < elements->curr_count - 1; i++) {
 		switch (elements->array[i].type) {
 		case cw_element_type_dot:
-			element_stats_update(&stats_dot, elements->array[i].duration);
+			cw_element_stats_update(&stats_dot, elements->array[i].duration);
 			break;
 		case cw_element_type_dash:
-			element_stats_update(&stats_dash, elements->array[i].duration);
+			cw_element_stats_update(&stats_dash, elements->array[i].duration);
 			break;
 		case cw_element_type_ims:
-			element_stats_update(&stats_ims, elements->array[i].duration);
+			cw_element_stats_update(&stats_ims, elements->array[i].duration);
 			break;
 		case cw_element_type_ics:
-			element_stats_update(&stats_ics, elements->array[i].duration);
+			cw_element_stats_update(&stats_ics, elements->array[i].duration);
 			break;
 		case cw_element_type_iws:
-			element_stats_update(&stats_iws, elements->array[i].duration);
+			cw_element_stats_update(&stats_iws, elements->array[i].duration);
 			break;
 		case cw_element_type_none: /* TODO: should we somehow log this? */
 		default:
@@ -421,11 +427,11 @@ static void calculate_test_results(const cw_elements_t * elements, test_data_t *
 		}
 	}
 
-	element_stats_calculate_divergences(&stats_dot, &test_data->current_div_dots, durations->dot_duration);
-	element_stats_calculate_divergences(&stats_dash, &test_data->current_div_dashes, durations->dash_duration);
-	element_stats_calculate_divergences(&stats_ims, &test_data->current_div_ims, durations->ims_duration);
-	element_stats_calculate_divergences(&stats_ics, &test_data->current_div_ics, durations->ics_duration);
-	element_stats_calculate_divergences(&stats_iws, &test_data->current_div_iws, durations->iws_duration);
+	cw_element_stats_calculate_divergences(&stats_dot, &test_data->current_div_dots, durations->dot_duration);
+	cw_element_stats_calculate_divergences(&stats_dash, &test_data->current_div_dashes, durations->dash_duration);
+	cw_element_stats_calculate_divergences(&stats_ims, &test_data->current_div_ims, durations->ims_duration);
+	cw_element_stats_calculate_divergences(&stats_ics, &test_data->current_div_ics, durations->ics_duration);
+	cw_element_stats_calculate_divergences(&stats_iws, &test_data->current_div_iws, durations->iws_duration);
 
 	print_element_stats_and_divergences(&stats_dot, &test_data->current_div_dots, "dots", durations->dot_duration);
 	print_element_stats_and_divergences(&stats_dash, &test_data->current_div_dashes, "dashes", durations->dash_duration);

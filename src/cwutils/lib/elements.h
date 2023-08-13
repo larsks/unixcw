@@ -51,16 +51,21 @@ typedef enum cw_state_t {
    Otherwise fractions of seconds lost in different places will accumulate,
    especially for data sets longer than 2-3 seconds.
 
+   For 44100 sample rate the sample spacing is 22.6757 microseconds. If we
+   were using integer type for increment, we would lose a lot of time over N
+   samples, and the data in input wav and in output raw files would diverge
+   over time. Use floating point for better results.
+
    'float' data type was not good enough, so I'm using 'double', at least for
    now.
 */
-typedef double cw_element_time_t;
+typedef double cw_element_time_t;  /* microseconds */
 
 
 
 
 typedef struct cw_element_t {
-	cw_element_time_t duration;   /* microseconds */
+	cw_element_time_t duration;   /* microseconds; TODO (acerion) 2023.08.12: rename to "time"; "duration" has integer type. */
 	cw_element_type_t type;
 	cw_state_t state;
 } cw_element_t;
@@ -68,16 +73,11 @@ typedef struct cw_element_t {
 
 
 
-struct cw_elements_t {
+typedef struct cw_elements_t {
 	cw_element_t * array;
 	size_t max_count;
 	size_t curr_count;
-};
-
-
-
-
-typedef struct cw_elements_t cw_elements_t;
+} cw_elements_t;
 
 
 
@@ -90,6 +90,8 @@ typedef struct cw_elements_t cw_elements_t;
 
    Function may fail if there is not enough space in @p elements for new
    element.
+
+   @reviewedon 2023.08.12
 
    @param[in/out] elements Elements structure to which to append new element
    @param[in] state State of the new element
@@ -111,7 +113,9 @@ int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_el
    Use cw_elements_delete() to de-allocate the structure returned by this
    function.
 
-   @param count Count of elements that the allocated structure will be able
+   @reviewedon 2023.08.12
+
+   @param[in] count Count of elements that the allocated structure will be able
    to hold.
 
    @return Newly allocated elements structure on success
@@ -127,7 +131,9 @@ cw_elements_t * cw_elements_new(size_t count);
 
    This function deallocates structure allocated with cw_elements_new().
 
-   @param elements Pointer to elements structure that is to be deallocated
+   @reviewedon 2023.08.12
+
+   @param[in/out] elements Pointer to elements structure that is to be deallocated
 */
 void cw_elements_delete(cw_elements_t ** elements);
 
@@ -137,7 +143,9 @@ void cw_elements_delete(cw_elements_t ** elements);
 /**
    @brief Print elements to file
 
-   @param[out] file File to write to
+   @reviewedon 2023.08.12
+
+   @param[out] file Opened file to write to
    @param[in] elements Elements structure to write to @p file
 */
 void cw_elements_print_to_file(FILE * file, cw_elements_t * elements);
@@ -146,31 +154,11 @@ void cw_elements_print_to_file(FILE * file, cw_elements_t * elements);
 
 
 /**
-   @brief Recognize elements in given string
-
-   Function walks through given @p string, recognizes marks and spaces of
-   different kind, builds element items from this information, sets 'type'
-   and 'state' in the element items, and appends the element items to @p
-   elements.
-
-   Function doesn't set duration member of element items because the input
-   string doesn't provide information necessary to get durations of elements.
-
-   @param[in] string string to be used as input of tests
-   @param[out] elements Structure with element items (each element has its type and state set)
-
-   @return 0 on success
-   @return -1 on failure
-*/
-int cw_elements_from_string(const char * string, cw_elements_t * elements);
-
-
-
-
-/**
    @brief Get printable representation of element's type
 
-   @param element Element for which to get the representation
+   @reviewedon 2023.08.12
+
+   @param[in] type Type of cw element to print
 
    @return Single character with printable representation of given @p type
 */

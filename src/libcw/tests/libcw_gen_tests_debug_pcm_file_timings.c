@@ -86,7 +86,7 @@ typedef struct test_data_t {
 
 static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string);
 static int get_elements_from_wav_file(const char * path, cw_elements_t * elements);
-static void elements_set_ideal_durations(cw_elements_t * elements, cw_gen_durations_t * durations);
+static int elements_set_ideal_durations(cw_elements_t * elements, const cw_gen_durations_t * durations);
 static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_elements_t * wav_elements);
 static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * string_elements, cw_elements_t * wav_elements);
 
@@ -168,11 +168,30 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 
 
 
-void elements_set_ideal_durations(cw_elements_t * elements, cw_gen_durations_t * durations)
+/**
+   For each element in @p elements, assign a duration looked up in @p durations
+
+   @reviewedon 2023.08.12
+
+   @param[out] elements Set of elements for which to assign durations
+   @param[in] durations Information about durations of different element types
+
+   @return 0 on success
+   @return -1 on failure (some element has unrecognized element type)
+*/
+static int elements_set_ideal_durations(cw_elements_t * elements, const cw_gen_durations_t * durations)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
-		elements->array[i].duration = ideal_duration_of_element(elements->array[i].type, durations);
+		int duration = 0;
+		if (0 != cw_element_type_to_duration(elements->array[i].type, durations, &duration)) {
+			fprintf(stderr, "[ERROR] Can't assign duration to element #%zd with type '%c'\n",
+			        i, elements->array[i].type);
+			return -1;
+		}
+		elements->array[i].duration = (cw_element_time_t) duration;
 	}
+
+	return 0;
 }
 
 
@@ -191,7 +210,7 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 	   wpm speed [microseconds]. */
 	cw_gen_durations_t durations = { 0 };
 	cw_gen_get_durations_internal(gen, &durations);
-	cw_durations_print(stderr, &durations);
+	cw_gen_durations_print(stderr, &durations);
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
@@ -202,9 +221,9 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 		fprintf(stderr, "[ERROR] Failed to allocate string elements for string '%s'\n", input_string);
 		exit(EXIT_FAILURE);
 	}
-	if (0 != cw_elements_from_string(input_string, string_elements)) {
+	if (0 != cw_elements_detect_from_string(input_string, string_elements)) {
 		/* This is treated as developer's error, therefore we exit. Developer
-		   should ensure that cw_elements_from_string() work correctly for valid
+		   should ensure that cw_elements_detect_from_string() work correctly for valid
 		   input strings. */
 		fprintf(stderr, "[ERROR] Failed to get elements from input string '%s'\n", input_string);
 		cw_elements_delete(&string_elements);
@@ -267,9 +286,21 @@ static int get_elements_from_wav_file(const char * path, cw_elements_t * element
 	}
 
 	wav_header_t header = { 0 };
-	read_wav_header(input_fd, &header);
+	if (0 != wav_read_header(input_fd, &header)) {
+		fprintf(stderr, "[ERROR] Failed to read header of wav file\n");
+		close(input_fd);
+		return -1;
+	}
 
-	const float sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
+	bool valid = false;
+	wav_validate_header(&header, &valid);
+	if (!valid) {
+		fprintf(stderr, "[ERROR] Header of wav file doesn't seem to be valid\n");
+		close(input_fd);
+		return -1;
+	}
+
+	const cw_element_time_t sample_spacing = (1000.0 * 1000.0) / header.sample_rate; // [us]
 	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
 	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
 

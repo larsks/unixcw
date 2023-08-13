@@ -22,7 +22,7 @@ static void cw_rec_tester_normalize_input_and_received(cw_rec_tester_t * tester)
 static void test_callback_func(void * arg, int key_state);
 static void low_tone_queue_callback(void * arg);
 
-static void * cw_rec_tester_receiver_input_generator_fn(void * arg_tester);
+static void * cw_rec_tester_play_string(void * arg_tester);
 
 static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len);
 
@@ -412,23 +412,27 @@ static void low_tone_queue_callback(void * arg)
 
 
 
-/*
-  Code that generates info about timing of input events for receiver.
+/**
+   @brief Generate input events for receiver
 
-  We could generate the info and the events using a big array of
-  timestamps and a call to usleep(), but instead we are using a new
-  generator that can inform us when marks/spaces start.
+   Use generator to generate keying events (with their timestamps) for
+   receiver.
+
+   We could generate the events using a big array of timestamps and a call to
+   usleep(), but instead we are using a new generator that can inform the
+   receiver when marks/spaces start.
 */
-static void * cw_rec_tester_receiver_input_generator_fn(void * arg_tester)
+static void * cw_rec_tester_play_string(void * arg_tester)
 {
 	cw_rec_tester_t * tester = arg_tester;
 
-	/* Start sending the test string. Registered callback will be
-	   called on every mark/space. Enqueue only initial part of
-	   string, just to start sending, the rest should be sent by
+	/* Start sending the test string. Registered callback will be called on
+	   every mark/space. Enqueue only initial part of string
+	   ('initial_count'), just to start sending, the rest should be sent by
 	   'low watermark' callback. */
+	const int initial_count = 5;
 	cw_gen_start(tester->gen);
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < initial_count; i++) {
 		const char c = tester->input_string[tester->input_string_i];
 		if ('\0' == c) {
 			/* A very short input string. */
@@ -458,7 +462,7 @@ void cw_rec_tester_start_test_code(cw_rec_tester_t * tester)
 	   function? */
 	tester->generating_in_progress = true;
 
-	pthread_create(&tester->receiver_test_code_thread_id, NULL, cw_rec_tester_receiver_input_generator_fn, tester);
+	pthread_create(&tester->receiver_test_code_thread_id, NULL, cw_rec_tester_play_string, tester);
 }
 
 

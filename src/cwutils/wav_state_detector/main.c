@@ -12,39 +12,43 @@
 
 
 
-#include <libcw.h>
 
-#include "lib/elements.h"
-#include "lib/elements_detect.h"
-#include "lib/wav.h"
+#include "libcw/libcw.h"
 
+#include <cwutils/lib/elements.h>
+#include <cwutils/lib/elements_detect.h>
+#include <cwutils/lib/wav.h>
 
 
 
 
 /**
+   \file main.c
+
    @brief Detect states (mark/space) in given wav file
 
    Small debug program that:
    - uses some 'elements' functions that are also used by libcw generator
      tests,
    - uses the functions to detect mark/space states in given wav file,
-   - saves the mark/space states into 'elements' data structures,
+   - saves the mark/space states into 'elements' data structure,
    - gives possibility to confirm that the 'elements' functions work
      correctly.
 
 
   The input file for this program is a wav file because it's possible to get
   parameters of file from the wav header. I could achieve the same by passing
-  command-line arguments to this program, but...
+  information about a raw file through command-line arguments to this
+  program, but that would be cumbersome.
 
 
   Usage:
 
   1. Compile unixcw package with enabled feature of saving samples to debug
      file:
-     ./configure --enable-dev
-     make
+
+         ./configure --enable-dev
+         make
 
   2. Generate debug file in one of unixcw programs: just play some string in
      either cw, cwcp or xcwcp. The debug file (with raw samples) will be
@@ -55,12 +59,15 @@
      limited, so don't make the string too long.
 
   3. Convert the raw file into wav file:
-     sox -e signed-integer -b 16 -c 1 -r 44100 /tmp/cw_file_PulseAudio_44100Hz_mono_signed_16bit_pcm.raw /tmp/cw_file_PulseAudio_44100Hz_mono_signed_16bit_pcm.wav
 
-     Adjust sample rate (44100 in above example) as necessary.
+         sox -e signed-integer -b 16 -c 1 -r 44100 /tmp/cw_file_PulseAudio_44100Hz_mono_signed_16bit_pcm.raw /tmp/cw_file_PulseAudio_44100Hz_mono_signed_16bit_pcm.wav
+
+     Adjust sample rate (44100 in above example) as necessary, depending
+     on parameters used by libcw and printed by unixcw program to console.
 
   4. Call the program on the wav file like this:
-    ./wav_state_detector /path/to/file.wav
+
+         ./wav_state_detector /path/to/file.wav
 
     The program will analyse the wav file, detect states (mark/space) and
     their durations, and will generate another raw file, this time with
@@ -97,29 +104,29 @@
    Ideally there should be as many samples in the output raw file as there
    were samples in input wav file used to create @p elements.
 
+   @reviewedon 2023.08.12
+
    @param[out] fd File into which to write the samples
    @param[in] elements Elements structure to write to file
    @param[in] sample_spacing Time span between samples
 */
 static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_time_t sample_spacing)
 {
+	/* Values selected to make the high and low levels of square wave look
+	   good in Audacity, compared to audio wave generated with libcw's
+	   default volume of 70%. */
 	const cw_sample_t high = 30000;
 	const cw_sample_t low = -30000;
+
 	for (size_t e = 0; e < elements->curr_count; e++) {
-		/*
-		  For 44100 sample rate the sample spacing is 22.6757 microseconds.
-		  If we were using integer type for increment, we would lose a lot of
-		  time over N samples, and the data in input wav and in output raw
-		  files would diverge over time. Use floating point for better results.
-		*/
-		cw_element_time_t d = 0.0F;
-		while (d < elements->array[e].duration) {
+		cw_element_time_t this_element_span = 0.0;
+		while (this_element_span < elements->array[e].duration) {
 			if (elements->array[e].state == cw_state_mark) {
 				write(fd, &high, sizeof (high));
 			} else {
 				write(fd, &low, sizeof (low));
 			}
-			d += sample_spacing;
+			this_element_span += sample_spacing;
 		}
 	}
 }
@@ -127,34 +134,50 @@ static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_
 
 
 
+/**
+   @reviewedon 2023.08.12
+*/
 int main(int argc, char * argv[])
 {
 	if (argc != 2) {
-		fprintf(stderr, "[ERROR] Missing path to audio file\n");
+		fprintf(stderr, "[ERROR] Missing argument with path to input wav audio file\n");
+		fprintf(stderr, "[INFO ] Run this program like this: '%s path_to_file.wav'\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	const char * path = argv[1];
-	int input_fd = open(path, O_RDONLY);
+	const char * wav_path = argv[1];
+	int input_fd = open(wav_path, O_RDONLY);
 	if (-1 == input_fd) {
-		fprintf(stderr, "[ERROR] Can't open input file '%s'\n", path);
+		fprintf(stderr, "[ERROR] Can't open input wav file '%s': %s\n", wav_path, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
 	wav_header_t header = { 0 };
-	read_wav_header(input_fd, &header);
+	if (0 != wav_read_header(input_fd, &header)) {
+		fprintf(stderr, "[ERROR] Failed to read header of input wav file '%s'\n", wav_path);
+		close(input_fd);
+		return -1;
+	}
 
-	const cw_element_time_t sample_spacing = (1000.0F * 1000.0F) / header.sample_rate; // [us]
+	bool valid = false;
+	wav_validate_header(&header, &valid);
+	if (!valid) {
+		fprintf(stderr, "[ERROR] Header of wav file doesn't seem to be valid\n");
+		close(input_fd);
+		exit(EXIT_FAILURE);
+	}
+
+	const cw_element_time_t sample_spacing = (1000.0 * 1000.0) / header.sample_rate; // [us]
 	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
-	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
+	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", sample_spacing);
 
 	cw_elements_t * wav_elements = cw_elements_new(1000);
 	const int retval = cw_elements_detect_from_wav(input_fd, wav_elements, sample_spacing);
 	close(input_fd);
-	if (-1 == retval) {
+	if (0 != retval) {
 		fprintf(stderr, "[ERROR] Failed to detect elements in wav\n");
 		cw_elements_delete(&wav_elements);
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 	fprintf(stderr, "[INFO ] Detected %zd elements in wav file\n", wav_elements->curr_count);
 	/* Debug. */
@@ -166,7 +189,7 @@ int main(int argc, char * argv[])
 	   with input file. The visual comparison done by human is a kind of
 	   verification that cw_elements_detect_from_wav() works correctly. */
 	char states_path[1024] = { 0 };
-	snprintf(states_path, sizeof (states_path), "%s_states.raw", path);
+	snprintf(states_path, sizeof (states_path), "%s_states.raw", wav_path);
 	int states_fd = open(states_path, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
 	if (-1 == states_fd) {
 		fprintf(stderr, "[ERROR] Failed to open output raw file '%s': %s\n", states_path, strerror(errno));

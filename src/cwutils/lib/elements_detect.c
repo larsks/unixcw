@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <libcw.h>
+#include <libcw_data.h>
 
 #include "elements.h"
 #include "elements_detect.h"
@@ -75,7 +76,7 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
 {
 	/* Time stamp of start of previous element. Zero time stamp is at the
 	   beginning of pcm file. */
-	cw_element_time_t prev_element_start_ts = 0.0F;
+	cw_element_time_t prev_element_start_ts = 0.0;
 
 	cw_state_t prev_state = cw_state_space;
 	cw_state_t current_state = cw_state_space;
@@ -99,13 +100,17 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
 
 		if (beginning_of_file) {
 			/* Special case for beginning of file. */
-			beginning_of_file = false;
-			const cw_element_time_t current_element_start_ts = sample_i * sample_spacing;
-			prev_element_start_ts = current_element_start_ts;
-			prev_state = current_state;
 			fprintf(stderr, "[DEBUG] Detected initial state %s\n", current_state == cw_state_mark ? "mark" : "space");
+
+			beginning_of_file = false;
+			const cw_element_time_t current_timestamp = sample_i * sample_spacing;
+
+			prev_element_start_ts = current_timestamp;
+			prev_state = current_state;
 		} else {
 			if (current_state != prev_state) {
+				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == cw_state_mark ? "mark" : "space");
+
 				/* We have just detected change of state. We now know how
 				   long the previous state lasted, and we need to save
 				   the duration of the previous state, and the previous
@@ -113,12 +118,12 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
 				   cw_elements_append_element() below. */
 				const cw_element_time_t current_timestamp = sample_i * sample_spacing;
 				const cw_element_time_t prev_duration = current_timestamp - prev_element_start_ts;
-				prev_element_start_ts = current_timestamp;
 				if (0 != cw_elements_append_element(elements, prev_state, prev_duration)) {
 					fprintf(stderr, "[ERROR] Failed to append element from wav\n");
 					return -1;
 				}
-				fprintf(stderr, "[DEBUG] Detected transition to %s\n", current_state == cw_state_mark ? "mark" : "space");
+
+				prev_element_start_ts = current_timestamp;
 				prev_state = current_state;
 			}
 		}
@@ -128,13 +133,88 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
 	/* Special case for end of file. Current state and its duration was never
 	   saved (because in the loop we always saved previous state). Now we
 	   have to save the last element found in file - the current state and
-	   its duration. */
+	   its duration. The file has just ended, and so the current element
+	   ends. This ending of current element must be reflected in
+	   'elements'. */
 	const cw_element_time_t current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
 	const cw_element_time_t current_duration = current_timestamp - prev_element_start_ts;
 	if (0 != cw_elements_append_element(elements, current_state, current_duration)) {
 		fprintf(stderr, "[ERROR] Failed to append last element from wav\n");
 		return -1;
 	}
+
+	return 0;
+}
+
+
+
+
+int cw_elements_detect_from_string(const char * string, cw_elements_t * elements)
+{
+	size_t e = 0;
+
+	int s = 0;
+	while (string[s] != '\0') {
+
+		if (string[s] == ' ') {
+			/* ' ' character is represented by iws. This is a special case
+			   because this character doesn't have its "natural"
+			   representation in form of dots and dashes. */
+			if (e > 0 && (elements->array[e - 1].type == cw_element_type_ims || elements->array[e - 1].type == cw_element_type_ics)) {
+				/* Overwrite last end-of-element: space changes its type to
+				   iws */
+				elements->array[e - 1].type = cw_element_type_iws;
+				elements->array[e - 1].state = cw_state_space;
+				/* No need to increment 'e' as we are not adding new element. */
+			} else {
+				elements->array[e].type = cw_element_type_iws;
+				elements->array[e].state = cw_state_space;
+				e++;
+			}
+		} else {
+			/* Regular (non-space) character has its Morse representation.
+			   Get the representation, and copy each dot/dash into
+			   'elements'. Add ims after each dot/dash. */
+			const char * representation = cw_character_to_representation_internal(string[s]);
+			int r = 0;
+			while (representation[r] != '\0') {
+				switch (representation[r]) {
+				case '.':
+					elements->array[e].type = cw_element_type_dot;
+					elements->array[e].state = cw_state_mark;
+					break;
+				case '-':
+					elements->array[e].type = cw_element_type_dash;
+					elements->array[e].state = cw_state_mark;
+					break;
+				default:
+					break;
+				};
+				r++;
+				e++;
+				elements->array[e].type = cw_element_type_ims;
+				elements->array[e].state = cw_state_space;
+				e++;
+
+			}
+			/* Turn ims after last mark (the last mark in character) into ics. */
+			elements->array[e - 1].type = cw_element_type_ics;
+			elements->array[e - 1].state = cw_state_space;
+		}
+		s++;
+	}
+
+	if (e > elements->max_count) {
+		fprintf(stderr, "[ERROR] Count of elements (%zd) exceeds available space (%zd)\n", e, elements->max_count);
+		return -1;
+	}
+	elements->curr_count = e;
+
+#if 0 /* For debugging only. */
+	for (size_t i = 0; i < elements->curr_count; i++) {
+		fprintf(stderr, "[DEBUG] Initialized element %3zd with type '%c'\n", i, cw_element_type_get_representation(elements->array[i].type));
+	}
+#endif
 
 	return 0;
 }
@@ -153,6 +233,8 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
    @p memory didn't accumulate enough data, or if @p memory together with @p
    sample indicate that a samples are transitioning between silence and
    sound.
+
+   @reviewedon 2023.08.12
 
    @param[in/out] memory memory of past samples, updated by this function
    @param[in] sample current sample to be used together with @p memory in evaluation of sound in samples
