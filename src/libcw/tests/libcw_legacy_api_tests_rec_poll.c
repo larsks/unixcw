@@ -37,6 +37,7 @@
 #include <cwutils/cw_common.h>
 #include <cwutils/cw_rec_tester.h>
 #include <cwutils/cw_easy_legacy_receiver.h>
+#include <cwutils/cw_easy_legacy_receiver_internal.h>
 
 
 
@@ -79,7 +80,6 @@
 
 
 static cw_rec_tester_t g_tester;
-static cw_easy_legacy_receiver_t g_easy_rec;
 static cw_test_executor_t * g_cte;
 
 
@@ -110,11 +110,11 @@ static int easy_rec_test_on_space_c_r(cw_easy_legacy_receiver_t * easy_rec, cw_r
 */
 void receiver_poll_receiver(cw_easy_legacy_receiver_t * easy_rec)
 {
-	if (easy_rec->libcw_receive_errno != 0) {
+	if (0 != cw_easy_legacy_receiver_get_libcw_errno(easy_rec)) {
 		receiver_poll_report_error(easy_rec);
 	}
 
-	if (easy_rec->is_pending_iws) {
+	if (cw_easy_legacy_receiver_is_pending_iws(easy_rec)) {
 		/* Check if receiver received the pending inter-word-space. */
 		if (easy_rec->get_representation) {
 			/* First poll representation, then character. */
@@ -124,7 +124,7 @@ void receiver_poll_receiver(cw_easy_legacy_receiver_t * easy_rec)
 			receiver_poll_space_c_r(easy_rec);
 		}
 
-		if (!easy_rec->is_pending_iws) {
+		if (!cw_easy_legacy_receiver_is_pending_iws(easy_rec)) {
 			/* We received the pending space. After it the
 			   receiver may have received another
 			   character.  Try to get it too. */
@@ -154,13 +154,17 @@ void receiver_poll_receiver(cw_easy_legacy_receiver_t * easy_rec)
 
 
 /**
-   \brief Handle any error registered when handling a libcw keying event
+   \brief Handle any error that occurred when handling a libcw keying event
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] easy_rec Easy receiver for which to do an error handling
 */
 void receiver_poll_report_error(cw_easy_legacy_receiver_t * easy_rec)
 {
-	easy_rec->libcw_receive_errno = 0;
+	/* TODO (acerion) 2023.08.15: do a real reporting of error. */
 
-	return;
+	cw_easy_legacy_receiver_clear_libcw_errno(easy_rec);
 }
 
 
@@ -482,7 +486,7 @@ void receiver_poll_space_r_c(cw_easy_legacy_receiver_t * easy_rec)
 
 
 /**
-   @reviewed 2020-08-27
+   @reviewed 2023-08-15
 */
 cwt_retv legacy_api_test_rec_poll(cw_test_executor_t * cte)
 {
@@ -502,6 +506,7 @@ cwt_retv legacy_api_test_rec_poll(cw_test_executor_t * cte)
 static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool get_representation)
 {
 	cte->print_test_header(cte, __func__);
+	g_cte = cte;
 
 	if (get_representation) {
 		cte->log_info(cte, "Test mode: poll representation, verify by polling character\n");
@@ -515,6 +520,7 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	}
 
 
+	cw_easy_legacy_receiver_t * easy_rec = cw_easy_legacy_receiver_new();
 	cw_clear_receive_buffer();
 	cw_set_frequency(cte->config->frequency);
 	cw_generator_start();
@@ -530,28 +536,23 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	   paddles are pressed, but (since it doesn't receive timing
 	   parameters) it won't be able to identify entered Morse
 	   code. */
-	cw_register_keying_callback(cw_easy_legacy_receiver_handle_libcw_keying_event, &g_easy_rec);
-	gettimeofday(&g_easy_rec.main_timer, NULL);
-	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", easy_rec.main_timer.tv_sec, easy_rec.main_timer.tv_usec);
-
-
-	/* Prepare easy_rec object. */
-	memset(&g_easy_rec, 0, sizeof (g_easy_rec));
-	g_cte = cte;
-	g_easy_rec.get_representation = get_representation;
-
+	cw_register_keying_callback(cw_easy_legacy_receiver_handle_libcw_keying_event, easy_rec);
+	gettimeofday(&easy_rec->main_timer, NULL);
+	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", easy_rec->main_timer.tv_sec, easy_rec->main_timer.tv_usec);
 
 	cw_rec_tester_init(&g_tester);
-	g_easy_rec.rec_tester = &g_tester;
-	cw_rec_tester_configure(&g_tester, &g_easy_rec, true);
+	cw_rec_tester_configure(&g_tester, easy_rec, true);
 	cw_rec_tester_start_test_code(&g_tester);
 
+	/* Prepare easy_rec object. */
+	easy_rec->rec_tester = &g_tester;
+	easy_rec->get_representation = get_representation;
 
 	while (g_tester.generating_in_progress) {
 		/* At 60WPM, a dot is 20ms, so polling for the maximum speed
 		   library needs a 10ms timeout. TODO: fix the timeout, multiply by 1000. */
 		usleep(10);
-		receiver_poll_receiver(&g_easy_rec);
+		receiver_poll_receiver(easy_rec);
 		int new_speed = 0;
 		if (cwtest_param_ranger_get_next(&g_tester.speed_ranger, &new_speed)) {
 			cw_gen_set_speed(g_tester.gen, new_speed);
@@ -590,6 +591,7 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	cw_generator_stop();
 	cw_generator_delete();
 
+	cw_easy_legacy_receiver_delete(&easy_rec);
 
 	cte->print_test_footer(cte, __func__);
 

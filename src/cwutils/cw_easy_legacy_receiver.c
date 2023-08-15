@@ -29,6 +29,16 @@
 
 #include "cw_rec_tester.h"
 #include "cw_easy_legacy_receiver.h"
+#include "cw_easy_legacy_receiver_internal.h"
+
+
+
+
+/**
+   \file cw_easy_legacy_receiver.c
+
+   Wrappers around legacy libcw API for cw receiver.
+*/
 
 
 
@@ -142,29 +152,6 @@ void cw_easy_legacy_receiver_ik_right_event(cw_easy_legacy_receiver_t * easy_rec
 
 
 
-/**
-   \brief Handler for the keying callback from the CW library
-   indicating that the state of a key has changed.
-
-   The "key" is libcw's internal key structure. It's state is updated
-   by libcw when e.g. one iambic keyer paddle is constantly
-   pressed. It is also updated in other situations. In any case: the
-   function is called whenever state of this key changes.
-
-   Notice that the description above talks about a key, not about a
-   receiver. Key's states need to be interpreted by receiver, which is
-   a separate task. Key and receiver are separate concepts. This
-   function connects them.
-
-   This function, called on key state changes, calls receiver
-   functions to ensure that receiver does "receive" the key state
-   changes.
-
-   This function is called in signal handler context, and it takes
-   care to call only functions that are safe within that context.  In
-   particular, it goes out of its way to deliver results by setting
-   flags that are later handled by receive polling.
-*/
 void cw_easy_legacy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_state)
 {
 	cw_easy_legacy_receiver_t * easy_rec = (cw_easy_legacy_receiver_t *) easy_receiver;
@@ -255,6 +242,7 @@ void cw_easy_legacy_receiver_start(cw_easy_legacy_receiver_t * easy_rec)
 	gettimeofday(&easy_rec->main_timer, NULL);
 	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", easy_rec->main_timer.tv_sec, easy_rec->main_timer.tv_usec);
 }
+
 
 
 
@@ -484,7 +472,7 @@ void cw_easy_legacy_receiver_clear_libcw_errno(cw_easy_legacy_receiver_t * easy_
 
 
 
-bool cw_easy_legacy_receiver_is_pending_inter_word_space(const cw_easy_legacy_receiver_t * easy_rec)
+bool cw_easy_legacy_receiver_is_pending_iws(const cw_easy_legacy_receiver_t * easy_rec)
 {
 	return easy_rec->is_pending_iws;
 }

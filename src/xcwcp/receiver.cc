@@ -34,6 +34,10 @@
 
 #include "cwutils/i18n.h"
 
+#ifdef XCWCP_WITH_REC_TEST
+#include "cwutils/cw_easy_legacy_receiver_internal.h"
+#endif
+
 
 
 
@@ -58,7 +62,7 @@ void Receiver::poll(const Mode *current_mode)
 		poll_report_error();
 	}
 
-	if (cw_easy_legacy_receiver_is_pending_inter_word_space(easy_rec)) {
+	if (cw_easy_legacy_receiver_is_pending_iws(easy_rec)) {
 
 		/**
 		   If we received a character on an earlier poll, check again to see
@@ -73,8 +77,8 @@ void Receiver::poll(const Mode *current_mode)
 			textarea->append(' ');
 		}
 
-		if (!cw_easy_legacy_receiver_is_pending_inter_word_space(easy_rec)) {
-			/* We received the pending space. After it the
+		if (!cw_easy_legacy_receiver_is_pending_iws(easy_rec)) {
+			/* We received the pending inter-word-space. After it the
 			   receiver may have received another
 			   character.  Try to get it too. */
 			poll_character();
