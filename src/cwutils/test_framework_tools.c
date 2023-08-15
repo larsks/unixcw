@@ -268,3 +268,30 @@ void cwtest_param_ranger_set_plateau_length(cwtest_param_ranger_t * ranger, int 
 		ranger->plateau_length = 0;
 	}
 }
+
+
+
+
+const char * get_test_result_string(test_result_t result)
+{
+#define BEGIN_GREEN   "\x1B[32m"
+#define BEGIN_RED     "\x1B[31m"
+#define END_COLOR     "\x1B[0m"
+
+	/*
+	  TODO (acerion) 2023.08.15) This function assumes that the string
+	  literals are kept on heap, or in other non-stack location. Check this
+	  expectation is following a standard or just uses an
+	  implementation-specific behaviour.
+	*/
+	switch (result) {
+	case test_result_pass:
+		return BEGIN_GREEN"[PASS]"END_COLOR;
+	case test_result_fail:
+		return BEGIN_RED"[FAIL]"END_COLOR;
+	default:
+		return BEGIN_RED"[????]"END_COLOR;
+	}
+}
+
+

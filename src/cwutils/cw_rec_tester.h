@@ -51,7 +51,10 @@ typedef struct cw_rec_tester_t {
 	/* Iterator to the array above. */
 	size_t received_string_i;
 
-	cw_gen_t * gen;
+	/* Generator used only to generate keying events at specific time
+	   intervals. The events are received by tested receiver. */
+	cw_gen_t * helper_gen;
+
 	cw_key_t key;
 
 	cwtest_param_ranger_t speed_ranger;
@@ -62,12 +65,16 @@ typedef struct cw_rec_tester_t {
 	float acceptable_error_rate_percent; /* [percents] */
 	size_t acceptable_last_mismatch_index;
 
-	/* Input variable for the test. Decreasing or increasing
-	   decides how many characters are enqueued with the same
-	   speed S1. Next batch of characters will be enqueued with
-	   another speed S2. Depending on how long it will take to
-	   dequeue this batch, the difference between S2 and S1 may be
-	   significant and this will throw receiver off. */
+	/*
+	  How many characters to enqueue at once in helper generator each time
+	  the helper generator's queue runs low?
+
+	  Input variable for the test. Decreasing or increasing decides how many
+	  characters are enqueued with the same speed S1. Next batch of
+	  characters will be enqueued with another speed S2. Depending on how
+	  long it will take to dequeue this batch, the difference between S2 and
+	  S1 may be significant and this will throw receiver off.
+	*/
 	int characters_to_enqueue;
 
 } cw_rec_tester_t;
@@ -77,6 +84,10 @@ typedef struct cw_rec_tester_t {
 
 /**
    @brief Initialize @p tester variable
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] tester Pre-allocated tester variable to be initialized
 */
 void cw_rec_tester_init(cw_rec_tester_t * tester);
 
@@ -95,13 +106,14 @@ void cw_rec_tester_stop_test_code(cw_rec_tester_t * tester);
 /**
    @brief See how well the receiver has received the data
 
-   Compare buffers with text that was sent to test generator and text
-   that was received from tested production receiver.
+   Call this function at the end of receiver tests. Function compare buffers
+   with text that was sent to test/helper generator and text that was
+   received from tested receiver.
 
-   Compare input text with what the receiver received.
+   @param[in] tester Tester that was used during tests
 
-   @return 0 if received text is similar enough to input text
-   @return -1 otherwisee
+   @return 0 if received text is similar enough to input text, and test passes
+   @return -1 otherwise
 */
 int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester);
 

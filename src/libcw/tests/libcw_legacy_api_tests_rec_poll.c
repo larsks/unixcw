@@ -79,7 +79,6 @@
 
 
 
-static cw_rec_tester_t g_tester;
 static cw_test_executor_t * g_cte;
 
 
@@ -540,22 +539,23 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	gettimeofday(&easy_rec->main_timer, NULL);
 	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", easy_rec->main_timer.tv_sec, easy_rec->main_timer.tv_usec);
 
-	cw_rec_tester_init(&g_tester);
-	cw_rec_tester_configure(&g_tester, easy_rec, true);
-	cw_rec_tester_start_test_code(&g_tester);
+	cw_rec_tester_t tester = { 0 };
+	cw_rec_tester_init(&tester);
+	cw_rec_tester_configure(&tester, easy_rec, true);
+	cw_rec_tester_start_test_code(&tester);
 
 	/* Prepare easy_rec object. */
-	easy_rec->rec_tester = &g_tester;
+	easy_rec->rec_tester = &tester;
 	easy_rec->get_representation = get_representation;
 
-	while (g_tester.generating_in_progress) {
+	while (tester.generating_in_progress) {
 		/* At 60WPM, a dot is 20ms, so polling for the maximum speed
 		   library needs a 10ms timeout. TODO: fix the timeout, multiply by 1000. */
 		usleep(10);
 		receiver_poll_receiver(easy_rec);
 		int new_speed = 0;
-		if (cwtest_param_ranger_get_next(&g_tester.speed_ranger, &new_speed)) {
-			cw_gen_set_speed(g_tester.gen, new_speed);
+		if (cwtest_param_ranger_get_next(&tester.speed_ranger, &new_speed)) {
+			cw_gen_set_speed(tester.helper_gen, new_speed);
 		}
 	}
 
@@ -577,9 +577,9 @@ static cwt_retv legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool ge
 	  ==2402==    by 0x10E703: main (test_main.c:130)
 	*/
 	/* TODO: remove this function altogether. */
-	//cw_rec_tester_stop_test_code(&g_tester);
+	//cw_rec_tester_stop_test_code(&tester);
 
-	const int receive_correctness = cw_rec_tester_evaluate_receive_correctness(&g_tester);
+	const int receive_correctness = cw_rec_tester_evaluate_receive_correctness(&tester);
 	if (g_cte->expect_op_int(g_cte, 0, "==", receive_correctness, "Final comparison of receive correctness")) {
 		fprintf(stderr, "[II] Test result: success\n");
 	} else {

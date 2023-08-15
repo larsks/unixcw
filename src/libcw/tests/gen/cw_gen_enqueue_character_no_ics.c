@@ -51,7 +51,21 @@ typedef struct callback_data {
 
 
 
-static void callback(void * cdata, cw_easy_rec_data_t * erd)
+
+
+
+
+/**
+   @brief Callback called by easy receiver on each receive event
+
+   @p cdata is an object in this problem that knows what to do when the
+   callback is called by easy receiver, and knows how to handle the contents
+   of @p erd.
+
+   @param[in/out] cdata Pointer to an object in this program
+   @param[in] erd Easy receiver data - variable storing result of the receive event
+*/
+static void receive_callback(void * cdata, cw_easy_rec_data_t * erd)
 {
 	callback_data_t * data = (callback_data_t *) cdata;
 	if (erd->is_iws) {
@@ -169,7 +183,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cw_gen_register_value_tracking_callback_internal(gen, cw_easy_rec_handle_libcw_keying_event, easy_rec);
 
 	callback_data_t data = { .buffer = { 0 }, .iter = 0, .cte = cte };
-	cw_easy_rec_register_receive_callback(easy_rec, callback, &data);
+	cw_easy_rec_register_receive_callback(easy_rec, receive_callback, &data);
 	cw_easy_rec_start(easy_rec);
 
 

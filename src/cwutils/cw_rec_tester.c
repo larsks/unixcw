@@ -16,15 +16,30 @@
 
 
 
-static int  cw_rec_tester_compare_input_and_received(cw_rec_tester_t * tester);
+/**
+   \file cw_rec_tester.c
+
+   Tester of easy legacy receiver.
+
+   Generate some Morse code by a helper generator (using known input text),
+   forward the keying events to receiver, and see what the receiver received
+   and if the received text matches known input text).
+*/
+/* TODO: since this file is for legacy api receiver, rename the file to
+   something better (e.g. cw_easy_legacy_receiver_tester.c). */
+
+
+
+
+static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester);
 static void cw_rec_tester_normalize_input_and_received(cw_rec_tester_t * tester);
 
-static void test_callback_func(void * arg, int key_state);
+static void test_callback_func(void * arg, int morse_state);
 static void low_tone_queue_callback(void * arg);
 
 static void * cw_rec_tester_play_string(void * arg_tester);
 
-static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len);
+static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short);
 
 static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester);
 
@@ -33,16 +48,10 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester);
 
 void cw_rec_tester_init(cw_rec_tester_t * tester)
 {
+	memset(tester, 0, sizeof (cw_rec_tester_t));
+
 	/* Configure test parameters. */
 	tester->characters_to_enqueue = 5;
-
-	/* TODO: more thorough reset of tester. */
-
-	memset(tester->input_string, 0, sizeof (tester->input_string));
-	tester->input_string_i = 0;
-
-	memset(tester->received_string, 0, sizeof (tester->received_string));
-	tester->received_string_i = 0;
 }
 
 
@@ -64,16 +73,16 @@ int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester)
 
 	tester->acceptable_error_rate_percent = 1.0F;
 	tester->acceptable_last_mismatch_index = 10;
-	const int compare_result = cw_rec_tester_compare_input_and_received(tester);
+	const bool match = cw_rec_tester_input_and_received_match(tester);
 
 	cw_rec_tester_display_differences(tester);
-	if (0 == compare_result) {
-		fprintf(stderr, "[II] Test result: success\n");
+	if (match) {
+		fprintf(stderr, "[II] Test result: %s\n", get_test_result_string(test_result_pass));
 		return 0;
 	} else {
-		fprintf(stderr, "[EE] Test result: failure\n");
+		fprintf(stderr, "[EE] Test result: %s\n", get_test_result_string(test_result_fail));
+		fprintf(stderr, "\n");
 		fprintf(stderr, "[EE] '%s' != '%s'\n", tester->input_string, tester->received_string);
-
 		fprintf(stderr, "\n");
 		return -1;
 	}
@@ -82,7 +91,19 @@ int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester)
 
 
 
-static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len)
+/**
+   @brief Initialize main text buffers of tester
+
+   The output buffer is just cleared (that's where the received text will go).
+
+   The input buffer is filled with a text that will be played by helper generator and then received by tested receiver.
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] tester Tester in which to initialize the text buffers
+   @param[in] make_short Whether the text put into input buffer should be short (for quick tests) or long
+*/
+static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short)
 {
 	memset(tester->input_string, 0, sizeof (tester->input_string));
 	tester->input_string_i = 0;
@@ -90,9 +111,10 @@ static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len
 	memset(tester->received_string, 0, sizeof (tester->received_string));
 	tester->received_string_i = 0;
 
-	/* TODO: generate the text randomly. */
+	/* TODO (acerion) 2023.08.15: generate the text randomly, with given length. */
+	/* TODO (acerion) 2023.08.15: replace 'make_short' argument with expected length of generated input text. */
 
-	if (0 == len) {
+	if (make_short) {
 		/* Short text for occasions where I need a quick test. */
 #define BASIC_SET_SHORT "one two three four paris"
 		const char input[REC_TEST_BUFFER_SIZE] = BASIC_SET_SHORT;
@@ -106,8 +128,6 @@ static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len
 		const char input[REC_TEST_BUFFER_SIZE] = BASIC_SET_LONG BASIC_SET_LONG;
 		snprintf(tester->input_string, sizeof (tester->input_string), "%s", input);
 	}
-
-	return;
 }
 
 
@@ -134,10 +154,10 @@ static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, size_t len
    from the beginning, all received characters may be recognized as
    non-matching.
 
-   @return 0 if input and received string are similar enough
-   @return -1 otherwise
+   @return true if input and received string are similar enough
+   @return false otherwise
 */
-static int cw_rec_tester_compare_input_and_received(cw_rec_tester_t * tester)
+static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 {
 	const size_t input_len = strlen(tester->input_string);
 	const size_t received_len = strlen(tester->received_string);
@@ -177,7 +197,7 @@ static int cw_rec_tester_compare_input_and_received(cw_rec_tester_t * tester)
 				len, mismatch_count,
 				(double) error_rate_percent,
 				(double) tester->acceptable_error_rate_percent);
-			return -1;
+			return false;
 		} else {
 			fprintf(stderr, "[NN] Input len %zd, mismatch cnt %zd, err rate "PERC_FMT" (acceptable, thresh "PERC_FMT")\n",
 				len, mismatch_count,
@@ -197,7 +217,7 @@ static int cw_rec_tester_compare_input_and_received(cw_rec_tester_t * tester)
 			   data. */
 			fprintf(stderr, "[EE] Input len %zd, last mismatch idx %zd (too far from beginning, thresh %zd)\n",
 				len, last_mismatch_index, tester->acceptable_last_mismatch_index);
-			return -1;
+			return false;
 		} else {
 			fprintf(stderr, "[NN] Input len %zd, last mismatch idx %zd (acceptable, thresh %zd)\n",
 				len, last_mismatch_index, tester->acceptable_last_mismatch_index);
@@ -208,7 +228,7 @@ static int cw_rec_tester_compare_input_and_received(cw_rec_tester_t * tester)
 	}
 
 
-	return 0;
+	return true;
 }
 
 
@@ -247,7 +267,7 @@ static void string_tolower(char * string)
 	}
 
 	for (size_t i = 0; i < len; i++) {
-		string[i] = tolower(string[i]);
+		string[i] = tolower((int) string[i]);
 	}
 }
 
@@ -346,28 +366,43 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 
 
 
+/**
+   @brief Configure a receiver's tester before using the tester
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] tester Tester to configure
+   @param[in] easy_rec Easy receiver that should be tested
+   @param[in] use_ranger Whether to vary speed of test generator when generating Morse Code
+*/
 void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger)
 {
-	cw_rec_tester_init_text_buffers(tester, 1);
+	cw_rec_tester_init_text_buffers(tester, false);
 	/* Using Null sound system because this generator is only
 	   used to enqueue text and control key. Sound will be played
-	   by main generator used by xcwcp */
+	   by main generator used in tested code. */
 	cw_gen_config_t gen_conf = {
 		  .sound_system = CW_AUDIO_NULL
-		, .sound_device = { 0 }
+		, .sound_device = ""
 	};
 
-	tester->gen = cw_gen_new(&gen_conf);
+	tester->helper_gen = cw_gen_new(&gen_conf);
 
-	cw_tq_register_low_level_callback_internal(tester->gen->tq, low_tone_queue_callback, tester, 5);
+	/* TODO (acerion) 2023.08.15: create cw_gen_register_low_level_callback_internal() to hide tq. */
+	cw_tq_register_low_level_callback_internal(tester->helper_gen->tq, low_tone_queue_callback, tester, 5);
 
-	cw_key_register_generator(&tester->key, tester->gen);
-	cw_gen_register_value_tracking_callback_internal(tester->gen, test_callback_func, (void *) easy_rec);
-	//cw_key_register_keying_callback(&key, test_callback_func, (void *) easy_rec);
+	/* TODO (acerion) 2023.08.15: it appears that the call to
+	   cw_key_register_generator() is not necessary. */
+	cw_key_register_generator(&tester->key, tester->helper_gen);
+	cw_gen_register_value_tracking_callback_internal(tester->helper_gen, test_callback_func, (void *) easy_rec);
 
 	if (use_ranger) {
 		/* TODO: use full range of allowed speeds. */
-		cwtest_param_ranger_init(&tester->speed_ranger, 6 /* CW_SPEED_MIN */, 40 /* CW_SPEED_MAX */, 1, cw_gen_get_speed(tester->gen));
+		/* TODO (acerion) 2023.08.15: it appears that the situations where
+		   ranger is not being used are not well documented. xcwcp uses
+		   tester, but doesn't use ranger. See if accidental use of
+		   uninitialized ranger is handled correctly. */
+		cwtest_param_ranger_init(&tester->speed_ranger, 6 /* CW_SPEED_MIN */, 40 /* CW_SPEED_MAX */, 1, cw_gen_get_speed(tester->helper_gen));
 		cwtest_param_ranger_set_interval_sec(&tester->speed_ranger, 4);
 		cwtest_param_ranger_set_plateau_length(&tester->speed_ranger, 6);
 	}
@@ -376,12 +411,29 @@ void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t
 
 
 
+/**
+   @brief Function called on each change of state of helper generator
+
+   The function tells the easy receiver (obtained from @p arg) that a change
+   of key state (@p key_state) has occurred.
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] arg Pointer to easy receiver under test
+   @param[in] key_state Current state of helper generator (here called a 'state of key'): mark or space
+*/
 static void test_callback_func(void * arg, int key_state)
 {
-	/* Inform libcw receiver about new state of straight key ("sk").
+	/*
+	  Inform easy receiver about new state of helper generator. From
+	  receiver's point of view the mark/space states of generator look like
+	  states of straight key, so use the straight key ("sk") function of the
+	  easy receiver.
 
-	   libcw receiver will process the new state and we will later
-	   try to poll a character or space from it. */
+	  Easy receiver (and the libcw receiver embedded in the easy receiver)
+	  will process the new state and we will later try to poll a character
+	  or space from the easy receiver.
+	*/
 
 	cw_easy_legacy_receiver_t * easy_rec = (cw_easy_legacy_receiver_t *) arg;
 	//fprintf(stderr, "Callback function, key state = %d\n", key_state);
@@ -391,6 +443,20 @@ static void test_callback_func(void * arg, int key_state)
 
 
 
+/**
+   @brief Add new characters to helper generator's queue
+
+   This callback is called each time the helper generator's internal queue
+   runs low. The callback adds new characters to the queue. The characters
+   come from tester's input string.
+
+   Register this callback in generator with
+   cw_tq_register_low_level_callback_internal().
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] arg Pointer to receiver's tester
+*/
 static void low_tone_queue_callback(void * arg)
 {
 	cw_rec_tester_t * tester = (cw_rec_tester_t *) arg;
@@ -398,56 +464,62 @@ static void low_tone_queue_callback(void * arg)
 	for (int i = 0; i < tester->characters_to_enqueue; i++) {
 		const char c = tester->input_string[tester->input_string_i];
 		if ('\0' == c) {
-			/* Unregister ourselves. */
-			cw_tq_register_low_level_callback_internal(tester->gen->tq, NULL, NULL, 0);
+			/* End of input string. We can/should now unregister
+			   ourselves. */
+			cw_tq_register_low_level_callback_internal(tester->helper_gen->tq, NULL, NULL, 0);
 			break;
 		} else {
-			cw_gen_enqueue_character(tester->gen, c);
+			cw_gen_enqueue_character(tester->helper_gen, c);
 			tester->input_string_i++;
 		}
 	}
-
-	return;
 }
 
 
 
 /**
-   @brief Generate input events for receiver
+   @brief Generate input events for tested receiver
 
-   Use generator to generate keying events (with their timestamps) for
+   Use helper generator to generate keying events (with their timestamps) for
    receiver.
 
    We could generate the events using a big array of timestamps and a call to
-   usleep(), but instead we are using a new generator that can inform the
+   usleep(), but instead we are using a helper generator that can inform the
    receiver when marks/spaces start.
+
+   @param[in/out] arg_tester Tester of easy receiver
 */
 static void * cw_rec_tester_play_string(void * arg_tester)
 {
 	cw_rec_tester_t * tester = arg_tester;
 
-	/* Start sending the test string. Registered callback will be called on
-	   every mark/space. Enqueue only initial part of string
+	/* Start sending the test string. Registered keying callback will be
+	   called on every mark/space. Enqueue only initial part of string
 	   ('initial_count'), just to start sending, the rest should be sent by
 	   'low watermark' callback. */
-	const int initial_count = 5;
-	cw_gen_start(tester->gen);
+    const int initial_count = 5;
+	cw_gen_start(tester->helper_gen);
 	for (int i = 0; i < initial_count; i++) {
 		const char c = tester->input_string[tester->input_string_i];
 		if ('\0' == c) {
 			/* A very short input string. */
 			break;
 		} else {
-			cw_gen_enqueue_character(tester->gen, c);
+			cw_gen_enqueue_character(tester->helper_gen, c);
 			tester->input_string_i++;
 		}
 	}
 
-	/* Wait for all characters to be played out. */
-	cw_tq_wait_for_level_internal(tester->gen->tq, 0);
+	/* Wait for all characters to be played out. During this wait the above
+	   'initial_count' characters are played, and the generator's 'low
+	   watermark' callbacks adds more and more characters from tester's
+	   input string. At some point the input string runs out of characters,
+	   the last character is finally enqueued and played, and the 'wait'
+	   returns. */
+	cw_tq_wait_for_level_internal(tester->helper_gen->tq, 0);
 	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 
-	cw_gen_delete(&tester->gen); /* TODO (2022.01.03) if we are doing delete() in this function, then should we also do new() here? */
+	cw_gen_delete(&tester->helper_gen); /* TODO (2022.01.03) if we are doing delete() in this function, then should we also do new() here? */
 	tester->generating_in_progress = false;
 
 	return NULL;

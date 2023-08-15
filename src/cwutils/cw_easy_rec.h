@@ -50,7 +50,7 @@ typedef struct cw_easy_rec_data_t {
    @param[in] callback_data Pointer to some object in an application that is using the receiver
    @param[in] erd Data with information about what was received by the receiver
 */
-typedef void (*cw_easy_rec_callback_t)(void * callback_data, cw_easy_rec_data_t * erd);
+typedef void (*cw_easy_rec_receive_callback_t)(void * callback_data, cw_easy_rec_data_t * erd);
 
 
 
@@ -189,7 +189,7 @@ int cw_easy_rec_get_tolerance(const cw_easy_rec_t * easy_rec);
    @param[in] cb Callback to be registered - function that will be called on each successful receive
    @param[in] data Pointer to client-side variable that will be passed to @p cb
 */
-void cw_easy_rec_register_receive_callback(cw_easy_rec_t * easy_rec, cw_easy_rec_callback_t cb, void * data);
+void cw_easy_rec_register_receive_callback(cw_easy_rec_t * easy_rec, cw_easy_rec_receive_callback_t cb, void * data);
 
 
 

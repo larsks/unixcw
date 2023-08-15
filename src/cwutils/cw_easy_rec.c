@@ -87,8 +87,13 @@ struct cw_easy_rec_t {
 	pthread_t thread;
 	bool run_thread;
 
-	cw_easy_rec_callback_t callback;
-	void * callback_data;
+	/* This is a callback registered by application using the easy receiver.
+	   It will be called on each successful receive. */
+	cw_easy_rec_receive_callback_t receive_callback;
+
+	/* This is a pointer to some object in application that uses the easy
+	   receiver. The pointer will be passed to 'receive_callback' */
+	void * receive_callback_data;
 };
 
 
@@ -242,10 +247,10 @@ static void * thread_fn(void * arg)
 		usleep(1000);
 		cw_easy_rec_data_t erd = { 0 };
 		if (cw_easy_rec_poll_data_internal(easy_rec, &erd)) {
-			if (easy_rec->callback) {
+			if (easy_rec->receive_callback) {
 				/* This may pass the data to application that is using the
 				   receiver. */
-				easy_rec->callback(easy_rec->callback_data, &erd);
+				easy_rec->receive_callback(easy_rec->receive_callback_data, &erd);
 			}
 		}
 	}
@@ -523,10 +528,10 @@ int cw_easy_rec_get_tolerance(const cw_easy_rec_t * easy_rec)
 
 
 
-void cw_easy_rec_register_receive_callback(cw_easy_rec_t * easy_rec, cw_easy_rec_callback_t cb, void * data)
+void cw_easy_rec_register_receive_callback(cw_easy_rec_t * easy_rec, cw_easy_rec_receive_callback_t cb, void * data)
 {
-	easy_rec->callback = cb;
-	easy_rec->callback_data = data;
+	easy_rec->receive_callback = cb;
+	easy_rec->receive_callback_data = data;
 }
 
 
