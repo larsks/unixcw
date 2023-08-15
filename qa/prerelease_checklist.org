@@ -3,10 +3,19 @@
 Based on https://cdw.sourceforge.net/documentation/release_checklist/release_checklist.html
 
 
+* TODO Define scope of changes to be done in this release
+
+Describe them here, and stick to them during the development phase. Don't
+extend the scope unless really necessary (e.g. unless you find a serious
+bug).
+
+The goals of this development cycle are:
+1.
+
 * DONE Do the actual coding
 
-Do whatever you planned to do for given release. Add, update, remove
-features, fix bugs, refactor.
+Do whatever you planned to do for given release (see first point in this
+document).
 
 * DONE Stop coding
 
@@ -27,7 +36,7 @@ Don't be afraid to do refactoring if you notice opportunities or necessity to do
 Do fix any problems that you find during the review.
 Note down (in README.dev.org) any problems that won't be fixed in this release.
 
-* TODO Review changes: documentation and test scenarios template
+* TODO Review changes - documentation and test scenarios template
 1. Review changes in code, documentation and other files. Based on that, make
    necessary changes to:
    - qa/test_scenarios/template.org: add, remove or update test cases
@@ -38,6 +47,17 @@ Note down (in README.dev.org) any problems that won't be fixed in this release.
    - qa/test_scenarios/template.org: add, remove or update test cases
    - package documentation (NEWS/README/README.dev.org/man pages/installation
      instructions, other)
+
+* TODO Static code analysis
+Run the following tools for static code analysis, on entire code base,
+including tests:
+1. clang-tidy (through qa/run_clang_tidy.sh)
+2. cppcheck
+
+These checks should be a part of Continuous Integration pipeline, but:
+1. they are not (yet),
+2. an additional 'manual' check of results should ensure that no serious
+   issues have crept in.
 
 * TODO Come up with new version numbers
 
