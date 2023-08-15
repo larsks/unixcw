@@ -1,20 +1,56 @@
 #!/bin/bash
 
-# Script that builds Debian packages from local copy of unixcw's git repo.
+
+
+
+# Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
+# Script that builds Debian packages from local copy of project's git repo.
+#
+# The git repo should contain 'debian' directory with proper contents. If
+# there is no such directory, the script will fail. You can modify the script
+# to use 'debian' directory or 'debian' archive with such directory (e.g.
+# $PACKAGE\_$VERSION.debian.tar.gz) that is pulled by the script from outside
+# of the git repo.
 #
 # Call the script without any arguments.
 #
 # Call the script either from repo's top-level directory, or from 'qa'
-# directory - the script can handle both situations.
+# subdirectory - the script can handle both situations.
 #
 # The Debian packages are being built outside of the git repo dir. You will
 # be prompted by this script to confirm the path in which to build the
 # packages.
+#
+#
+# Customize this script by assigning correct values to PACKAGE and VERSION
+# variables.
 
 
 
+
+# Customize these variables as needed.
 PACKAGE="unixcw"
 VERSION="3.6.0"
+
+
+
 
 # Project's distribution archive, created by 'make dist'. Should not contain
 # 'debian' directory.
