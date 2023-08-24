@@ -63,6 +63,7 @@
 
 #include "libcw.h"
 #include "libcw_debug.h"
+#include "libcw_utils.h"
 #include "cwutils/cw_cmdline.h"
 
 #include "test_framework.h"
@@ -1545,7 +1546,7 @@ static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_obje
 
 
 		if (cte->use_resource_meas) {
-			usleep(1000 * LIBCW_TEST_INTER_TEST_PAUSE_MSECS);
+			usleep(CW_MSECS_PER_SEC * LIBCW_TEST_INTER_TEST_PAUSE_MSECS);
 			/*
 			  First stop the test, then display CPU usage summary.
 
@@ -1556,14 +1557,14 @@ static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_obje
 			*/
 			resource_meas_stop(&cte->resource_meas);
 
-			const int current_cpu_usage = resource_meas_get_current_cpu_usage(&cte->resource_meas);
-			const int max_cpu_usage = resource_meas_get_maximal_cpu_usage(&cte->resource_meas);
+			const float current_cpu_usage = resource_meas_get_current_cpu_usage(&cte->resource_meas);
+			const float max_cpu_usage = resource_meas_get_maximal_cpu_usage(&cte->resource_meas);
 			cte->log_info(cte, "CPU usage: last = "CWTEST_CPU_FMT", max = "CWTEST_CPU_FMT"\n",
-				      current_cpu_usage, max_cpu_usage);
+			              (double) current_cpu_usage, (double) max_cpu_usage);
 			if (max_cpu_usage > LIBCW_TEST_MEAS_CPU_OK_THRESHOLD_PERCENT) {
 				cte->stats->failures++;
 				cte->log_error(cte, "Registered high CPU usage "CWTEST_CPU_FMT" during execution of '%s'\n",
-					       max_cpu_usage, test_obj->name);
+				               (double) max_cpu_usage, test_obj->name);
 			}
 		}
 

@@ -346,7 +346,7 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
 	erd->errno_val = errno;
 	if (CW_SUCCESS == cwret) {
 
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef XCWCP_WITH_REC_TEST /* TODO acerion 2023.08.21: this should not say "XCWCP_*" because this code is not in xcwcp. */
 		if (CW_SUCCESS != cw_rec_tester_on_character(easy_rec->rec_tester, erd, &timer)) {
 			/* FIXME acerion 2022.02.19: this is a library code,
 			   so don't call exit(). */
@@ -426,7 +426,7 @@ bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_r
 	if (erd->is_iws) {
 		//fprintf(stderr, "End of word '%c'\n\n", erd->character);
 
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef XCWCP_WITH_REC_TEST /* TODO acerion 2023.08.21: this should not say "XCWCP_*" because this code is not in xcwcp. */
 		if (CW_SUCCESS != cw_rec_tester_on_space(easy_rec->rec_tester, erd, &timer)) {
 			/* FIXME acerion 2022.02.19: this is a library code,
 			   so don't call exit(). */

@@ -501,7 +501,7 @@ typedef struct cw_test_set_t {
 /* At what intervals the CPU usage will be measured. */
 #define LIBCW_TEST_MEAS_CPU_MEAS_INTERVAL_MSECS 200
 
-/* What is the top CPU usage threshold during test function's execution. */
+/* What is the top allowed CPU usage threshold during test function's execution [percent]. */
 #define LIBCW_TEST_MEAS_CPU_OK_THRESHOLD_PERCENT 4.0F
 
 

@@ -236,7 +236,7 @@ void cw_easy_rec_handle_libcw_keying_event(void * easy_receiver, int key_state)
 
    The loop is running as long as cw_easy_rec_t::run_thread is true.
 
-   @reviewedon 2023.08.12
+   @reviewedon 2023.08.21
 
    @param[in/out] arg Easy receiver
 */
@@ -244,7 +244,7 @@ static void * thread_fn(void * arg)
 {
 	cw_easy_rec_t * easy_rec = (cw_easy_rec_t *) arg;
 	while (easy_rec->run_thread) {
-		usleep(1000);
+		usleep(1000); /* TODO acerion 2023.08.21: replace with uninterruptible sleep function. */
 		cw_easy_rec_data_t erd = { 0 };
 		if (cw_easy_rec_poll_data_internal(easy_rec, &erd)) {
 			if (easy_rec->receive_callback) {
@@ -336,6 +336,24 @@ static bool cw_easy_rec_poll_data_internal(cw_easy_rec_t * easy_rec, cw_easy_rec
 
 
 
+
+/**
+   @brief Try polling a character from receiver
+
+   See if a receiver has received/recognized a character (a character other
+   than ' ').
+
+   Function may return false (failure) for completely valid reasons, e.g.
+   when it's too early to decide if a receiver has received something or not.
+
+   Call this function periodically on a receiver.
+
+   @param[in] easy_rec Easy receiver from which to try to poll the character
+   @param[out] erd Data of easy receiver, filled on successful poll.
+
+   @return true if receiver has received a character (@p erd is updated accordingly)
+   @return false if receiver didn't receive a character
+*/
 static bool cw_easy_rec_poll_character_internal(cw_easy_rec_t * easy_rec, cw_easy_rec_data_t * erd)
 {
 	/* Don't use receiver.easy_rec->main_timer - it is used exclusively for
@@ -409,6 +427,24 @@ static bool cw_easy_rec_poll_character_internal(cw_easy_rec_t * easy_rec, cw_eas
 
 
 
+/**
+   @brief Try polling an inter-word-space from receiver
+
+   See if a receiver has received/recognized an inter-word-space (a ' ' character).
+
+   'iws' in function name stands for 'inter-word-space' (i.e. a ' ' character).
+
+   Function may return false (failure) for completely valid reasons, e.g.
+   when it's too early to decide if a receiver has received something or not.
+
+   Call this function if cw_easy_rec_t::is_pending_iws flag is set to true.
+
+   @param[in] easy_rec Easy receiver from which to try to poll the character
+   @param[out] erd Data of easy receiver, filled on successful poll.
+
+   @return true if receiver has received a space (@p erd is updated accordingly)
+   @return false if receiver didn't receive a space
+*/
 static bool cw_easy_rec_poll_iws_internal(cw_easy_rec_t * easy_rec, cw_easy_rec_data_t * erd)
 {
 	/* We expect the receiver to contain a character, but we don't

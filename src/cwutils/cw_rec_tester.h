@@ -94,10 +94,39 @@ void cw_rec_tester_init(cw_rec_tester_t * tester);
 
 
 
+/**
+   @brief Configure a receiver's tester before using the tester
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] tester Tester to configure
+   @param[in] easy_rec Easy receiver that should be tested
+   @param[in] use_ranger Whether to vary speed of test generator when generating Morse Code
+*/
 void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger);
 
+
+
+
+/**
+   @brief Start tester of legacy receiver
+
+   @reviewedon 2023.08.21
+
+   @param[in/out] tester Tester of legacy receiver to start
+ */
 void cw_rec_tester_start_test_code(cw_rec_tester_t * tester);
 
+
+
+
+/**
+   @brief Stop tester of legacy receiver
+
+   @reviewedon 2023.08.21
+
+   @param[in/out] tester Tester of legacy receiver to stop
+ */
 void cw_rec_tester_stop_test_code(cw_rec_tester_t * tester);
 
 
@@ -106,11 +135,13 @@ void cw_rec_tester_stop_test_code(cw_rec_tester_t * tester);
 /**
    @brief See how well the receiver has received the data
 
-   Call this function at the end of receiver tests. Function compare buffers
+   Call this function at the end of receiver tests. Function compares buffers
    with text that was sent to test/helper generator and text that was
    received from tested receiver.
 
-   @param[in] tester Tester that was used during tests
+   @reviewedon 2023.08.21
+
+   @param[in/out] tester Tester that was used during tests
 
    @return 0 if received text is similar enough to input text, and test passes
    @return -1 otherwise
@@ -120,7 +151,47 @@ int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester);
 
 
 
+/**
+   @brief Pass to the tester a received character
+
+   Let tester know that a tested receiver has received a non-inter-word-space
+   character (i.e. character other than ' ' space).
+
+   The tester also does an additional poll and a cross-check from the tested
+   receiver to double-check the received @p erd.
+
+   @reviewedon 2023.08.21
+
+   @param[in/out] tester Tester of easy legacy receiver
+   @param[in] erd Data received by tester easy legacy receiver
+   @param[in] timeval Timestamp passed earlier to cw_receive_character()
+
+   @return CW_SUCCESS if no error occurred during the additional poll or cross-check
+   @return CW_FAILURE otherwise
+*/
 int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct timeval * timer);
+
+
+
+
+/**
+   @brief Pass to the tester a received inter-word-space (' ' character)
+
+   Let tester know that a tested receiver has received an inter-word-space
+   character (i.e. ' ' character).
+
+   The tester also does an additional poll and a cross-check from the tested
+   receiver to double-check the received @p erd.
+
+   @reviewedon 2023.08.21
+
+   @param[in/out] tester Tester of easy legacy receiver
+   @param[in] erd Data received by tester easy legacy receiver
+   @param[in] timeval Timestamp passed earlier to cw_receive_character()
+
+   @return CW_SUCCESS if no error occurred during the additional poll or cross-check
+   @return CW_FAILURE otherwise
+*/
 int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct timeval * timer);
 
 

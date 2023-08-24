@@ -63,8 +63,8 @@ int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester)
 	   string. It will be easier to do visual comparison of the
 	   two strings if they are presented that way. */
 
-	fprintf(stderr, "[II] Sent:     \n\n'%s'\n\n", tester->input_string);
-	fprintf(stderr, "[II] Received: \n\n'%s'\n\n", tester->received_string);
+	fprintf(stderr, "[II] Sent (raw):     \n\n'%s'\n\n", tester->input_string);
+	fprintf(stderr, "[II] Received (raw): \n\n'%s'\n\n", tester->received_string);
 
 	cw_rec_tester_normalize_input_and_received(tester);
 
@@ -366,15 +366,6 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 
 
 
-/**
-   @brief Configure a receiver's tester before using the tester
-
-   @reviewedon 2023.08.15
-
-   @param[in/out] tester Tester to configure
-   @param[in] easy_rec Easy receiver that should be tested
-   @param[in] use_ranger Whether to vary speed of test generator when generating Morse Code
-*/
 void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger)
 {
 	cw_rec_tester_init_text_buffers(tester, false);
@@ -552,7 +543,16 @@ int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, st
 {
 	fprintf(stderr, "[II] Character: '%c'\n", erd->character);
 
+	/* TODO acerion 2023.08.21: check for iterator-in-range. */
 	tester->received_string[tester->received_string_i++] = erd->character;
+
+	/*
+	  TODO acerion 2023.08.21: do we *really* need the remainder of the
+	  function? The remainder only confirms that polling tested receiver for
+	  representation gives the same result as 'erd' that was received by
+	  caller of this function with cw_receive_character(). So maybe that's
+	  the entire point of the remainder?
+	*/
 
 	cw_rec_data_t test_data = { 0 };
 	int cw_ret = cw_receive_representation(timer, test_data.representation, &test_data.is_iws, &test_data.is_error);
@@ -562,12 +562,12 @@ int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, st
 	}
 
 	if (test_data.is_iws != erd->is_iws) {
-		fprintf(stderr, "[EE] Character: 'is end of word' markers mismatch: %d != %d\n", test_data.is_iws, erd->is_iws);
+		fprintf(stderr, "[EE] Character: 'is inter-word-space' markers mismatch: %d != %d\n", test_data.is_iws, erd->is_iws);
 		return CW_FAILURE;
 	}
 
 	if (test_data.is_iws) {
-		fprintf(stderr, "[EE] Character: 'is end of word' marker is unexpectedly 'true'\n");
+		fprintf(stderr, "[EE] Character: 'is inter-word-space' marker is unexpectedly 'true'\n");
 		return CW_FAILURE;
 	}
 
@@ -607,8 +607,16 @@ int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct
 		return CW_FAILURE;
 	}
 
-
+	/* TODO acerion 2023.08.21: check for iterator-in-range. */
 	tester->received_string[tester->received_string_i++] = ' ';
+
+	/*
+	  TODO acerion 2023.08.21: do we *really* need the remainder of the
+	  function? The remainder only confirms that polling tested receiver for
+	  representation gives the same result as 'erd' that was received by
+	  caller of this function with cw_receive_character(). So maybe that's
+	  the entire point of the remainder?
+	*/
 
 	cw_rec_data_t test_data = { 0 };
 	int cw_ret = cw_receive_representation(timer, test_data.representation, &test_data.is_iws, &test_data.is_error);
@@ -618,12 +626,12 @@ int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct
 	}
 
 	if (test_data.is_iws != erd->is_iws) {
-		fprintf(stderr, "[EE] Space: 'is end of word' markers mismatch: %d != %d\n", test_data.is_iws, erd->is_iws);
+		fprintf(stderr, "[EE] Space: 'is inter-word-space' markers mismatch: %d != %d\n", test_data.is_iws, erd->is_iws);
 		return CW_FAILURE;
 	}
 
 	if (!test_data.is_iws) {
-		fprintf(stderr, "[EE] Space: 'is end of word' marker is unexpectedly 'false'\n");
+		fprintf(stderr, "[EE] Space: 'is inter-word-space' marker is unexpectedly 'false'\n");
 		return CW_FAILURE;
 	}
 

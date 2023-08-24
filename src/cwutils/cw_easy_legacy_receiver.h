@@ -103,7 +103,7 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
 
 
 /**
-   @brief Try polling a space from receiver
+   @brief Try polling an inter-word-space from receiver
 
    See if a receiver has received/recognized an inter-word-space (a ' ' character).
 
