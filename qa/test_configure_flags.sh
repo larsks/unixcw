@@ -82,7 +82,14 @@ do
 
     #echo $(eval pwd)
 
-    # real code
+    # The main part - the compilation with given configuration flags.
+	#
+	# TODO acerion 2023.08.24: the command should run "make distcheck"
+	# instead of just "make check" to ensure that:
+
+	# 1. a code is being built in clear dir (unpacked from dist package)
+	# 2. 'make dist' always works, regardless of './configure' flags (a
+	#    heavy-duty test of 'make dist')
     command="./configure $switches &>/dev/null   &&   make &>/dev/null   &&   make check &>/dev/null   &&   make clean &>/dev/null"
     echo $i": "$command
     result=$(eval $command)
