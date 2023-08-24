@@ -51,13 +51,14 @@ lib_cwcp_a_SOURCES        = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h
 
 lib_xcwcp_a_SOURCES       = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h
 if WITH_XCWCP_REC_TEST
-lib_xcwcp_a_SOURCES      += test_framework_tools.c test_framework_tools.h
 lib_xcwcp_a_CPPFLAGS      =-DXCWCP_WITH_REC_TEST
+lib_xcwcp_a_LIBADD        = $(top_builddir)/src/test_framework/basic_utils/lib.a
 endif
 
 lib_cwgen_a_SOURCES       = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h
 lib_libcw_tests_a_SOURCES = cw_easy_rec.c cw_easy_rec.h cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h
-lib_rec_tests_a_SOURCES   = cw_rec_tester.c cw_rec_tester.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h test_framework_tools.c test_framework_tools.h
+lib_rec_tests_a_SOURCES   = cw_rec_tester.c cw_rec_tester.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h
+lib_rec_tests_a_LIBADD    = $(top_builddir)/src/test_framework/basic_utils/lib.a
 
 
 # Test targets; no self-test, but make sure all is built.

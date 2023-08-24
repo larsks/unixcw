@@ -179,6 +179,7 @@ libcw_tests_DEPENDENCIES =  \
 	$(top_builddir)/src/cwutils/lib_libcw_tests.a \
 	$(top_builddir)/src/cwutils/lib_rec_tests.a \
 	$(top_builddir)/src/cwutils/lib/libcwutils.a \
+	$(top_builddir)/src/test_framework/basic_utils/lib.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -683,8 +684,9 @@ libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_T
 # symbols from the dynamic library.
 libcw_tests_LDADD = $(top_builddir)/src/cwutils/lib_libcw_tests.a \
 	$(top_builddir)/src/cwutils/lib_rec_tests.a \
-	$(top_builddir)/src/cwutils/lib/libcwutils.a $(INTL_LIB) -lm \
-	-lpthread $(DL_LIB) -L../.libs -lcw_test
+	$(top_builddir)/src/cwutils/lib/libcwutils.a \
+	$(top_builddir)/src/test_framework/basic_utils/lib.a \
+	$(INTL_LIB) -lm -lpthread $(DL_LIB) -L../.libs -lcw_test
 EXTRA_DIST = \
 	$(check_SCRIPTS) \
 	count_functions_under_test.py

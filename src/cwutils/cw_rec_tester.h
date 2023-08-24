@@ -6,7 +6,8 @@
 
 #include <stdint.h>
 #include "../libcw/libcw_key.h"
-#include "test_framework_tools.h"
+#include <test_framework/basic_utils/param_ranger.h>
+#include <test_framework/basic_utils/test_result.h>
 
 #include "cw_easy_legacy_receiver.h"
 

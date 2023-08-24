@@ -18484,8 +18484,8 @@ done
 
 # Decide on which subdirectories to build; substitute into SRC_SUBDIRS.
 # Build cwcp if curses is available, and xcwcp if Qt is available.
-# libcw tests depend on static library from cwutils, so cwutils goes first.
-SRC_SUBDIRS="cwutils libcw"
+# libcw tests depend on static library from cwutils, so cwutils goes before libcw.
+SRC_SUBDIRS="test_framework cwutils libcw"
 
 if test "$WITH_CWGEN" = 'yes' ; then
     SRC_SUBDIRS="$SRC_SUBDIRS cwgen"
@@ -18689,7 +18689,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile src/cwutils/lib/Makefile"
+ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile src/cwutils/lib/Makefile src/test_framework/Makefile src/test_framework/basic_utils/Makefile"
 
 
 if test "$WITH_CWGEN" = 'yes' ; then
@@ -19850,6 +19850,8 @@ do
     "src/libcw/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/libcw/tests/Makefile" ;;
     "src/cwutils/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/Makefile" ;;
     "src/cwutils/lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/lib/Makefile" ;;
+    "src/test_framework/Makefile") CONFIG_FILES="$CONFIG_FILES src/test_framework/Makefile" ;;
+    "src/test_framework/basic_utils/Makefile") CONFIG_FILES="$CONFIG_FILES src/test_framework/basic_utils/Makefile" ;;
     "src/cwgen/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwgen/Makefile" ;;
     "src/cw/Makefile") CONFIG_FILES="$CONFIG_FILES src/cw/Makefile" ;;
     "src/cwcp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwcp/Makefile" ;;

@@ -67,7 +67,7 @@
 #include "cwutils/cw_cmdline.h"
 
 #include "test_framework.h"
-#include "cwutils/test_framework_tools.h"
+#include <test_framework/basic_utils/param_ranger.h>
 
 
 
@@ -1559,11 +1559,11 @@ static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_obje
 
 			const float current_cpu_usage = resource_meas_get_current_cpu_usage(&cte->resource_meas);
 			const float max_cpu_usage = resource_meas_get_maximal_cpu_usage(&cte->resource_meas);
-			cte->log_info(cte, "CPU usage: last = "CWTEST_CPU_FMT", max = "CWTEST_CPU_FMT"\n",
+			cte->log_info(cte, "CPU usage: last = "MEAS_CPU_FMT", max = "MEAS_CPU_FMT"\n",
 			              (double) current_cpu_usage, (double) max_cpu_usage);
 			if (max_cpu_usage > LIBCW_TEST_MEAS_CPU_OK_THRESHOLD_PERCENT) {
 				cte->stats->failures++;
-				cte->log_error(cte, "Registered high CPU usage "CWTEST_CPU_FMT" during execution of '%s'\n",
+				cte->log_error(cte, "Registered high CPU usage "MEAS_CPU_FMT" during execution of '%s'\n",
 				               (double) max_cpu_usage, test_obj->name);
 			}
 		}

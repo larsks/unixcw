@@ -512,8 +512,8 @@ AC_CHECK_FUNCS([gettimeofday setlocale select strerror], [], [AC_MSG_ERROR([a fu
 
 # Decide on which subdirectories to build; substitute into SRC_SUBDIRS.
 # Build cwcp if curses is available, and xcwcp if Qt is available.
-# libcw tests depend on static library from cwutils, so cwutils goes first.
-SRC_SUBDIRS="cwutils libcw"
+# libcw tests depend on static library from cwutils, so cwutils goes before libcw.
+SRC_SUBDIRS="test_framework cwutils libcw"
 
 if test "$WITH_CWGEN" = 'yes' ; then
     SRC_SUBDIRS="$SRC_SUBDIRS cwgen"
@@ -675,7 +675,10 @@ AC_CONFIG_FILES([Makefile.inc
 	src/libcw/Makefile
 	src/libcw/tests/Makefile
 	src/cwutils/Makefile
-	src/cwutils/lib/Makefile])
+	src/cwutils/lib/Makefile
+	src/test_framework/Makefile
+	src/test_framework/basic_utils/Makefile
+	])
 
 if test "$WITH_CWGEN" = 'yes' ; then
    AC_CONFIG_FILES([src/cwgen/Makefile])

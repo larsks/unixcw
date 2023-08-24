@@ -112,9 +112,11 @@ libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_T
 # Target-specific linker flags (objects to link). Order is important:
 # first static libraries then dynamic. Otherwise linker may not find
 # symbols from the dynamic library.
-libcw_tests_LDADD  = $(top_builddir)/src/cwutils/lib_libcw_tests.a
+libcw_tests_LDADD  =
+libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib_libcw_tests.a
 libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib_rec_tests.a
 libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib/libcwutils.a
+libcw_tests_LDADD += $(top_builddir)/src/test_framework/basic_utils/lib.a
 libcw_tests_LDADD += $(INTL_LIB) -lm -lpthread $(DL_LIB) -L../.libs -lcw_test
 
 
