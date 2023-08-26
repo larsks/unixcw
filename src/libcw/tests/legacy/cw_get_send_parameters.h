@@ -1,8 +1,3 @@
-/*
-  This file is a part of unixcw project.  unixcw project is covered by
-  GNU General Public License, version 2 or later.
-*/
-
 #ifndef TEST_CW_GET_SEND_PARAMETERS_H
 #define TEST_CW_GET_SEND_PARAMETERS_H
 

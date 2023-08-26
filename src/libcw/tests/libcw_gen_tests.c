@@ -907,7 +907,7 @@ cwt_retv test_cw_gen_enqueue_primitives(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -980,7 +980,7 @@ cwt_retv test_cw_gen_enqueue_primitives(cw_test_executor_t * cte)
 		cte->expect_op_int(cte, false, "==", failure, "enqueue iws internal()");
 	}
 
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1006,7 +1006,7 @@ cwt_retv test_cw_gen_enqueue_representations(cw_test_executor_t * cte)
 	   representation represents a supported character. */
 
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1071,7 +1071,7 @@ cwt_retv test_cw_gen_enqueue_representations(cw_test_executor_t * cte)
 	   way. */
 	cw_usleep_internal(1 * CW_USECS_PER_SEC);
 #endif
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1093,7 +1093,7 @@ cwt_retv test_cw_gen_enqueue_character(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1148,7 +1148,7 @@ cwt_retv test_cw_gen_enqueue_character(cw_test_executor_t * cte)
 	}
 
 
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1170,7 +1170,7 @@ cwt_retv test_cw_gen_enqueue_string(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
@@ -1221,7 +1221,7 @@ cwt_retv test_cw_gen_enqueue_string(cw_test_executor_t * cte)
 		cte->expect_op_int(cte, false, "==", failure, "enqueue string(<invalid>)");
 	}
 
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 

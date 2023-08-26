@@ -1179,7 +1179,7 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 	cte->print_test_header(cte, "%s (%d)", __func__, loops);
 
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return -1;
 	}
@@ -1328,7 +1328,7 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 	cte->expect_op_int(cte, CW_SUCCESS, "==", cwret, "tq gen operations A: final wait for level 0");
 
 
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1349,7 +1349,7 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 {
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return -1;
 	}
@@ -1443,7 +1443,7 @@ int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 	cw_tq_enqueue_internal(gen->tq, &tone);
 	cw_tq_wait_for_level_internal(gen->tq, 0);
 
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->print_test_footer(cte, __func__);
 
@@ -1646,7 +1646,7 @@ int test_cw_tq_callback(cw_test_executor_t * cte)
 
 	for (int i = 1; i < loops; i++) { /* TODO: the test doesn't work for i == 0. This needs to be communicated in documentation. */
 
-		if (0 != helper_gen_setup(cte, &gen)) {
+		if (0 != gen_setup(cte, &gen)) {
 			cte->log_error(cte, "%s:%d: Failed to create generator in iteration %d\n", __func__, __LINE__, i);
 			return -1;
 		}
@@ -1711,7 +1711,7 @@ int test_cw_tq_callback(cw_test_executor_t * cte)
 		}
 
 		cw_tq_flush_internal(gen->tq);
-		helper_gen_destroy(&gen);
+		gen_destroy(&gen);
 	}
 
 	cte->expect_op_int(cte, false, "==", register_failure, "registering low level callback");

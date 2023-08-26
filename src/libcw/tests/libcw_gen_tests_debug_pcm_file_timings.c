@@ -18,41 +18,38 @@
 
 
 
+/**
+   @file libcw_gen_tests_debug_pcm_file_timings.c
+
+   This test is verifying if marks and spaces in wav (sound) file produced by
+   generator have proper durations.
+
+   The sound file is produced by libcw if libcw is compiled in development
+   mode ("./configure --enable-dev"). In such case the generator copies all
+   sound samples to dedicated file in /tmp.
+
+   This test is checking if durations of the marks and spaces are as expected.
+
+   This test requires 'sox' program installed on test machine.
+*/
+
+
+
+
 #include <math.h> /* fabs() */
 #include <stdlib.h> /* exit() */
 
-
-
+#include <cwutils/lib/elements.h>
+#include <cwutils/lib/elements_detect.h>
+#include <cwutils/lib/element_stats.h>
+#include <cwutils/lib/misc.h>
+#include <cwutils/lib/wav.h>
 
 #include "libcw2.h"
-
-
-
-#include "cwutils/lib/elements.h"
-#include "cwutils/lib/elements_detect.h"
-#include "cwutils/lib/element_stats.h"
-#include "cwutils/lib/misc.h"
-#include "cwutils/lib/wav.h"
-
-
 #include "libcw_data.h"
 #include "libcw_gen_tests_debug_pcm_file_timings.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
-
-
-
-
-/*
-  This test is verifying if marks and spaces in wav (sound) file produced by
-  generator have proper lengths.
-
-  The sound file is produced by libcw if libcw is compiled in development
-  mode ("./configure --enable-dev"). In such case the generator copies all
-  sound samples to dedicated file in /tmp.
-
-  This test is checking if durations of the marks and spaces are as expected.
-*/
 
 
 
@@ -71,13 +68,10 @@
 
 
 typedef struct test_data_t {
-	/* Sound system for which we have reference data, and with which the
-	   current run of a test should be done. */
+	/* Sound system for which to run tests. */
 	enum cw_audio_systems sound_system;
 
-	/* Speed (WPM) for which we have reference data, and at which current
-	   run of a test should be done (otherwise we will be comparing
-	   results of tests made in different conditions). */
+	/* Speed (WPM) for which to run the tests. */
 	int speed;
 } test_data_t;
 
@@ -87,13 +81,17 @@ typedef struct test_data_t {
 static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte, test_data_t * test_data, const char * sound_device, const char * input_string);
 static int get_elements_from_wav_file(const char * path, cw_elements_t * elements);
 static int elements_set_ideal_durations(cw_elements_t * elements, const cw_gen_durations_t * durations);
-static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_elements_t * wav_elements);
-static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * string_elements, cw_elements_t * wav_elements);
+static void print_test_results(FILE * file, const cw_elements_t * string_elements, const cw_elements_t * wav_elements);
+static void evaluate_test_results(cw_test_executor_t * cte, const cw_elements_t * string_elements, const cw_elements_t * wav_elements);
 
 
 
 
 static test_data_t g_test_data[] = {
+
+	/* There is no pcm file sink implemented for NULL and CONSOLE sound
+	   systems. */
+#if 0
 	{ .sound_system = CW_AUDIO_NULL,    .speed =  4 },
 	{ .sound_system = CW_AUDIO_NULL,    .speed = 12 },
 	{ .sound_system = CW_AUDIO_NULL,    .speed = 24 },
@@ -105,6 +103,8 @@ static test_data_t g_test_data[] = {
 	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 24 },
 	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 36 },
 	{ .sound_system = CW_AUDIO_CONSOLE, .speed = 60 },
+#endif
+
 
 	{ .sound_system = CW_AUDIO_OSS,     .speed =  4 },
 	{ .sound_system = CW_AUDIO_OSS,     .speed = 12 },
@@ -117,10 +117,9 @@ static test_data_t g_test_data[] = {
 	{ .sound_system = CW_AUDIO_ALSA,    .speed = 24 },
 	{ .sound_system = CW_AUDIO_ALSA,    .speed = 36 },
 	{ .sound_system = CW_AUDIO_ALSA,    .speed = 60 },
-#if 0
+
 	{ .sound_system = CW_AUDIO_PA,      .speed =  4 },
 	{ .sound_system = CW_AUDIO_PA,      .speed = 12 },
-#endif
 	{ .sound_system = CW_AUDIO_PA,      .speed = 24 },
 	{ .sound_system = CW_AUDIO_PA,      .speed = 36 },
 	{ .sound_system = CW_AUDIO_PA,      .speed = 60 },
@@ -139,10 +138,12 @@ cwt_retv test_cw_gen_debug_pcm_file_timings(cw_test_executor_t * cte)
 	  impact on required value of ELEMENTS_COUNT_MAX.
 
 	  Make sure to include some inter-word-spaces in the text.
+
+	  TODO acerion 2023.08.26: generate it randomly. Make sure that it
+	  contains inter-word-spaces (sometimes even at the beginning and end).
 	*/
 	const char * const input_string = " The fox over the lazy dog";
 	//const char * const input_string = " abc ";
-
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -214,6 +215,8 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
+	/* Elements and their duration for input string. An output from wav file
+	   will be compared against this reference data. */
 	cw_elements_t * string_elements = cw_elements_new(ELEMENTS_COUNT_MAX);
 	if (NULL == string_elements) {
 		/* This is treated as developer's error, therefore we exit. Developer
@@ -236,32 +239,45 @@ static cwt_retv test_cw_gen_debug_pcm_file_timings_sub(cw_test_executor_t * cte,
 	elements_set_ideal_durations(string_elements, &durations);
 
 
+	/*
+	  Tested generator for which:
+	  - we send an input string to,
+	  - wait for generator to generate sound based on that input string,
+	  - wait for generator to also generate pcm samples file.
+	*/
 	cw_gen_start(gen);
 	cw_gen_enqueue_string(gen, input_string);
 	cw_gen_wait_for_queue_level(gen, 0);
 	cw_gen_stop(gen);
 
+
+	/* Convert the raw samples pcm file into wav file from which we extract
+	   elements. */
 	char pcm_file_path[256] = { 0 };
-	char wav_file_path[256 + 4] = { 0 };
+	char wav_file_path[sizeof (pcm_file_path) + sizeof (".wav")] = { 0 };
 	snprintf(pcm_file_path, sizeof (pcm_file_path), "%s", gen->dev_raw_sink_path);
 	snprintf(wav_file_path, sizeof (wav_file_path), "%s.wav", gen->dev_raw_sink_path);
 	char cmd[1024] = { 0 };
 	snprintf(cmd, sizeof (cmd), "sox -e signed-integer -b 16 -c 1 -r %u %s %s",
 	         gen->sample_rate,
 	         pcm_file_path, wav_file_path);
+	cw_gen_delete(&gen);
 	if (0 != system(cmd)) {
 		fprintf(stderr, "[ERROR] Running command '%s' failed\n", cmd);
 		return cwt_retv_err;
 	}
-	cw_gen_delete(&gen);
+
 
 	cw_elements_t * wav_elements = cw_elements_new(ELEMENTS_COUNT_MAX);
 	const int wav_elements_count = get_elements_from_wav_file(wav_file_path, wav_elements);
 	if (-1 == wav_elements_count) {
+		cw_elements_delete(&string_elements);
 		cw_elements_delete(&wav_elements);
 		exit(EXIT_FAILURE);
 	}
 
+	/* The main part of the test: compare elements found in output wav file
+	   with elements found in input string. */
 	print_test_results(stderr, string_elements, wav_elements);
 	evaluate_test_results(cte, string_elements, wav_elements);
 
@@ -301,8 +317,8 @@ static int get_elements_from_wav_file(const char * path, cw_elements_t * element
 	}
 
 	const cw_element_time_t sample_spacing = (1000.0 * 1000.0) / header.sample_rate; // [us]
-	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
-	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", (double) sample_spacing);
+	fprintf(stderr, "[INFO ] wav file sample rate    = %d Hz\n", header.sample_rate);
+	fprintf(stderr, "[INFO ] wav file sample spacing = %.4f us\n", sample_spacing);
 
 	const int retval = cw_elements_detect_from_wav(input_fd, elements, sample_spacing);
 	close(input_fd);
@@ -313,7 +329,16 @@ static int get_elements_from_wav_file(const char * path, cw_elements_t * element
 
 
 
-static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_elements_t * wav_elements)
+/**
+   @brief Visualisation of test results
+
+   Print string elements (the input) and wav elements (the output) side-by-side for easy visual inspection of test results
+
+   @param[in] file File to which to print the results
+   @param[in] string_elements Elements from input string (from the input data)
+   @param[in] wav_elements Elements from wav file (from output of generator)
+*/
+static void print_test_results(FILE * file, const cw_elements_t * string_elements, const cw_elements_t * wav_elements)
 {
 	const size_t count = string_elements->curr_count;
 	fprintf(file, "[DEBUG]  Num. | str state  type     duration | wav state     duration |\n");
@@ -341,19 +366,28 @@ static void print_test_results(FILE * file, cw_elements_t * string_elements, cw_
 
 
 /**
-  @p string_elements are treated as reference values against which the @p
-  wav_elements will be compared.
+   @brief Evaluate data collected in the test
+
+   @p string_elements are treated as reference values against which the @p
+   wav_elements will be compared.
+
+   @reviewedon 2023.08.26
+
+   @param[in] cte Test executor
+   @param[in] string_elements Elements from input string (from the input data)
+   @param[in] wav_elements Elements from wav file (from output of generator)
 */
-static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * string_elements, cw_elements_t * wav_elements)
+static void evaluate_test_results(cw_test_executor_t * cte, const cw_elements_t * string_elements, const cw_elements_t * wav_elements)
 {
 	if (!cte->expect_op_int(cte, string_elements->curr_count, "==", wav_elements->curr_count, "The same count of elements")) {
 		/* If count of characters doesn't match then there is no point in
-		   checking other properties of element sets. Therefore return. */
+		   checking other properties of element sets. Therefore return
+		   now. */
 		return;
 	}
 
-	/* cw_element_t::type is set only in string_elements, so we won't be
-	   checking for mismatch of types. */
+	/* Counts of mis-matched values. cw_element_t::type is set only in
+	   string_elements, so we won't be checking for mismatch of types. */
 	int states_mismatch = 0;
 	int durations_mismatch = 0;
 
@@ -363,8 +397,8 @@ static void evaluate_test_results(cw_test_executor_t * cte, cw_elements_t * stri
 	  cause, and then remove "-1" in the condition of the loop.
 	*/
 	for (size_t i = 0; i < string_elements->curr_count - 1; i++) {
-		cw_element_t * string_element = &string_elements->array[i];
-		cw_element_t * wav_element = &wav_elements->array[i];
+		const cw_element_t * string_element = &string_elements->array[i];
+		const cw_element_t * wav_element = &wav_elements->array[i];
 
 		/* dot/dash states should be set correctly in both element sets. */
 		if (string_element->state != wav_element->state) {

@@ -2056,7 +2056,9 @@ void cw_rec_sync_parameters_internal(cw_rec_t * rec)
 	} else {
 		/* Fixed speed receiving mode. */
 
+		/* Dividing by 100[%] because tolerance is in percents. */
 		const int dot_margin = (rec->dot_duration_ideal * rec->tolerance) / 100; /* [microseconds] */
+
 		rec->dot_duration_min = rec->dot_duration_ideal - dot_margin;
 		rec->dot_duration_max = rec->dot_duration_ideal + dot_margin;
 		/* TODO (acerion) 2023.07.27: shouldn't calculations of dash duration

@@ -27,8 +27,8 @@ extern "C"
 
 
 enum {
-	CW_MSECS_PER_SEC =    1000,  /**< Milliseconds in a second. */
-	CW_USECS_PER_SEC = 1000000   /**< Microseconds in a second. */
+	CW_MSECS_PER_SEC = (1 * 1000),        /**< Milliseconds in a second. */
+	CW_USECS_PER_SEC = (1 * 1000 * 1000)  /**< Microseconds in a second. */
 };
 
 

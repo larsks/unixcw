@@ -111,19 +111,6 @@
 /* Measuring how long some thread operations take. */
 #define LIBCW_GEN_DEBUG_THREAD_TIMING   1
 
-/*
-  In proper Morse code timing the following three rules are given:
-  1. Duration of inter-mark-space is one Unit, perhaps adjusted.
-  2. Duration of inter-character-space is three Units total.
-  3. Duration of inter-word-space is seven Units total.
-*/
-#define UNITS_PER_IMS 1
-#define UNITS_PER_ICS 3
-#define UNITS_PER_IWS 7
-
-
-
-
 /* Our own definition, to have it as a float. */
 static const float CW_PI = 3.14159265358979323846F;
 
@@ -2117,28 +2104,6 @@ int cw_gen_get_weighting(const cw_gen_t * gen)
 
 
 
-/**
-   @brief Get timing parameters for sending
-
-   Return the low-level timing parameters calculated from the speed,
-   gap, tolerance, and weighting set.  Units of returned parameter
-   values are microseconds.
-
-   Use NULL for the pointer argument to any parameter value not required.
-
-   @internal
-   @reviewed 2020-08-06
-   @endinternal
-
-   @param[in] gen
-   @param[out] dot_duration
-   @param[out] dash_duration
-   @param[out] ims_duration duration of inter-mark-space
-   @param[out] ics_duration duration of inter-character-space
-   @param[out] iws_duration duration of inter-word-space
-   @param[out] additional_space_duration
-   @param[out] adjustment_space_duration
-*/
 void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
 					   int * dot_duration,
 					   int * dash_duration,
@@ -2150,40 +2115,36 @@ void cw_gen_get_timing_parameters_internal(cw_gen_t * gen,
 {
 	cw_gen_sync_parameters_internal(gen);
 
-	if (dot_duration)   { *dot_duration = gen->durations.dot_duration; }
-	if (dash_duration)  { *dash_duration = gen->durations.dash_duration; }
+	if (dot_duration)  { *dot_duration  = gen->durations.dot_duration; }
+	if (dash_duration) { *dash_duration = gen->durations.dash_duration; }
+	if (ims_duration)  { *ims_duration  = gen->durations.ims_duration; }
+	if (ics_duration)  { *ics_duration  = gen->durations.ics_duration; }
+	if (iws_duration)  { *iws_duration  = gen->durations.iws_duration; }
 
-	if (ims_duration)   { *ims_duration = gen->durations.ims_duration; }
-	if (ics_duration)   { *ics_duration = gen->durations.ics_duration; }
-	if (iws_duration)   { *iws_duration = gen->durations.iws_duration; }
-
-	if (additional_space_duration)    { *additional_space_duration = gen->durations.additional_space_duration; }
-	if (adjustment_space_duration)    { *adjustment_space_duration = gen->durations.adjustment_space_duration; }
-
-	return;
+	if (additional_space_duration) { *additional_space_duration = gen->durations.additional_space_duration; }
+	if (adjustment_space_duration) { *adjustment_space_duration = gen->durations.adjustment_space_duration; }
 }
 
 
 
 
-/**
-   @brief Convenience wrapper around cw_gen_get_timing_parameters_internal()
-
-   @param[in] gen generator from which to get durations
-   @param[out] durations structure with generator's durations
-*/
 void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_durations_t * durations)
 {
-	/* TODO (acerion) 2023.08.06: reimplement this function as a simple
-	   assignment from cw_gen_t::durations. */
-	cw_gen_get_timing_parameters_internal(gen,
-	                                      &durations->dot_duration,
-	                                      &durations->dash_duration,
-	                                      &durations->ims_duration,
-	                                      &durations->ics_duration,
-	                                      &durations->iws_duration,
-	                                      &durations->additional_space_duration,
-	                                      &durations->adjustment_space_duration);
+	/*
+	  This function shall always and forever be a wrapper around
+	  cw_gen_get_timing_parameters_internal(). Let the wrapped function do
+	  some steps necessary before returning the parameters.
+	*/
+
+	cw_gen_get_timing_parameters_internal
+		(gen,
+		 &durations->dot_duration,
+		 &durations->dash_duration,
+		 &durations->ims_duration,
+		 &durations->ics_duration,
+		 &durations->iws_duration,
+		 &durations->additional_space_duration,
+		 &durations->adjustment_space_duration);
 }
 
 
@@ -2201,9 +2162,7 @@ void cw_gen_get_durations_internal(cw_gen_t * gen, cw_gen_durations_t * duration
    Function also returns CW_FAILURE if adding the element to queue of
    tones failed.
 
-   @internal
-   @reviewed 2020-08-06
-   @endinternal
+   @reviewedon 2023-08-26
 
    @param[in] gen generator to be used to enqueue a mark and inter-mark-space
    @param[in] mark mark to send: Dot (CW_DOT_REPRESENTATION) or Dash (CW_DASH_REPRESENTATION)
@@ -2250,7 +2209,7 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, 0, gen->durations.ims_duration, CW_SLOPE_MODE_NO_SLOPES);
 	cwret = cw_tq_enqueue_internal(gen->tq, &tone);
-	/* Enqueueing an ims. Record this fact in space units counter. */
+	/* Enqueueing an ims must be recorded in space units counter. */
 	gen->space_units_count = UNITS_PER_IMS;
 	return cwret;
 }
@@ -2270,9 +2229,7 @@ cw_ret_t cw_gen_enqueue_mark_internal(cw_gen_t * gen, char mark, bool is_first)
 
    Inter-character adjustment space is added at the end.
 
-   @internal
-   @reviewed 2023-08-06
-   @endinternal
+   @reviewedon 2023-08-06
 
    @param[in] gen generator in which to enqueue the space
 
@@ -2351,9 +2308,7 @@ cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen)
 
    Inter-word adjustment space is added at the end.
 
-   @internal
-   @reviewed 2023-08-06
-   @endinternal
+   @reviewedon 2023-08-06
 
    @param[in] gen generator in which to enqueue the space
 
@@ -2638,8 +2593,9 @@ cw_ret_t cw_gen_enqueue_valid_character_no_ics_internal(cw_gen_t * gen, char cha
    @brief Enqueue a given valid ASCII character in generator, to be sent using Morse code
 
    After enqueueing last Mark (Dot or Dash) comprising a character, an
-   inter-mark-space is enqueued.  Inter-character-space is enqueued
-   after that last inter-mark-space.
+   inter-mark-space is enqueued. Inter-character-space is enqueued after that
+   last inter-mark-space. The inter-character-space is not added if @p
+   character is a ' ' character (i.e. inter-word-space).
 
    _valid_character_ in function's name means that the function expects the
    character @p character to be valid (@p character should be validated by
@@ -2647,9 +2603,7 @@ cw_ret_t cw_gen_enqueue_valid_character_no_ics_internal(cw_gen_t * gen, char cha
 
    @exception ENOENT @p character is not a valid character.
 
-   @internal
-   @reviewed 2020-08-23
-   @endinternal
+   @reviewed 2023-08-26
 
    @param[in] gen generator to be used to enqueue character
    @param[in] character character to enqueue
@@ -2664,13 +2618,23 @@ cw_ret_t cw_gen_enqueue_valid_character_internal(cw_gen_t * gen, char character)
 		return CW_FAILURE;
 	}
 
-	/* In the context of this function adding ics after freshly enqueued iws
-	   doesn't make sense: iws should not be followed by ics. */
-	if (' ' != character) {
-		/* This function will add enough units to form a full 3-Unit inter-character-space. */
-		if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
-			return CW_FAILURE;
-		}
+	if (' ' == character) {
+		/*
+		  In the context of this function adding ics after freshly enqueued
+		  iws would not be valid: iws should not be followed by ics.
+		  Therefore don't call cw_gen_enqueue_ics_internal(). Just return
+		  now.
+
+		  Since cw_gen_enqueue_valid_character_no_ics_internal() called above
+		  has succeeded, return the success here.
+		*/
+		return CW_SUCCESS;
+	}
+
+	/* This function will add enough units to form a full 3-Unit
+	   inter-character-space. */
+	if (CW_SUCCESS != cw_gen_enqueue_ics_internal(gen)) {
+		return CW_FAILURE;
 	}
 
 	return CW_SUCCESS;
@@ -2771,9 +2735,7 @@ void cw_gen_reset_parameters_internal(cw_gen_t * gen)
 /**
    @brief Synchronize generator's low level timing parameters
 
-   @internal
-   @reviewed 2020-10-24
-   @endinternal
+   @reviewedon 2023-08-26
 
    @param[in] gen generator for which to synchronize parameters
 */
@@ -2801,7 +2763,7 @@ void cw_gen_sync_parameters_internal(cw_gen_t * gen)
 	  The duration of inter-mark-space is adjusted by 28/22 times
 	  weighting length to keep PARIS calibration correctly
 	  timed (PARIS has 22 full units, and 28 empty ones).
-	  Inter-mark-space and end of character delays take
+	  Inter-mark-space and inter-character-space take
 	  weightings into account.
 	*/
 	const int w = (28 * weighting_duration) / 22;

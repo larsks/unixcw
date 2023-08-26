@@ -57,7 +57,7 @@ void cw_rec_tester_init(cw_rec_tester_t * tester)
 
 
 
-int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester)
+void cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester, bool * test_passes)
 {
 	/* Use multiple newlines to clearly present sent and received
 	   string. It will be easier to do visual comparison of the
@@ -78,14 +78,14 @@ int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester)
 	cw_rec_tester_display_differences(tester);
 	if (match) {
 		fprintf(stderr, "[II] Test result: %s\n", get_test_result_string(test_result_pass));
-		return 0;
 	} else {
 		fprintf(stderr, "[EE] Test result: %s\n", get_test_result_string(test_result_fail));
 		fprintf(stderr, "\n");
 		fprintf(stderr, "[EE] '%s' != '%s'\n", tester->input_string, tester->received_string);
 		fprintf(stderr, "\n");
-		return -1;
 	}
+
+	*test_passes = match;
 }
 
 
@@ -368,7 +368,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 
 void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger)
 {
-	cw_rec_tester_init_text_buffers(tester, false);
+	cw_rec_tester_init_text_buffers(tester, true);
 	/* Using Null sound system because this generator is only
 	   used to enqueue text and control key. Sound will be played
 	   by main generator used in tested code. */

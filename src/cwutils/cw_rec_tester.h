@@ -140,14 +140,15 @@ void cw_rec_tester_stop_test_code(cw_rec_tester_t * tester);
    with text that was sent to test/helper generator and text that was
    received from tested receiver.
 
-   @reviewedon 2023.08.21
+   Result of comparison is returned through @p test_passes: true if buffers
+   are the same (or the same to a satisfying degree), false otherwise.
+
+   @reviewedon 2023.08.26
 
    @param[in/out] tester Tester that was used during tests
-
-   @return 0 if received text is similar enough to input text, and test passes
-   @return -1 otherwise
+   @param[out] test_passes Information whether test passes
 */
-int cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester);
+void cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester, bool * test_passes);
 
 
 

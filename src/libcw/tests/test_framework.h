@@ -143,7 +143,7 @@ typedef struct cw_test_executor_t {
 	   by "[ OK ]" or "[FAIL]" tags, and the newline would put these tags
 	   in new line, decreasing readability of test results.
 
-	   @return true if this comparison shows that the values satisfy the operator
+	   @return true if tested value and expected value satisfy given operator (i.e. test passes)
 	   @return false otherwise
 	*/
 	bool (* expect_op_int)(struct cw_test_executor_t * self, int expected_value, const char * operator, int received_value, const char * fmt, ...) __attribute__ ((format (printf, 5, 6)));

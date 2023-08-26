@@ -37,7 +37,7 @@
 
 
 
-void cw_elements_print_to_file(FILE * file, cw_elements_t * elements)
+void cw_elements_print_to_file(FILE * file, const cw_elements_t * elements)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		if (cw_state_mark == elements->array[i].state) {

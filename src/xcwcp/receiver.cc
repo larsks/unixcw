@@ -359,7 +359,8 @@ void Receiver::start_test_code()
 void Receiver::stop_test_code()
 {
 	cw_rec_tester_stop_test_code(&this->rec_tester);
-	cw_rec_tester_evaluate_receive_correctness(&this->rec_tester);
+	__attribute__((unused)) bool test_passes = false;
+	cw_rec_tester_evaluate_receive_correctness(&this->rec_tester, &test_passes);
 }
 
 

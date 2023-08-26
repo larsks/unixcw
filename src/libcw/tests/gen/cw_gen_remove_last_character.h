@@ -1,8 +1,3 @@
-/*
-  This file is a part of unixcw project.  unixcw project is covered by
-  GNU General Public License, version 2 or later.
-*/
-
 #ifndef _LIBCW_TESTS_GEN_CW_GEN_REMOVE_LAST_CHARACTER_H_
 #define _LIBCW_TESTS_GEN_CW_GEN_REMOVE_LAST_CHARACTER_H_
 

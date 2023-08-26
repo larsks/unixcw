@@ -62,7 +62,7 @@
 
 
 
-#include "cwutils/cw_copyright.h"
+#include <cwutils/cw_copyright.h>
 #include "libcw.h"
 #include "libcw2.h"
 #include "libcw_debug.h"

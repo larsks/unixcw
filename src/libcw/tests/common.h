@@ -43,10 +43,10 @@ int test_rec_params_relations(cw_test_executor_t * cte, const cw_rec_parameters_
    @param[in] params Parameters to test
    @param[in] speed Generator's speed ([wpm])
 
-   @return cwt_retv_ok if test was executed to the end
-   @return cwt_retv_err if test was interrupted
+   @return 0 if test was executed to the end
+   @return -1 if test was interrupted
 */
-cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed);
+int test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed);
 
 
 
@@ -79,14 +79,15 @@ int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor
 /**
    @brief Prepare new generator, possibly with parameter values passed through command line
 
-   Test helper function.
+   Test helper function, allocating and configuring a generator that is used
+   with modern libcw API.
 
    @reviewed on 2023-08-06
 
    @return 0 on success
    @return -1 on failure
 */
-int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
+int gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
 
 
 
@@ -94,11 +95,11 @@ int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen);
 /**
    @brief Delete @param gen, set the pointer to NULL
 
-   Test helper function.
+   Test helper function, deallocating a generator that was used with modern libcw API.
 
    @reviewed on 2023-08-06
 */
-void helper_gen_destroy(cw_gen_t ** gen);
+void gen_destroy(cw_gen_t ** gen);
 
 
 

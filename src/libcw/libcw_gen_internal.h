@@ -20,7 +20,20 @@
 
 
 
-/* Internal functions of this module, exposed to unit tests code. */
+/* Internal definitions of this module, exposed to unit tests code. */
+
+
+
+
+/*
+  In proper Morse code timing the following three rules are given:
+  1. Duration of inter-mark-space is one Unit, perhaps adjusted.
+  2. Duration of inter-character-space is three Units total.
+  3. Duration of inter-word-space is seven Units total.
+*/
+#define UNITS_PER_IMS 1
+#define UNITS_PER_ICS 3
+#define UNITS_PER_IWS 7
 
 
 

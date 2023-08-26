@@ -148,7 +148,7 @@ void cw_elements_delete(cw_elements_t ** elements);
    @param[out] file Opened file to write to
    @param[in] elements Elements structure to write to @p file
 */
-void cw_elements_print_to_file(FILE * file, cw_elements_t * elements);
+void cw_elements_print_to_file(FILE * file, const cw_elements_t * elements);
 
 
 

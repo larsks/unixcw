@@ -38,6 +38,9 @@ extern "C"
 #if LIBCW_WITH_DEV
 #include "libcw_gen.h"
 
+
+
+
 /**
    @brief Open debug sink file for generator
 
@@ -47,9 +50,14 @@ extern "C"
 
    The file should be closed with cw_dev_debug_raw_sink_close_internal().
 
+   @reviewedon 2023.08.26
+
    @param[in/out] gen generator for which to open the sink file
 */
 void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen);
+
+
+
 
 /**
    @brief Close debug sink file for generator
@@ -57,9 +65,14 @@ void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen);
    Close a debug sink file that was opened with cw_dev_debug_raw_sink_open_internal().
    The file itself is not removed.
 
+   @reviewedon 2023.08.26
+
    @param[in/out] gen generator for which to close the sink file
 */
 void cw_dev_debug_raw_sink_close_internal(cw_gen_t * gen);
+
+
+
 
 #endif
 

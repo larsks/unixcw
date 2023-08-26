@@ -20,6 +20,15 @@
 
 
 
+/**
+   @file cw_gen_enqueue_character_no_ics.c
+
+   Test of cw_gen_enqueue_character_no_ics().
+*/
+
+
+
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -43,14 +52,10 @@
    string has up to 8 characters, I don't expect the receiver to require more
    than 20 slots for received characters. */
 typedef struct callback_data {
-	char buffer[20 + 1];
-	int iter;
-	cw_test_executor_t * cte;
+	char accumulator[20 + 1]; /**< Accumulator of received characters. */
+	int acc_iter;             /**< Iterator for the accumulator, pointing to first free slot in the accumulator. */
+	cw_test_executor_t * cte; /**< Test executor variable. */
 } callback_data_t;
-
-
-
-
 
 
 
@@ -62,6 +67,11 @@ typedef struct callback_data {
    callback is called by easy receiver, and knows how to handle the contents
    of @p erd.
 
+   The object accumulates characters received by helper receiver from a
+   tested generator
+
+   @reviewedon 2023.08.26
+
    @param[in/out] cdata Pointer to an object in this program
    @param[in] erd Easy receiver data - variable storing result of the receive event
 */
@@ -70,12 +80,12 @@ static void receive_callback(void * cdata, cw_easy_rec_data_t * erd)
 	callback_data_t * data = (callback_data_t *) cdata;
 	if (erd->is_iws) {
 		data->cte->cte_log(data->cte, LOG_DEBUG, "Received character ' '\n");
-		data->buffer[data->iter] = ' ';
+		data->accumulator[data->acc_iter] = ' ';
 	} else {
 		data->cte->cte_log(data->cte, LOG_DEBUG, "Received character '%c'\n", erd->character);
-		data->buffer[data->iter] = erd->character;
+		data->accumulator[data->acc_iter] = erd->character;
 	}
-	data->iter++;
+	data->acc_iter++;
 }
 
 
@@ -109,7 +119,8 @@ static const struct {
 
 	/* Expected result of receiving: a punctuation character formed by
 	   playing two input characters with just an inter-mark-space between
-	   them. */
+	   them. The expected result includes inter-word-space added by tested
+	   generator. */
 	const char * expected_result;
 } g_test_data[] = {
 	{ "AF",     "\""  " " },
@@ -154,19 +165,26 @@ static const struct {
    This test confirms that a duration of space between two characters
    enqueued in such a way is more or less just an inter-mark-space.
 
-   @reviewed on 2023-07-25
+   @reviewed on 2023-08-26
+
+   @param cte test executor
+
+   @return cwt_retv_ok if execution of the test was carried out
+   @return cwt_retv_err if execution of the test had to be aborted
 */
 cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
+	/* Tested generator. */
 	cw_gen_t * gen = NULL;
-	if (0 != helper_gen_setup(cte, &gen)) {
+	if (0 != gen_setup(cte, &gen)) {
 		cte->log_error(cte, "%s:%d: Failed to create generator\n", __func__, __LINE__);
 		return cwt_retv_err;
 	}
 	cw_gen_start(gen);
 
+	/* Helper receiver. */
 	cw_easy_rec_t * easy_rec = cw_easy_rec_new();
 	cw_easy_rec_set_speed(easy_rec, cw_gen_get_speed(gen));
 
@@ -175,14 +193,18 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	  generator speed this should be enough. With 10% and PulseAudio I
 	  already experienced problems.
 
-	  TODO: the value of tolerance should be different for different sound
-	  systems.
+	  TODO acerion 2023.08.26: the value of tolerance should be different for
+	  different sound systems.
 	*/
 	cw_easy_rec_set_tolerance(easy_rec, 15);
 
+	/* Helper receiver will be notified through callback about each change of
+	   tested generator's state (mark/space). */
 	cw_gen_register_value_tracking_callback_internal(gen, cw_easy_rec_handle_libcw_keying_event, easy_rec);
 
-	callback_data_t data = { .buffer = { 0 }, .iter = 0, .cte = cte };
+	callback_data_t data = { .accumulator = { 0 }, .acc_iter = 0, .cte = cte };
+	/* Configure callback to be called each time a helper receiver makes a
+	   successful receive of something sent by tested generator. */
 	cw_easy_rec_register_receive_callback(easy_rec, receive_callback, &data);
 	cw_easy_rec_start(easy_rec);
 
@@ -195,11 +217,19 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 		data.cte = cte;
 
 
-		int i = 0;
+		/* Enqueue characters from test data. Normally enqueued characters
+		   would be generated and then received as two (or more) separate
+		   characters. But since the function-under-test doesn't insert
+		   inter-character-space between them, then the generator will play
+		   something that is a sum of input characters. That "sum of input
+		   characters" will be then received by helper receiver as a single
+		   character, different from the individual input characters. */
+
+		   int i = 0;
 		while ('\0' != g_test_data[t].input[i]) {
 			cw_ret_t cwret = LIBCW_TEST_FUT(cw_gen_enqueue_character_no_ics)(gen, g_test_data[t].input[i]);
 			if (!cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret,
-			                                    "Call to cw_gen_enqueue_character_no_ics(), input #%d ([%s], character #%d ('%c)",
+			                                    "Call to cw_gen_enqueue_character_no_ics(), input #%d ([%s], character #%d ('%c))",
 			                                    t, g_test_data[t].input, i, g_test_data[t].input[i])) {
 				failure = true;
 				break;
@@ -215,8 +245,9 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 
 		/* The main part of the test: comparing enqueued string with what has
 		   been played and received. */
-		cte->expect_strcasecmp(cte, g_test_data[t].expected_result, data.buffer, "Enqueue of character without ics, in: [%s], out: [%s]",
-		                       g_test_data[t].input, data.buffer);
+		cte->expect_strcasecmp(cte, g_test_data[t].expected_result, data.accumulator,
+		                       "Enqueue of character without ics, in: [%s], out: [%s]",
+		                       g_test_data[t].input, data.accumulator);
 		t++;
 	}
 
@@ -224,7 +255,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cw_easy_rec_delete(&easy_rec);
 
 	cw_gen_stop(gen);
-	helper_gen_destroy(&gen);
+	gen_destroy(&gen);
 
 	cte->expect_op_int(cte, false, "==", failure, "Enqueue character without ics");
 

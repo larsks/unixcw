@@ -33,6 +33,7 @@
 #include <signal.h>
 
 #include "../libcw_gen.h"
+#include "../libcw_gen_internal.h"
 #include "../libcw_rec.h"
 #include "../libcw_utils.h"
 #include "common.h"
@@ -101,7 +102,7 @@ int legacy_api_standalone_test_teardown(__attribute__((unused)) cw_test_executor
 
 
 
-int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
+int gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
 {
 	*gen = cw_gen_new(&cte->current_gen_conf);
 	if (!*gen) {
@@ -129,7 +130,7 @@ int helper_gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
 
 
 
-void helper_gen_destroy(cw_gen_t ** gen)
+void gen_destroy(cw_gen_t ** gen)
 {
 	cw_gen_delete(gen); /* This function sets **gen to NULL. */
 }
@@ -183,21 +184,26 @@ int test_rec_params_relations(cw_test_executor_t * cte, const cw_rec_parameters_
 
 
 
-cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed)
+/*
+  This function assumes that weighting and gap are zero, and therefore don't
+  influence durations' relations.
+*/
+int test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durations_t * params, int speed)
 {
 	/* Let's hope that those divisions (one when calculating dot duration
 	   in gen, and the other here) work out correctly. */
 	cte->expect_op_int_errors_only(cte, CW_DOT_CALIBRATION / speed, "==", params->dot_duration,  "confirm dot duration at speed %d wpm", speed);
 
-	cte->expect_op_int_errors_only(cte, 3 * params->dot_duration, "==", params->dash_duration, "confirm dash duration relative to dot at %d wpm", speed);
-	cte->expect_op_int_errors_only(cte, 1 * params->dot_duration, "==", params->ims_duration,  "confirm ims duration relative to dot at %d wpm", speed);
-	cte->expect_op_int_errors_only(cte, 3 * params->dot_duration, "==", params->ics_duration,  "confirm ics duration relative to dot at %d wpm", speed);
-	cte->expect_op_int_errors_only(cte, 7 * params->dot_duration, "==", params->iws_duration,  "confirm iws duration relative to dot at %d wpm", speed);
+	/* TODO: acerion 2023.08.26: "dot_duration" or "unit_duration"? */
+	cte->expect_op_int(cte,             3 * params->dot_duration, "==", params->dash_duration, "confirm dash duration relative to dot at %d wpm", speed);
+	cte->expect_op_int(cte, UNITS_PER_IMS * params->dot_duration, "==", params->ims_duration,  "confirm ims duration relative to dot at %d wpm", speed);
+	cte->expect_op_int(cte, UNITS_PER_ICS * params->dot_duration, "==", params->ics_duration,  "confirm ics duration relative to dot at %d wpm", speed);
+	cte->expect_op_int(cte, UNITS_PER_IWS * params->dot_duration, "==", params->iws_duration,  "confirm iws duration relative to dot at %d wpm", speed);
 
 	/* As far as I know these two should be zero in generator running
 	   with default configuration. */
-	cte->expect_op_int_errors_only(cte, 0, "==", params->additional_space_duration,  "confirm additional space duration at %d wpm", speed);
-	cte->expect_op_int_errors_only(cte, 0, "==", params->adjustment_space_duration,  "confirm adjustment space duration at %d wpm", speed);
+	cte->expect_op_int(cte, 0, "==", params->additional_space_duration, "confirm additional space duration at %d wpm", speed);
+	cte->expect_op_int(cte, 0, "==", params->adjustment_space_duration, "confirm adjustment space duration at %d wpm", speed);
 
 	/* Confirm a statement from comment in
 	   cw_timestamp_compare_internal():
@@ -205,10 +211,10 @@ cwt_retv test_gen_params_relations(cw_test_executor_t * cte, const cw_gen_durati
 	   "At 4 WPM, the dash duration is 3*(1200000/4)=900,000 usecs, and
 	   the inter-word-space is 2,100,000 usecs. */
 	if (4 == speed) {
-		cte->expect_op_int_errors_only(cte,  900000, "==", params->dash_duration, "confirm specific dash duration at %d wpm", speed);
-		cte->expect_op_int_errors_only(cte, 2100000, "==", params->iws_duration,  "confirm specific iws duration at %d wpm", speed);
+		cte->expect_op_int(cte,  900000, "==", params->dash_duration, "confirm specific dash duration at %d wpm", speed);
+		cte->expect_op_int(cte, 2100000, "==", params->iws_duration,  "confirm specific iws duration at %d wpm", speed);
 	}
 
-	return cwt_retv_ok;
+	return 0;
 }
 

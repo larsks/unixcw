@@ -21,61 +21,58 @@
 #include <math.h> /* fabs() */
 #include <stdlib.h> /* exit() */
 
-
-
+#include <cwutils/lib/elements.h>
+#include <cwutils/lib/elements_detect.h>
+#include <cwutils/lib/element_stats.h>
+#include <cwutils/lib/misc.h>
 
 #include "libcw2.h"
-
-
-
-
 #include "libcw_data.h"
 #include "libcw_gen_tests_state_callback.h"
 #include "libcw_gen.h"
 #include "libcw_utils.h"
-#include "cwutils/lib/elements.h"
-#include "cwutils/lib/elements_detect.h"
-#include "cwutils/lib/element_stats.h"
-#include "cwutils/lib/misc.h"
 
 
 
 
-/*
-  This test is verifying if callback called on each change of state of
-  generator is called at proper intervals.
+/**
+   @file libcw_gen_tests_state_callback.c
 
-  Client code can use cw_gen_register_value_tracking_callback_internal() to
-  register a callback. The callback will be called each time the generator
-  changes it's state between mark/space. The changes of state should occur at
-  time intervals specified by length of marks (dots, dashes) and spaces.
+   This test is verifying if callback called on each change of state of
+   generator is called at proper intervals.
 
-  libcw is using sound card's (sound system's) blocking write property to
-  measure how often and for how long a generator should stay in particular
-  state. Generator will write e.g. mark to sound system, the blocking write
-  will block the generator for specified time, and then the generator will be
-  able to get from tone queue the next element (mark or space) and do another
-  blocking write to sound system.
+   Client code can use cw_gen_register_value_tracking_callback_internal() to
+   register a callback. The callback will be called each time the generator
+   changes it's state between mark/space. The changes of state should occur
+   at time intervals specified by duration of marks (dots, dashes) and
+   spaces.
 
-  Calls to the callback are made between each blocking write. The calls to
-  the callback will be made with smaller or larger precision, depending on:
+   libcw is using sound card's (sound system's) blocking write property to
+   measure how often and for how long a generator should stay in particular
+   state. Generator will write e.g. mark to sound system, the blocking write
+   will block the generator for specified time, and then the generator will
+   be able to get from tone queue the next element (mark or space) and do
+   another blocking write to sound system.
 
-  1. the exact mechanism used by libcw. For now libcw uses blocking write,
-     but e.g. ALSA is offering other mechanisms that are right now
-     unexplored.
+   Calls to the callback are made between each blocking write. The calls to
+   the callback will be made with smaller or larger precision, depending on:
 
-  2. how well the libcw has configured the mechanism. Commit
-     cb99e7884dc5370519dc3a3eacfb3184959b0f87 has fixed an error in
-     configuration of ALSA's HW period size. That incorrect configuration has
-     led to the callback being called at totally invalid (very, very short)
-     intervals.
+   1. the exact mechanism used by libcw. For now libcw uses blocking write,
+      but e.g. ALSA is offering other mechanisms that are right now
+      unexplored.
 
-  I started writing this test to verify that the fix from commit
-  cb99e7884dc5370519dc3a3eacfb3184959b0f87 has been working, but then I
-  thought that the test can work for any sound system supported by libcw. I
-  don't need to verify if low-level configuration of ALSA is working
-  correctly, I just need to verify if the callback mechanism (relying on
-  proper configuration of a sound system) is working correctly.
+   2. how well the libcw has configured the mechanism. Commit
+      cb99e7884dc5370519dc3a3eacfb3184959b0f87 has fixed an error in
+      configuration of ALSA's HW period size. That incorrect configuration
+      has led to the callback being called at totally invalid (very, very
+      short) intervals.
+
+   I started writing this test to verify that the fix from commit
+   cb99e7884dc5370519dc3a3eacfb3184959b0f87 has been working, but then I
+   thought that the test can work for any sound system supported by libcw. I
+   don't need to verify if low-level configuration of ALSA is working
+   correctly, I just need to verify if the callback mechanism (relying on
+   proper configuration of a sound system) is working correctly.
 */
 
 
@@ -99,8 +96,8 @@
 typedef struct callback_data_t {
 	struct timeval prev_timestamp; /* Timestamp at which previous callback was made. */
 
-	int element_idx; /* Index to elements->array[]. */
-	cw_elements_t * elements;
+	int element_idx; /* Index to string_elements->array[]. */
+	cw_elements_t * string_elements;
 
 	/* Ideal durations of dots, dashes and spaces, as reported by libcw for given
 	   wpm speed [microseconds]. */
@@ -149,19 +146,20 @@ static void evaluate_test_results(cw_test_executor_t * cte, test_data_t * test_d
 
 
 /**
-  Results of test from reference branch post_3.5.1 with:
-  1. fixed ALSA HW period size,
-  2. modified PA parameters, copied from these two commits:
-  https://github.com/m5evt/unixcw-3.5.1/commit/2d5491a461587ac4686e2d1b897619c98be05c9e
-  https://github.com/m5evt/unixcw-3.5.1/commit/c86785b595a6d711aae915150df2ccb848ace05c
+   Results of test from reference branch post_3.5.1 with:
+   1. fixed ALSA HW period size,
+   2. modified PA parameters, copied from these two commits:
+   https://github.com/m5evt/unixcw-3.5.1/commit/2d5491a461587ac4686e2d1b897619c98be05c9e
+   https://github.com/m5evt/unixcw-3.5.1/commit/c86785b595a6d711aae915150df2ccb848ace05c
 
-  For OSS sound system I'm copying results for ALSA.
+   For OSS sound system I'm copying results for ALSA.
 
-  For Console sound system I'm copying results for Null sound system
-  (both systems simulate a blocking write with sleep function).
+   For Console sound system I'm copying results for Null sound system (both
+   systems simulate a blocking write with sleep function).
 
-  For ims/ics/iws I'm just copying data for dot, at least for now. Maybe I
-  will adjust the data in the future..
+   For ims/ics/iws I'm just copying data for dot, at least for now. Maybe I
+   will adjust the data in the future. (TODO acerion 2023.08.26: review the
+   data).
 */
 static test_data_t g_test_data[] = {
 
@@ -219,16 +217,16 @@ static void gen_callback_fn(void * callback_arg, int state)
 	const bool execute_nonessential = true;
 
 	callback_data_t * callback_data = (callback_data_t *) callback_arg;
-	const cw_elements_t * elements = callback_data->elements;
+	const cw_elements_t * string_elements = callback_data->string_elements;
 	const size_t this_idx = callback_data->element_idx;
 
 
 	struct timeval now_timestamp = { 0 };
-	gettimeofday(&now_timestamp, NULL);
+	gettimeofday(&now_timestamp, NULL); /* TODO acerion 2023.08.26: use monotonic clock instead of wall clock. */
 	struct timeval prev_timestamp = callback_data->prev_timestamp;
 
 
-	cw_element_t * this_element = &elements->array[this_idx];
+	cw_element_t * this_element = &string_elements->array[this_idx];
 	if (execute_nonessential) {
 		/* Check that state is consistent with element. */
 		if (state) {
@@ -244,9 +242,10 @@ static void gen_callback_fn(void * callback_arg, int state)
 
 	callback_data->element_idx++;
 	callback_data->prev_timestamp = now_timestamp;
-	/* Don't increment elements->curr_count because it's indicating
-	   how many non-empty elements are there in elements. All elements are
-	   already appended in there, we are just filling durations. */
+	/* Don't increment string_elements->curr_count because curr_count is
+	   indicating how many non-empty elements are there in string_elements.
+	   All elements are already appended in there, we are just filling
+	   durations. */
 
 	cw_element_t * prev_element = NULL;
 	if (this_idx == 0) {
@@ -257,7 +256,7 @@ static void gen_callback_fn(void * callback_arg, int state)
 		/* Update previous element. We are at the beginning of new element,
 		   and currently calculated duration is how long *previous* element
 		   was. */
-		prev_element = &elements->array[this_idx - 1];
+		prev_element = &string_elements->array[this_idx - 1];
 		prev_element->duration = cw_timestamp_compare_internal(&prev_timestamp, &now_timestamp);
 	}
 
@@ -299,10 +298,18 @@ cwt_retv test_cw_gen_state_callback(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
-	/* Test string that will be played by test. Length of string may have impact
-	   on required value of ELEMENTS_COUNT_MAX. */
-	//const char * const input_string = "one two three four";
-	const char * const input_string = "ooo""ooo""ooo sss""sss""sss";
+	/*
+	  Test string that will be played by test. Length of string may have
+	  impact on required value of ELEMENTS_COUNT_MAX.
+
+	  Make sure to include some inter-word-spaces in the text.
+
+	  TODO acerion 2023.08.26: generate this string randomly. Make sure that
+	  it contains inter-word-spaces (sometimes even at the beginning and
+	  end).
+	*/
+	const char * const input_string = "one two three four";
+	//const char * const input_string = "ooo""ooo""ooo sss""sss""sss";
 
 	cwt_retv retv = cwt_retv_ok;
 	const size_t n_tests = sizeof (g_test_data) / sizeof (g_test_data[0]);
@@ -344,25 +351,33 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	fprintf(stderr, "[INFO ] speed               = %d WPM\n", test_data->speed);
 
 
-	cw_elements_t * elements = cw_elements_new(ELEMENTS_COUNT_MAX);
-	if (NULL == elements) {
+	/* Elements and their duration for input string. An output from wav file
+	   will be compared against this reference data. */
+	cw_elements_t * string_elements = cw_elements_new(ELEMENTS_COUNT_MAX);
+	if (NULL == string_elements) {
 		/* This is treated as developer's error, therefore we exit. Developer
 		   should ensure sufficient count of elements for given string. */
 		fprintf(stderr, "[ERROR] Failed to allocate string elements for string '%s'\n", input_string);
 		exit(EXIT_FAILURE);
 	}
-	if (0 != cw_elements_detect_from_string(input_string, elements)) {
+	if (0 != cw_elements_detect_from_string(input_string, string_elements)) {
 		/* This is treated as developer's error, therefore we exit. Developer
 		   should ensure that cw_elements_detect_from_string() work correctly for valid
 		   input strings. */
 		fprintf(stderr, "[ERROR] Failed to get elements from input string '%s'\n", input_string);
 		exit(EXIT_FAILURE);
 	}
+	/* TODO acerion 2023.08.26: tests in
+	   libcw_gen_tests_debug_pcm_file_timings.c is assigning durations to the
+	   elements (with elements_set_ideal_durations()) at this stage. Maybe
+	   this test could do this now too. */
+
 
 	callback_data_t callback_data = { 0 };
-	callback_data.elements = elements;
+	callback_data.string_elements = string_elements;
 	callback_data.durations = &durations;
 	cw_gen_register_value_tracking_callback_internal(gen, gen_callback_fn, &callback_data);
+
 
 	cw_gen_start(gen);
 	cw_gen_enqueue_string(gen, input_string);
@@ -373,10 +388,10 @@ static cwt_retv test_cw_gen_state_callback_sub(cw_test_executor_t * cte, test_da
 	cw_gen_delete(&gen);
 
 
-	calculate_test_results(elements, test_data, &durations);
+	calculate_test_results(string_elements, test_data, &durations);
 	evaluate_test_results(cte, test_data);
 
-	cw_elements_delete(&elements);
+	cw_elements_delete(&string_elements);
 
 	return 0;
 }
@@ -405,21 +420,22 @@ static void calculate_test_results(const cw_elements_t * elements, test_data_t *
 	   correctness of values of these elements. TODO: make the elements
 	   correct. */
 	for (size_t i = 1; i < elements->curr_count - 1; i++) {
-		switch (elements->array[i].type) {
+		const cw_element_t * element = &elements->array[i];
+		switch (element->type) {
 		case cw_element_type_dot:
-			cw_element_stats_update(&stats_dot, elements->array[i].duration);
+			cw_element_stats_update(&stats_dot, element->duration);
 			break;
 		case cw_element_type_dash:
-			cw_element_stats_update(&stats_dash, elements->array[i].duration);
+			cw_element_stats_update(&stats_dash, element->duration);
 			break;
 		case cw_element_type_ims:
-			cw_element_stats_update(&stats_ims, elements->array[i].duration);
+			cw_element_stats_update(&stats_ims, element->duration);
 			break;
 		case cw_element_type_ics:
-			cw_element_stats_update(&stats_ics, elements->array[i].duration);
+			cw_element_stats_update(&stats_ics, element->duration);
 			break;
 		case cw_element_type_iws:
-			cw_element_stats_update(&stats_iws, elements->array[i].duration);
+			cw_element_stats_update(&stats_iws, element->duration);
 			break;
 		case cw_element_type_none: /* TODO: should we somehow log this? */
 		default:
