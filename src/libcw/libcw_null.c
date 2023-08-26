@@ -40,7 +40,6 @@
 
 
 
-#include "libcw_debug_internal.h"
 #include "libcw_gen.h"
 #include "libcw_null.h"
 #include "libcw_utils.h"
@@ -115,10 +114,6 @@ bool cw_is_null_possible(__attribute__((unused)) const char * device_name)
 */
 static cw_ret_t cw_null_open_and_configure_sound_device_internal(cw_gen_t * gen, __attribute__((unused)) const cw_gen_config_t * gen_conf)
 {
-#if CW_DEV_RAW_SINK
-	cw_dev_debug_raw_sink_open_internal(gen);
-#endif
-
 	gen->sound_device_is_open = true;
 	return CW_SUCCESS;
 }
@@ -136,10 +131,7 @@ static cw_ret_t cw_null_open_and_configure_sound_device_internal(cw_gen_t * gen,
 static void cw_null_close_sound_device_internal(cw_gen_t * gen)
 {
 	gen->sound_device_is_open = false;
-
-#if CW_DEV_RAW_SINK
-	cw_dev_debug_raw_sink_close_internal(gen);
-#endif
+	return;
 }
 
 
