@@ -398,6 +398,7 @@ users, add "--disable-cw" to configure script.
 While you are at it, add similar flag for cwgen.
 
 * TODO
+
 ** code
 *** Use suseconds_t for duration variables?
 
@@ -612,3 +613,12 @@ LD_LIBRARY_PATH+=$LD_LIBRARY_PATH:$HOME/lib ./src/cwdaemon -x p -n
 Add "run 'build Debian package' test" to list of tests in qa/tests.org.
 *** Add qa/ script for reproducible Debian builds
 https://manpages.debian.org/buster/reprotest/reprotest.1.en.html
+** TODO R00XY Feature: remove cw_assert() from libcw
+
+Replace it with dev debug message that is compiled only in dev builds.
+** TODO R00XZ Feature: run tests with dev features enabled
+There are sections of code that are enabled only in dev builds: e.g. some
+additional checks and safeguards. The unit/integration code must have a
+chance at triggering these checks and safeguards.
+
+
