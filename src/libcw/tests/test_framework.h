@@ -335,17 +335,7 @@ typedef struct cw_test_executor_t {
 
 
 	/**
-	   Log message with given severity to cw_test_executor_t::stdout file (if it is set).
-	   Add severity prefix string/mark at the beginning.
-	   Add message prefix at the beginning.
-	   Don't add newline character at the end.
-
-	   @return number of characters printed
-	*/
-	int (* cte_log)(struct cw_test_executor_t * self, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
-
-	/**
-	   Log information to cw_test_executor_t::stdout file (if it is set).
+	   Log information to cw_test_executor_t::file_out file (if it is set).
 	   Add "[II]" mark at the beginning.
 	   Add message prefix at the beginning.
 	   Don't add newline character at the end.
@@ -355,7 +345,7 @@ typedef struct cw_test_executor_t {
 	int (* log_info)(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 	/**
-	   Log text to cw_test_executor_t::stdout file (if it is set).
+	   Log text to cw_test_executor_t::file_out file (if it is set).
 	   Don't add "[II]" mark at the beginning.
 	   Don't add message prefix at the beginning.
 	   Don't add newline character at the end.
@@ -368,7 +358,7 @@ typedef struct cw_test_executor_t {
 	void (* flush_info)(struct cw_test_executor_t * self);
 
 	/**
-	   Log error to cw_test_executor_t::stdout file (if it is set).
+	   Log error to cw_test_executor_t::file_out file (if it is set).
 	   Add "[EE]" mark at the beginning.
 	   Add message prefix at the beginning.
 	   Don't add newline character at the end.
@@ -418,6 +408,28 @@ typedef struct cw_test_executor_t {
 	unsigned int (* get_total_errors_count)(struct cw_test_executor_t * cte);
 
 } cw_test_executor_t;
+
+
+
+
+/**
+   @brief Log message with given severity to cw_test_executor_t::file_out file (if it is set)
+
+   Prepend the message with severity string/mark that matches @p severity.
+
+   Use syslog's severity level values (LOG_ERR, LOG_INFO, etc) as values of
+   @p severity. Only values in range of LOG_DEBUG - LOG_ERR (inclusive) are
+   supported.
+
+   The function doesn't append its own newline character at the end.
+
+   @param[in/out] executor Test executor
+   @param[in] severity Severity level (e.g. LOG_ERR, LOG_INFO)
+   @param[in] fmt Format string of message
+
+   @return number of characters printed
+*/
+int kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 
 

@@ -102,7 +102,7 @@ cwt_retv test_cw_gen_get_timing_parameters_internal(cw_test_executor_t * cte)
 			 &params.additional_space_duration,
 			 &params.adjustment_space_duration);
 
-		cte->cte_log(cte, LOG_DEBUG,
+		kite_log(cte, LOG_DEBUG,
 		             "generator's sending parameters at %2d wpm:\n"
 		             "    dot duration = %7d us\n"
 		             "   dash duration = %7d us\n"
@@ -122,7 +122,7 @@ cwt_retv test_cw_gen_get_timing_parameters_internal(cw_test_executor_t * cte)
 
 
 		if (0 != test_gen_params_relations(cte, &params, speed)) {
-			cte->cte_log(cte, LOG_ERR, "Failed to test generator's relations at %2d wpm", speed);
+			kite_log(cte, LOG_ERR, "Failed to test generator's relations at %2d wpm", speed);
 			return cwt_retv_err;
 		}
 	}

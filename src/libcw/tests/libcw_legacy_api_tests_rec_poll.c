@@ -450,7 +450,7 @@ static int legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool poll_re
 	}
 
 	if (CW_SUCCESS != cw_generator_new(cte->current_gen_conf.sound_system, cte->current_gen_conf.sound_device)) {
-		cte->cte_log(cte, LOG_ERR, "failed to create generator\n");
+		kite_log(cte, LOG_ERR, "failed to create generator\n");
 		return -1;
 	}
 

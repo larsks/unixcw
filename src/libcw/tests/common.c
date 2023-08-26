@@ -60,19 +60,19 @@ int legacy_api_standalone_test_setup(cw_test_executor_t * cte, bool start_gen)
 	cw_reset_send_receive_parameters();
 
 	if (CW_SUCCESS != cw_set_gap(0)) { /* This function sets gap in both generator and receiver. */
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting gen/rec gap\n", __func__, __LINE__);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting gen/rec gap\n", __func__, __LINE__);
 		return -1;
 	}
 	if (CW_SUCCESS != cw_set_send_speed(cte->config->send_speed)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator speed %d\n", __func__, __LINE__, cte->config->send_speed);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator speed %d\n", __func__, __LINE__, cte->config->send_speed);
 		return -1;
 	}
 	if (CW_SUCCESS != cw_set_frequency(cte->config->frequency)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator frequency %d\n", __func__, __LINE__, cte->config->frequency);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator frequency %d\n", __func__, __LINE__, cte->config->frequency);
 		return -1;
 	}
 	if (CW_SUCCESS != cw_set_volume(cte->config->volume)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator volume %d\n", __func__, __LINE__, cte->config->volume);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't prepare legacy API testing, failed at setting generator volume %d\n", __func__, __LINE__, cte->config->volume);
 		return -1;
 	}
 	/* Duration parameters have been recalculated internally on new values of
@@ -106,20 +106,20 @@ int gen_setup(cw_test_executor_t * cte, cw_gen_t ** gen)
 {
 	*gen = cw_gen_new(&cte->current_gen_conf);
 	if (!*gen) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, stopping the test\n", __func__, __LINE__);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't create generator, stopping the test\n", __func__, __LINE__);
 		return -1;
 	}
 	cw_gen_reset_parameters_internal(*gen);
 	if (CW_SUCCESS != cw_gen_set_speed(*gen, cte->config->send_speed)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting speed %d\n", __func__, __LINE__, cte->config->send_speed);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting speed %d\n", __func__, __LINE__, cte->config->send_speed);
 		return -1;
 	}
 	if (CW_SUCCESS != cw_gen_set_frequency(*gen, cte->config->frequency)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting frequency %d\n", __func__, __LINE__, cte->config->frequency);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting frequency %d\n", __func__, __LINE__, cte->config->frequency);
 		return -1;
 	}
 	if (CW_SUCCESS != cw_gen_set_volume(*gen, cte->config->volume)) {
-		cte->cte_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting volume %d\n", __func__, __LINE__, cte->config->volume);
+		kite_log(cte, LOG_ERR, "%s:%d: Can't create generator, failed at setting volume %d\n", __func__, __LINE__, cte->config->volume);
 		return -1;
 	}
 	cw_gen_sync_parameters_internal(*gen);

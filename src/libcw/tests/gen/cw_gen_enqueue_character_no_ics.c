@@ -79,10 +79,10 @@ static void receive_callback(void * cdata, cw_easy_rec_data_t * erd)
 {
 	callback_data_t * data = (callback_data_t *) cdata;
 	if (erd->is_iws) {
-		data->cte->cte_log(data->cte, LOG_DEBUG, "Received character ' '\n");
+		kite_log(data->cte, LOG_DEBUG, "Received character ' '\n");
 		data->accumulator[data->acc_iter] = ' ';
 	} else {
-		data->cte->cte_log(data->cte, LOG_DEBUG, "Received character '%c'\n", erd->character);
+		kite_log(data->cte, LOG_DEBUG, "Received character '%c'\n", erd->character);
 		data->accumulator[data->acc_iter] = erd->character;
 	}
 	data->acc_iter++;

@@ -50,7 +50,7 @@ int legacy_api_test_cw_get_receive_parameters(cw_test_executor_t * cte)
 	if (0 != CW_TOLERANCE_MIN) {
 		/* We really want to test at zero tolerance, so if for some reason
 		   MIN is not zero, then we will be unhappy. */
-		cte->cte_log(cte, LOG_ERR, "Unexpected value of CW_TOLERANCE_MIN: %d (expected zero)\n", CW_TOLERANCE_MIN);
+		kite_log(cte, LOG_ERR, "Unexpected value of CW_TOLERANCE_MIN: %d (expected zero)\n", CW_TOLERANCE_MIN);
 		return -1;
 	}
 
@@ -66,7 +66,7 @@ int legacy_api_test_cw_get_receive_parameters(cw_test_executor_t * cte)
 		const int tolerance = tolerances[i];
 
 		if (CW_SUCCESS != cw_set_tolerance(tolerance)) {
-			cte->cte_log(cte, LOG_ERR, "Failed to set tolerance %d of receiver\n", tolerance);
+			kite_log(cte, LOG_ERR, "Failed to set tolerance %d of receiver\n", tolerance);
 			return -1;
 		}
 
@@ -95,7 +95,7 @@ int legacy_api_test_cw_get_receive_parameters(cw_test_executor_t * cte)
 	/* Restore original tolerance of a receiver. Other receiver tests will
 	   rely on the receiver using default tolerance. */
 	if (CW_SUCCESS != cw_set_tolerance(orig_tolerance)) {
-		cte->cte_log(cte, LOG_ERR, "Failed to restore original tolerance of receiver\n");
+		kite_log(cte, LOG_ERR, "Failed to restore original tolerance of receiver\n");
 		return -1;
 	}
 	legacy_api_standalone_test_teardown(cte);

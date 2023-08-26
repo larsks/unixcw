@@ -131,7 +131,6 @@ static void cw_test_set_current_topic_and_gen_config(cw_test_executor_t * self, 
 
 static void cw_test_print_test_stats(cw_test_executor_t * self);
 
-static int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 static int cw_test_log_info(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 static void cw_test_log_info_cont(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 static void cw_test_flush_info(struct cw_test_executor_t * self);
@@ -1124,7 +1123,6 @@ void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const
 
 	self->print_test_stats = cw_test_print_test_stats;
 
-	self->cte_log = cw_test_log;
 	self->log_info = cw_test_log_info;
 	self->log_info_cont = cw_test_log_info_cont;
 	self->flush_info = cw_test_flush_info;
@@ -1150,9 +1148,9 @@ void cw_test_deinit(cw_test_executor_t * self)
 
 
 
-int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt, ...)
+int kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...)
 {
-	if (NULL == self->file_out) {
+	if (NULL == executor->file_out) {
 		return 0;
 	}
 
@@ -1161,6 +1159,15 @@ int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt
 	case LOG_ERR:
 		tag = "[EE]";
 		break;
+	case LOG_WARNING:
+		tag = "[WW]";
+		break;
+	case LOG_NOTICE:
+		tag = "[NN]";
+		break;
+	case LOG_INFO:
+		tag = "[II]";
+		break;
 	case LOG_DEBUG:
 		tag = "[DD]";
 		break;
@@ -1168,18 +1175,31 @@ int cw_test_log(struct cw_test_executor_t * self, int severity, const char * fmt
 		break;
 	}
 
-	char va_buf[256] = { 0 };
+	char va_buf[512] = { 0 };
 
 	va_list ap;
 	va_start(ap, fmt);
 	/* FIXME: this vsnprintf() introduces *some* delays when
 	   running tests under valgrind/callgrind. Fixing this FIXME
 	   will have very small impact, so try this as last. */
-	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	size_t va_buf_len = (size_t) vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+	if (va_buf_len >= sizeof (va_buf)) {
+		/* vsnprintf() would want to write va_buf_len, but it wrote less. */
+		va_buf_len = sizeof (va_buf) - 1;
+	}
 	va_end(ap);
 
-	const int n = fprintf(self->file_out, "%s %s", tag, va_buf);
-	fflush(self->file_out);
+#if 1
+	/* Version (hopefully) optimized for speed. */
+	size_t n = 0;
+	n += fwrite(tag, 4, 1, executor->file_out);
+	n += fwrite(" ", 1, 1, executor->file_out);
+	n += fwrite(va_buf, va_buf_len, 1, executor->file_out);
+#else
+	/* Version not optimized for speed. */
+	const int n = fprintf(executor->file_out, "%s %s", tag, va_buf);
+#endif
+	fflush(executor->file_out);
 
 	return n;
 }
