@@ -162,15 +162,27 @@ static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 	const size_t input_len = strlen(tester->input_string);
 	const size_t received_len = strlen(tester->received_string);
 
+	/* 'Empty received string' issue has popped up once. It may be a sign of
+	   problems in test code, and it's always worth checking for. Check the
+	   input string's length too. */
+	if (0 == input_len) {
+		fprintf(stderr, "[EE] Length of input string is zero\n");
+		return false;
+	}
+	if (0 == received_len) {
+		fprintf(stderr, "[EE] Length of received string is zero\n");
+		return false;
+	}
+
 	/* Find shorter string's length. */
-	const size_t len = input_len <= received_len ? input_len : received_len;
+	const size_t comparison_len = input_len <= received_len ? input_len : received_len;
 
 	size_t mismatch_count = 0;
 	/* Index of last mismatched character. "Last" when looking
 	   from the beginning of the string. */
 	size_t last_mismatch_index = (size_t) -1;
 
-	for (size_t i = 0; i < len; i++) {
+	for (size_t i = 0; i < comparison_len; i++) {
 		const size_t input_index = input_len - 1 - i;
 		const size_t received_index = received_len - 1 - i;
 
@@ -190,23 +202,22 @@ static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 
 #define PERC_FMT "%.3f%%"
 	if (0 != mismatch_count) {
-		const float error_rate_percent = 100.0F * mismatch_count / len;
+		const float error_rate_percent = 100.0F * mismatch_count / comparison_len;
 		if (error_rate_percent > tester->acceptable_error_rate_percent) {
 			/* High error rate is never acceptable. */
 			fprintf(stderr, "[EE] Input len %zd, mismatch cnt %zd, err rate "PERC_FMT" (too high, thresh "PERC_FMT")\n",
-				len, mismatch_count,
-				(double) error_rate_percent,
-				(double) tester->acceptable_error_rate_percent);
+			        comparison_len, mismatch_count,
+			        (double) error_rate_percent,
+			        (double) tester->acceptable_error_rate_percent);
 			return false;
 		} else {
 			fprintf(stderr, "[NN] Input len %zd, mismatch cnt %zd, err rate "PERC_FMT" (acceptable, thresh "PERC_FMT")\n",
-				len, mismatch_count,
-				(double) error_rate_percent,
-				(double) tester->acceptable_error_rate_percent);
+			        comparison_len, mismatch_count,
+			        (double) error_rate_percent,
+			        (double) tester->acceptable_error_rate_percent);
 		}
 	} else {
-		fprintf(stderr, "[II] Input len %zd, mismatch cnt 0\n",
-			len);
+		fprintf(stderr, "[II] Compared %zd chars, found %zd mismatches\n", comparison_len, mismatch_count);
 	}
 #undef PERC_FMT
 
@@ -215,16 +226,15 @@ static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 			/* Errors are acceptable only at the beginning, where
 			   receiver didn't tune yet into stream of incoming
 			   data. */
-			fprintf(stderr, "[EE] Input len %zd, last mismatch idx %zd (too far from beginning, thresh %zd)\n",
-				len, last_mismatch_index, tester->acceptable_last_mismatch_index);
+			fprintf(stderr, "[EE] Compared %zd chars, last mismatch idx %zd (too far from beginning, thresh %zd)\n",
+			        comparison_len, last_mismatch_index, tester->acceptable_last_mismatch_index);
 			return false;
 		} else {
-			fprintf(stderr, "[NN] Input len %zd, last mismatch idx %zd (acceptable, thresh %zd)\n",
-				len, last_mismatch_index, tester->acceptable_last_mismatch_index);
+			fprintf(stderr, "[NN] Compared %zd chars, last mismatch idx %zd (acceptable, thresh %zd)\n",
+			        comparison_len, last_mismatch_index, tester->acceptable_last_mismatch_index);
 		}
 	} else {
-		fprintf(stderr, "[II] Input len %zd, last mismatch idx none\n",
-			len);
+		fprintf(stderr, "[II] Compared %zd chars, last mismatch idx none\n", comparison_len);
 	}
 
 
@@ -347,7 +357,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 		}
 		if (diffs_reported == diffs_to_report_max) {
 			/* Don't print them all if there are more of X differences. */
-			fprintf(stderr, "[EE] more differences may be present, but not showing them\n");
+			fprintf(stderr, "[EE] More differences may be present, but not showing them\n");
 			break;
 		}
 	}
@@ -356,11 +366,9 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 		if (0 == diffs_reported) {
 			/* Because of condition in 'for' loop we might
 			   skipped checking end of one of strings. */
-			fprintf(stderr, "[EE] difference appears to be at beginning of one of strings\n");
+			fprintf(stderr, "[EE] Difference appears to be at beginning of one of strings\n");
 		}
 	}
-
-	return;
 }
 
 

@@ -627,6 +627,10 @@ static int expect_correct_receive_on_character_r_c(cw_test_executor_t * cte, cw_
 
 	fprintf(stderr, "[II] Poll representation: '%s' -> %c -> '%s'\n", erd->representation, test.character, looked_up_representation);
 
+	/* This is needed to allow caller to accumulate received data. Smells
+	   like a workaround. */
+	erd->character = test.character;
+
 	cte->expect_op_int(cte, test_ok, "==", true, "Poll representation");
 
 	free(looked_up_representation);
