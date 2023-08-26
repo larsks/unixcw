@@ -79,6 +79,9 @@
    in test N+1 that will be executed right after test N. */
 #define LIBCW_TEST_INTER_TEST_PAUSE_MSECS (2 * LIBCW_TEST_MEAS_CPU_MEAS_INTERVAL_MSECS)
 
+#define MSG_BUF_SIZE 1024
+#define VA_BUF_SIZE   128
+
 
 
 
@@ -109,7 +112,7 @@ static void cw_assert2(struct cw_test_executor_t * self, bool condition, const c
 
 static void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...);
 static void cw_test_print_test_footer(cw_test_executor_t * self, const char * test_name);
-static void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int n, const char * status_string);
+static void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int message_len, const char * status_string);
 
 static cwt_retv cw_test_process_args(cw_test_executor_t * self, int argc, char * const argv[]);
 static int cw_test_get_loops_count(cw_test_executor_t * self);
@@ -149,6 +152,11 @@ static unsigned int cw_test_get_total_errors_count(cw_test_executor_t * cte);
 static cwt_retv iterate_over_topics(cw_test_executor_t * cte, cw_test_set_t * test_set);
 static cwt_retv iterate_over_sound_systems(cw_test_executor_t * cte, cw_test_set_t * test_set, int topic);
 static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_object_t * test_objects, int topic, cw_sound_system sound_system);
+
+
+
+
+static int msg_buff_prepare(struct cw_test_executor_t * executor, char * msg_buf, size_t msg_buf_size, const char * va_buff);
 
 
 
@@ -288,7 +296,7 @@ static int cw_test_get_loops_count(cw_test_executor_t * self)
 
 bool cw_test_expect_op_int(struct cw_test_executor_t * self, int expected_value, const char * operator, int received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	/* FIXME: this vsnprintf() introduces large delays when running tests under valgrind/callgrind. */
@@ -303,7 +311,7 @@ bool cw_test_expect_op_int(struct cw_test_executor_t * self, int expected_value,
 
 bool cw_test_expect_op_int_errors_only(struct cw_test_executor_t * self, int expected_value, const char * operator, int received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	/* FIXME: this vsnprintf() introduces large delays when running tests under valgrind/callgrind. */
@@ -320,12 +328,7 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 {
 	bool as_expected = false;
 
-	char msg_buf[1024] = { 0 };
-	/* FIXME: these snprintf() call introduce large delays when running tests under valgrind/callgrind. */
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
 
 	bool success = false;
 	if (operator[0] == '=' && operator[1] == '=') {
@@ -356,9 +359,8 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 		if (!errors_only) {
 			self->stats->successes++;
 
-			/* FIXME: believe it or not, this line
-			   introduces large delays when running tests
-			   under valgrind/callgrind. */
+			const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
+
 			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
 
 			self->log_info(self, "%s\n", msg_buf);
@@ -366,6 +368,8 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 		as_expected = true;
 	} else {
 		self->stats->failures++;
+
+		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
 		self->log_error(self, "%s\n", msg_buf);
@@ -382,7 +386,7 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 
 bool cw_test_expect_op_float(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
@@ -396,7 +400,7 @@ bool cw_test_expect_op_float(struct cw_test_executor_t * self, float expected_va
 
 bool cw_test_expect_op_float_errors_only(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
@@ -410,11 +414,7 @@ bool cw_test_expect_op_float_errors_only(struct cw_test_executor_t * self, float
 
 static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float expected_value, const char * operator, float received_value, bool errors_only, const char * va_buf)
 {
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
 
 	bool success = false;
 	if (operator[0] == '<' && operator[1] == '\0') {
@@ -434,6 +434,7 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 		if (!errors_only) {
 			self->stats->successes++;
 
+			const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
 			self->log_info(self, "%s\n", msg_buf);
 		}
@@ -441,6 +442,7 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 	} else {
 		self->stats->failures++;
 
+		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected %f, got %f   ***\n", (double) expected_value, (double) received_value);
@@ -455,7 +457,7 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 
 bool cw_test_expect_op_double(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
@@ -469,7 +471,7 @@ bool cw_test_expect_op_double(struct cw_test_executor_t * self, double expected_
 
 bool cw_test_expect_op_double_errors_only(struct cw_test_executor_t * self, double expected_value, const char * operator, double received_value, const char * fmt, ...)
 {
-	char va_buf[128] = { 0 };
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
@@ -485,24 +487,21 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 {
 	bool as_expected = false;
 
-	char va_buf[128] = { 0 };
-	va_list ap;
-	va_start(ap, fmt);
-	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
-	va_end(ap);
-
-	char msg_buf[1024] = { 0 };
-	/* FIXME: these snprintf() call introduce large delays when running tests under valgrind/callgrind. */
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
+	char va_buf[VA_BUF_SIZE] = { 0 };
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
 
 	bool errors_only = false;
 	bool success = 0 == strcasecmp(expected_value, received_value);
 	if (success) {
 		if (!errors_only) {
 			self->stats->successes++;
+
+			va_list ap;
+			va_start(ap, fmt);
+			vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+			va_end(ap);
+
+			const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 			/* FIXME: believe it or not, this line
 			   introduces large delays when running tests
@@ -515,6 +514,12 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 	} else {
 		self->stats->failures++;
 
+		va_list ap;
+		va_start(ap, fmt);
+		vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+		va_end(ap);
+
+		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected [%s], got [%s]   ***\n", expected_value, received_value);
@@ -534,16 +539,22 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 
    This is a private function so it is not put into cw_test_executor_t
    class.
+
+   FIXME: believe it or not, this function introduces large delays when
+   running tests under valgrind/callgrind.
 */
-void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int n, const char * status_string)
+void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int message_len, const char * status_string)
 {
 	const char * separator = " "; /* Separator between test message and test status string, for better visibility of status string. */
-	const size_t space_left = self->console_n_cols - n;
+	const int space_left = self->console_n_cols - message_len;
 
-	if (space_left > strlen(separator) + strlen(status_string)) {
-		sprintf(msg_buf + self->console_n_cols - strlen(separator) - strlen(status_string), "%s%s", separator, status_string);
+	const int separator_len = (int) strlen(separator);
+	const int status_string_len = (int) strlen(status_string);
+
+	if (space_left > separator_len + status_string_len) {
+		sprintf(msg_buf + self->console_n_cols - separator_len - status_string_len, "%s%s", separator, status_string);
 	} else {
-		sprintf(msg_buf + self->console_n_cols - strlen("...") - strlen(separator) - strlen(status_string), "...%s%s", separator, status_string);
+		sprintf(msg_buf + self->console_n_cols - strlen("...") - separator_len - status_string_len, "...%s%s", separator, status_string);
 	}
 }
 
@@ -553,23 +564,20 @@ void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int
 bool cw_test_expect_between_int(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...)
 {
 	bool as_expected = true;
-	char va_buf[128] = { 0 };
 
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
 	va_end(ap);
 
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
+	const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 	if (expected_lower <= received_value && received_value <= expected_higher) {
 		self->stats->successes++;
 
 		cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
-		//self->log_info(self, "%s\n", msg_buf);
 		self->log_info(self, "%s %d %d %d\n", msg_buf, expected_lower, received_value, expected_higher);
 
 		as_expected = true;
@@ -592,7 +600,7 @@ bool cw_test_expect_between_int(struct cw_test_executor_t * self, int expected_l
 bool cw_test_expect_between_int_errors_only(struct cw_test_executor_t * self, int expected_lower, int received_value, int expected_higher, const char * fmt, ...)
 {
 	bool as_expected = true;
-	char buf[128] = { 0 };
+	char buf[VA_BUF_SIZE] = { 0 };
 
 	va_list ap;
 	va_start(ap, fmt);
@@ -618,18 +626,15 @@ bool cw_test_expect_between_int_errors_only(struct cw_test_executor_t * self, in
 bool cw_test_expect_null_pointer(struct cw_test_executor_t * self, const void * pointer, const char * fmt, ...)
 {
 	bool as_expected = false;
-	char va_buf[128] = { 0 };
 
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
 	va_end(ap);
 
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
+	const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 	if (NULL == pointer) {
 		self->stats->successes++;
@@ -658,23 +663,20 @@ bool cw_test_expect_null_pointer(struct cw_test_executor_t * self, const void * 
 bool cw_test_expect_null_pointer_errors_only(struct cw_test_executor_t * self, const void * pointer, const char * fmt, ...)
 {
 	bool as_expected = false;
-	char va_buf[128] = { 0 };
-
-	va_list ap;
-	va_start(ap, fmt);
-	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
-	va_end(ap);
-
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
 
 	if (NULL == pointer) {
 		as_expected = true;
 	} else {
 		self->stats->failures++;
+
+		char va_buf[VA_BUF_SIZE] = { 0 };
+		va_list ap;
+		va_start(ap, fmt);
+		vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+		va_end(ap);
+
+		char msg_buf[MSG_BUF_SIZE] = { 0 };
+		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
 		self->log_error(self, "%s\n", msg_buf);
@@ -682,7 +684,6 @@ bool cw_test_expect_null_pointer_errors_only(struct cw_test_executor_t * self, c
 
 		as_expected = false;
 	}
-
 
 	return as_expected;
 }
@@ -693,18 +694,15 @@ bool cw_test_expect_null_pointer_errors_only(struct cw_test_executor_t * self, c
 bool cw_test_expect_valid_pointer(struct cw_test_executor_t * self, const void * pointer, const char * fmt, ...)
 {
 	bool as_expected = false;
-	char va_buf[128] = { 0 };
 
+	char va_buf[VA_BUF_SIZE] = { 0 };
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
 	va_end(ap);
 
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
+	const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 	if (NULL != pointer) {
 		self->stats->successes++;
@@ -733,23 +731,20 @@ bool cw_test_expect_valid_pointer(struct cw_test_executor_t * self, const void *
 bool cw_test_expect_valid_pointer_errors_only(struct cw_test_executor_t * self, const void * pointer, const char * fmt, ...)
 {
 	bool as_expected = false;
-	char va_buf[128] = { 0 };
-
-	va_list ap;
-	va_start(ap, fmt);
-	vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
-	va_end(ap);
-
-	char msg_buf[1024] = { 0 };
-	int n = snprintf(msg_buf, sizeof (msg_buf), "%s", self->msg_prefix);
-	const int message_len = n + snprintf(msg_buf + n, sizeof (msg_buf) - n, "%s", va_buf);
-	n += snprintf(msg_buf + n, sizeof (msg_buf) - n, "%-*s", (self->console_n_cols - n), va_buf);
-
 
 	if (NULL != pointer) {
 		as_expected = true;
 	} else {
 		self->stats->failures++;
+
+		char va_buf[VA_BUF_SIZE] = { 0 };
+		va_list ap;
+		va_start(ap, fmt);
+		vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
+		va_end(ap);
+
+		char msg_buf[MSG_BUF_SIZE] = { 0 };
+		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
 		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
 		self->log_error(self, "%s\n", msg_buf);
@@ -757,7 +752,6 @@ bool cw_test_expect_valid_pointer_errors_only(struct cw_test_executor_t * self, 
 
 		as_expected = false;
 	}
-
 
 	return as_expected;
 }
@@ -769,8 +763,7 @@ void cw_assert2(struct cw_test_executor_t * self, bool condition, const char * f
 {
 	if (!condition) {
 
-		char va_buf[128] = { 0 };
-
+		char va_buf[VA_BUF_SIZE] = { 0 };
 		va_list ap;
 		va_start(ap, fmt);
 		vsnprintf(va_buf, sizeof (va_buf), fmt, ap);
@@ -1590,3 +1583,19 @@ unsigned int cw_test_get_total_errors_count(cw_test_executor_t * cte)
 	}
 	return result;
 }
+
+
+
+
+static int msg_buff_prepare(struct cw_test_executor_t * executor, char * msg_buf, size_t msg_buf_size, const char * va_buff)
+{
+	/* FIXME: these snprintf() call introduce large delays when running tests
+	   under valgrind/callgrind. */
+	int n = snprintf(msg_buf, msg_buf_size, "%s", executor->msg_prefix);
+	const int message_len = n + snprintf(msg_buf + n, msg_buf_size - n, "%s", va_buff);
+	snprintf(msg_buf + n, msg_buf_size - n, "%-*s", (executor->console_n_cols - n), va_buff);
+
+	return message_len;
+}
+
+
