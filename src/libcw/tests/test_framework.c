@@ -64,7 +64,7 @@
 #include "libcw.h"
 #include "libcw_debug.h"
 #include "libcw_utils.h"
-#include "cwutils/cw_cmdline.h"
+#include <cwutils/cw_cmdline.h>
 
 #include "test_framework.h"
 #include <test_framework/basic_utils/param_ranger.h>
@@ -242,11 +242,12 @@ cwt_retv cw_test_process_args(cw_test_executor_t * self, int argc, char * const 
 		  clock.
 
 		  But if the tests will be ever executed on embedded devices that
-		  perhaps won't have an NTP client or won't have battery-sustained
+		  perhaps won't have an NTP client, or NTP server will be
+		  unavailable, or the device or won't have battery-sustained
 		  real-time clock, the call to time(0) may be returning values from a
-		  small pool. The values would be somewhere from first hour of first
-		  day of January 1970. That would mean a decreased uniqueness of
-		  seed.
+		  small pool. The values would frequently be somewhere from first
+		  hour of first day of January 1970. That would mean a decreased
+		  uniqueness of seed.
 		*/
 		self->random_seed = time(0);
 		srand48(self->random_seed);
