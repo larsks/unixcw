@@ -170,12 +170,26 @@ static void receiver_poll_report_error(cw_easy_legacy_receiver_t * easy_rec)
 
 
 /**
-   \brief Receive any new character from the CW library.
+   \brief Try polling non-inter-word-space character from legacy receiver
 
    The function is called r_c because primary function in production code
    polls representation, and only then in test code a character is polled.
 
-   @reviewed TODO
+   If @p poll_representation is true, this function will try polling a
+   representation (string of dots/dashes) of received data.
+
+   If @p poll_representation is false, this function will try polling a
+   character (represented by integer-typed variable).
+
+   This test code does a verification of data returned by the first poll
+   described above. The verification is done during a second poll that does
+   the polling using the "opposite" function. Results of both polls are
+   compared with each other.
+
+   @reviewedon 2023.08.26
+
+   @param[in/out] easy_rec Receiver from which to poll character
+   @param[in] poll_representation Flag indicating which method to use for polling
 */
 static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool poll_representation)
 {
@@ -187,7 +201,7 @@ static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool p
 	   time intervals measured by easy_rec->main_timer, and that
 	   would interfere with recognizing dots and dashes. */
 	struct timeval local_timer;
-	gettimeofday(&local_timer, NULL);
+	gettimeofday(&local_timer, NULL); /* TODO acerion 2023.08.26: use monotonic clock instead of wall clock. */
 	//fprintf(stderr, "poll_receive_char:  %10ld : %10ld\n", local_timer.tv_sec, local_timer.tv_usec);
 
 
@@ -209,37 +223,42 @@ static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool p
 		prev_errno = 0;
 
 		if (poll_representation) {
-			/* Receiver stores full, well formed representation. Display it. */
+			/* Polling the receiver gives us a representation in erd. Display it. */
 			fprintf(stderr, "[II] Polled representation '%s'\n", erd.representation);
 
 			/* Test code. */
 			{
+				/* Test currently polled data. */
 				expect_correct_receive_on_character_r_c(g_cte, &erd, &local_timer);
+
+				/* Append current data to accumulator for later tests. */
 				cw_rec_tester_t * tester = (cw_rec_tester_t *) easy_rec->rec_tester;
 				tester->received_string[tester->received_string_i++] = erd.character;
 			}
 
 		} else {
-			/* Receiver stores full, well formed  character. Display it. */
+			/* Polling the receiver gives us a character in erd. Display it. */
 			fprintf(stderr, "[II] Polled character '%c'\n", erd.character);
 
 			/* Test code. */
 			{
+				/* Test currently polled data. */
 				expect_correct_receive_on_character_c_r(g_cte, &erd, &local_timer);
+
+				/* Append current data to accumulator for later tests. */
 				cw_rec_tester_t * tester = (cw_rec_tester_t *) easy_rec->rec_tester;
 				tester->received_string[tester->received_string_i++] = erd.character;
 			}
 		}
 
 
-		/* A full character has been received. Directly after it
-		   comes a space. Either a short inter-character-space
-		   followed by another character (in this case we won't
-		   display the inter-character-space), or longer
-		   inter-word-space - this space we would like to catch and
-		   display.
+		/* A full character has been received. Directly after it comes some
+		   space. Either a short inter-character-space followed by another
+		   character (in this case we won't display the
+		   inter-character-space), or longer inter-word-space - this space we
+		   would like to catch and display.
 
-		   Set a flag indicating that next poll may result in
+		   Set a flag indicating that next poll *may* result in
 		   inter-word-space. */
 		easy_rec->is_pending_iws = true;
 
@@ -247,10 +266,8 @@ static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool p
 		/* Handle receive error detected on trying to read a character. */
 		switch (errno) {
 		case EAGAIN:
-			/* Call made too early, receiver hasn't
-			   received a full character yet. Try next
-			   time. */
-
+			/* Call made too early, receiver hasn't received a full character
+			   yet. Try next time. */
 			if (debug_errnos && prev_errno != EAGAIN) {
 				fprintf(stderr, "[NN] %s: %d -> EAGAIN\n", function_name, prev_errno);
 				prev_errno = EAGAIN;
@@ -258,14 +275,12 @@ static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool p
 			break;
 
 		case ERANGE:
-			/* Call made not in time, or not in proper
-			   sequence. Receiver hasn't received any
-			   character (yet). Try harder. */
+			/* Call made not in time, or not in proper sequence. Receiver
+			   hasn't received any character (yet). Try harder. */
 			if (debug_errnos && prev_errno != ERANGE) {
 				fprintf(stderr, "[NN] %s: %d -> RANGE\n", function_name, prev_errno);
 				prev_errno = ERANGE;
 			}
-
 			break;
 
 		case ENOENT:
@@ -298,31 +313,48 @@ static void receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, bool p
 
 
 /**
-   If we received a character on an earlier poll, check again to see
-   if we need to revise the decision about whether it is the end of a
-   word too.
+   @brief Try polling inter-word-space character from legacy receiver
+
+   If we received a character on an earlier poll, check again to see if we
+   need to revise the decision about whether it is the end of a word too.
 
    The function is called r_c because primary function in production code
    polls representation, and only then in test code a character is polled.
 
-   @reviewed TODO
+   If @p poll_representation is true, this function will try polling with a
+   function used for getting from the receiver a representation (string of
+   dots/dashes) of received data. In case of polling a space having a
+   representation (dots/dashes) doesn't make sense, but the polling function
+   also returns "is-inter-word-space" flag.
+
+   If @p poll_representation is false, this function will try polling a
+   character (represented by integer-typed variable). That polling function
+   also returns "is-inter-word-space" flag.
+
+   This test code does a verification of data returned by the first poll
+   described above. The verification is done during a second poll that does
+   the polling using the "opposite" function. Results of both polls are
+   compared with each other.
+
+   @reviewedon 2023.08.26
+
+   @param[in/out] easy_rec Receiver from which to poll character
+   @param[in] poll_representation Flag indicating which method to use for polling
 */
 static void receiver_poll_space(cw_easy_legacy_receiver_t * easy_rec, bool poll_representation)
 {
 	/* Recheck the receive buffer for end of word. */
 
-	/* We expect the receiver to contain a character, but we don't
-	   ask for it this time. The receiver should also store
-	   information about an inter-character-space. If it is longer
-	   than a regular inter-character-space, then the receiver
-	   will treat it as inter-word-space, and communicate it over
-	   is_iws.
+	/* We expect the receiver to contain a character, but we don't ask for it
+	   this time. The receiver should also store information about an
+	   inter-character-space. If it is longer than a regular
+	   inter-character-space, then the receiver will treat it as
+	   inter-word-space, and communicate it over is_iws.
 
-	   Don't use easy_rec->main_timer - it is used eclusively for
-	   marking initial "key down" events. Use local throw-away
-	   local_timer. */
+	   Don't use easy_rec->main_timer - it is used eclusively for marking
+	   initial "key down" events. Use local throw-away local_timer. */
 	struct timeval local_timer;
-	gettimeofday(&local_timer, NULL);
+	gettimeofday(&local_timer, NULL); /* TODO acerion 2023.08.26: use monotonic clock instead of wall clock. */
 	//fprintf(stderr, "receiver_poll_space(): %10ld : %10ld\n", local_timer.tv_sec, local_timer.tv_usec);
 
 
@@ -339,11 +371,14 @@ static void receiver_poll_space(cw_easy_legacy_receiver_t * easy_rec, bool poll_
 
 		/* Test code. */
 		{
+			/* Test currently polled data. */
 			if (poll_representation) {
 				expect_correct_receive_on_space_r_c(g_cte, &erd, &local_timer);
 			} else {
 				expect_correct_receive_on_space_c_r(g_cte, &erd, &local_timer);
 			}
+
+			/* Append current data to accumulator for later tests. */
 			cw_rec_tester_t * tester = (cw_rec_tester_t *) easy_rec->rec_tester;
 			tester->received_string[tester->received_string_i++] = ' ';
 		}
@@ -351,17 +386,14 @@ static void receiver_poll_space(cw_easy_legacy_receiver_t * easy_rec, bool poll_
 		cw_clear_receive_buffer();
 		easy_rec->is_pending_iws = false;
 	} else {
-		/* We don't reset is_pending_iws. The
-		   space that currently lasts, and isn't long enough
-		   to be considered inter-word-space, may grow to
+		/* We don't reset is_pending_iws. The space that currently lasts, and
+		   isn't long enough to be considered inter-word-space, may grow to
 		   become the inter-word-space. Or not.
 
-		   This growing of inter-character-space into
-		   inter-word-space may be terminated by incoming next
-		   tone (key down event) - the tone will mark
-		   beginning of new character within the same
-		   word. And since a new character begins, the flag
-		   will be reset (elsewhere). */
+		   This growing of inter-character-space into inter-word-space may be
+		   terminated by incoming next tone (key down event) - the tone will
+		   mark beginning of new character within the same word. And since a
+		   new character begins, the flag will be reset (elsewhere). */
 	}
 }
 
