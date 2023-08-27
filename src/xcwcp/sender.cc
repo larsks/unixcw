@@ -24,16 +24,14 @@
 #include <deque>
 #include <sstream>
 
+#include <libcw.h>
+
+#include <cwutils/i18n.h>
 
 #include "application.h"
 #include "sender.h"
 #include "textarea.h"
 #include "modeset.h"
-
-#include "libcw.h"
-
-#include "cwutils/i18n.h"
-
 
 
 

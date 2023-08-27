@@ -24,19 +24,19 @@
 #include <cerrno>
 #include <sstream>
 
+#include <libcw.h>
+
+#include <cwutils/i18n.h>
+
+#ifdef XCWCP_WITH_REC_TEST
+#include <cwutils/cw_easy_legacy_receiver_internal.h>
+#endif
 
 #include "application.h"
 #include "receiver.h"
 #include "textarea.h"
 #include "modeset.h"
 
-#include "libcw.h"
-
-#include "cwutils/i18n.h"
-
-#ifdef XCWCP_WITH_REC_TEST
-#include "cwutils/cw_easy_legacy_receiver_internal.h"
-#endif
 
 
 

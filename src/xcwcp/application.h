@@ -31,9 +31,10 @@
 #include <string>
 #include <deque>
 
-#include "libcw.h"
+#include <libcw.h>
+#include <cwutils/cw_common.h>
+
 #include "modeset.h"
-#include "cwutils/cw_common.h"
 
 
 

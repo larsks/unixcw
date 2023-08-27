@@ -17,7 +17,7 @@
 //
 
 #include "modeset.h"
-#include "cwutils/dictionary.h"
+#include <cwutils/dictionary.h>
 
 
 

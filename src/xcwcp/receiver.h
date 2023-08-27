@@ -25,8 +25,8 @@
 
 
 
-#include "cwutils/cw_easy_legacy_receiver.h"
-#include "cwutils/cw_rec_tester.h"
+#include <cwutils/cw_easy_legacy_receiver.h>
+#include <cwutils/cw_rec_tester.h>
 
 
 

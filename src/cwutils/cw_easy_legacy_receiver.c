@@ -62,6 +62,9 @@ void cw_easy_legacy_receiver_delete(cw_easy_legacy_receiver_t ** easy_rec)
 
 
 
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 void cw_easy_legacy_receiver_sk_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down)
 {
 	/* Inform xcwcp receiver (which will inform libcw receiver)
@@ -93,6 +96,9 @@ void cw_easy_legacy_receiver_sk_event(cw_easy_legacy_receiver_t * easy_rec, bool
 
 
 
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 void cw_easy_legacy_receiver_ik_left_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles)
 {
 	easy_rec->is_left_down = is_down;
@@ -123,7 +129,9 @@ void cw_easy_legacy_receiver_ik_left_event(cw_easy_legacy_receiver_t * easy_rec,
 
 
 
-
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 void cw_easy_legacy_receiver_ik_right_event(cw_easy_legacy_receiver_t * easy_rec, bool is_down, bool is_reverse_paddles)
 {
 	easy_rec->is_right_down = is_down;
@@ -140,7 +148,7 @@ void cw_easy_legacy_receiver_ik_right_event(cw_easy_legacy_receiver_t * easy_rec
 		//fprintf(stderr, "time on Rkey down:  %10ld : %10ld\n", easy_rec->main_timer.tv_sec, easy_rec->main_timer.tv_usec);
 	}
 
-	/* Inform libcw about state of left paddle regardless of state
+	/* Inform libcw about state of right paddle regardless of state
 	   of the other paddle. */
 	is_reverse_paddles
 		? cw_notify_keyer_dot_paddle_event(is_down)
@@ -151,7 +159,9 @@ void cw_easy_legacy_receiver_ik_right_event(cw_easy_legacy_receiver_t * easy_rec
 
 
 
-
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 void cw_easy_legacy_receiver_handle_libcw_keying_event(void * easy_receiver, int key_state)
 {
 	cw_easy_legacy_receiver_t * easy_rec = (cw_easy_legacy_receiver_t *) easy_receiver;
@@ -304,12 +314,14 @@ bool cw_easy_legacy_receiver_poll_data(cw_easy_legacy_receiver_t * easy_rec, cw_
 
 	if (easy_rec->is_pending_iws) {
 		/* Check if receiver received the pending inter-word-space. */
+		/* FIXME acerion 2023.08.27: return value is not checked. */
 		cw_easy_legacy_receiver_poll_iws(easy_rec, erd);
 
 		if (!easy_rec->is_pending_iws) {
 			/* We received the pending space. After it the
 			   receiver may have received another
 			   character.  Try to get it too. */
+			/* FIXME acerion 2023.08.27: return value is not checked. */
 			cw_easy_legacy_receiver_poll_character(easy_rec, erd);
 			return true; /* A space has been polled successfully. */
 		}
@@ -328,6 +340,9 @@ bool cw_easy_legacy_receiver_poll_data(cw_easy_legacy_receiver_t * easy_rec, cw_
 
 
 
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
 {
 	/* Don't use receiver.easy_rec->main_timer - it is used exclusively for
@@ -404,8 +419,12 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
 
 
 
-// TODO: can we return true when a space has been successfully polled,
-// instead of returning it through erd?
+/**
+   TODO: can we return true when a space has been successfully polled,
+   instead of returning it through erd?
+
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
 {
 	/* We expect the receiver to contain a character, but we don't
@@ -480,6 +499,9 @@ bool cw_easy_legacy_receiver_is_pending_iws(const cw_easy_legacy_receiver_t * ea
 
 
 
+/**
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+*/
 void cw_easy_legacy_receiver_clear(cw_easy_legacy_receiver_t * easy_rec)
 {
 	cw_clear_receive_buffer();

@@ -29,10 +29,10 @@
 
 #include <string>
 
+#include <cwutils/i18n.h>
+
 #include "application.h"
 #include "textarea.h"
-#include "cwutils/i18n.h"
-
 
 
 

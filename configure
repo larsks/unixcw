@@ -17352,7 +17352,7 @@ $as_echo "no" >&6; }
 fi
 
 
-# Build xcwcp with receiver test? No by default.
+# Build receiver test in xcwcp? No by default.
 # Check whether --enable-xcwcp_rec_test was given.
 if test "${enable_xcwcp_rec_test+set}" = set; then :
   enableval=$enable_xcwcp_rec_test;

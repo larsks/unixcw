@@ -262,7 +262,7 @@ else
 fi
 
 
-# Build xcwcp with receiver test? No by default.
+# Build receiver test in xcwcp? No by default.
 AC_ARG_ENABLE(xcwcp_rec_test,
     AS_HELP_STRING([--enable-xcwcp-rec-test], [Include receiver test in xcwcp]),
     [],
