@@ -50,18 +50,6 @@ may affect end user.
 Note down (as "tickets" in README.dev.org or as TODO/FIXME notes in code) any
 problems that won't be fixed in this release.
 
-* TODO Review changes - documentation and test scenarios template
-1. Review changes in code, documentation and other files. Based on that, make
-   necessary changes to:
-   - qa/test_scenarios/template.org: add, remove or update test cases
-   - package documentation (NEWS/README/README.dev.org/man pages/installation
-     instructions, other)
-2. Review changes noted down in commit log. Based on that, make necessary
-   changes to:
-   - qa/test_scenarios/template.org: add, remove or update test cases
-   - package documentation (NEWS/README/README.dev.org/man pages/installation
-     instructions, other)
-
 * TODO Static code analysis
 Run the following tools for static code analysis, on entire code base,
 including tests:
@@ -141,7 +129,6 @@ testing next release, to see if you haven't reintroduced them.
 
 The test scenarios describe both manual and automatic tests.
 
-
 * TODO Make sure that debug and optimization compiler flags are correct (again)
 
 Make sure that CFLAGS of code that is almost ready for release doesn't
@@ -149,7 +136,27 @@ contain "-g -O". Do this test for a second time (after testing phase): maybe
 you have added the flags during fixing of some issues found during testing
 phase.
 
+* TODO Review changes - documentation and test scenarios template
 
+After those elements are done, you are ready to describe what has changed in
+the package:
+ - the changes that were planned for the release,
+ - fixes during global review,
+ - static code analysis,
+ - deciding soname of library and version of package,
+ - syncing with changes made in Debian,
+ - doing tests per test scenarios and introducing fixes of bugs found that way,
+
+1. Review changes in code, documentation and other files. Based on that, make
+   necessary changes to:
+   - qa/test_scenarios/template.org: add, remove or update test cases
+   - package documentation (NEWS/README/README.dev.org/man pages/installation
+     instructions, other)
+2. Review changes noted down in commit log. Based on that, make necessary
+   changes to:
+   - qa/test_scenarios/template.org: add, remove or update test cases
+   - package documentation (NEWS/README/README.dev.org/man pages/installation
+     instructions, other)
 * TODO Localization
 
 If you use gettext or any other tool to facilitate localization of your
