@@ -60,12 +60,15 @@ typedef struct {
    @param meas, so that a new value can be calculated during new
    measurement.
 
-   @reviewedon 2023.08.21
+   @reviewedon 2023.08.27
 
    @param[in/out] meas Resource measurement variable
    @param[in] meas_interval_msecs Value indicating at what intervals the measurements should be taken [milliseconds]
+
+   @return 0 on successful start
+   @return -1 otherwise
 */
-void resource_meas_start(resource_meas * meas, int meas_interval_msecs);
+int resource_meas_start(resource_meas * meas, int meas_interval_msecs);
 
 
 

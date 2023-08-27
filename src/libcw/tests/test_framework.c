@@ -1559,7 +1559,10 @@ static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_obje
 			   want to reset 'max resources' value - we want to
 			   measure the 'max resources' value only per test
 			   object, not per whole test set. */
-			resource_meas_start(&cte->resource_meas, LIBCW_TEST_MEAS_CPU_MEAS_INTERVAL_MSECS);
+			if (0 != resource_meas_start(&cte->resource_meas, LIBCW_TEST_MEAS_CPU_MEAS_INTERVAL_MSECS)) {
+				kite_log(cte, LOG_ERR, "Failed to start resource meas when starting tests of '%s'\n", cte->config->test_function_name);
+				return cwt_retv_err;
+			}
 		}
 
 		cw_test_set_current_topic_and_gen_config(cte, topic, sound_system);

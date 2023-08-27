@@ -29,6 +29,7 @@
 
 
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdio.h>
 #include <string.h>
@@ -73,16 +74,29 @@ static void * resouce_meas_thread(void * arg)
 
 
 
-void resource_meas_start(resource_meas * meas, int meas_interval_msecs)
+int resource_meas_start(resource_meas * meas, int meas_interval_msecs)
 {
 	memset(meas, 0, sizeof (*meas));
 	meas->meas_interval_msecs = meas_interval_msecs;
 
-	pthread_mutex_init(&meas->mutex, NULL);
-	pthread_attr_init(&meas->thread_attr);
-	pthread_create(&meas->thread_id, &meas->thread_attr, resouce_meas_thread, meas);
+	if (0 != pthread_mutex_init(&meas->mutex, NULL)) {
+		fprintf(stderr, "[EE] Failed to initialize mutex of resource meas: '%s'\n", strerror(errno));
+		return -1;
+	}
+	if (0 != pthread_attr_init(&meas->thread_attr)) {
+		fprintf(stderr, "[EE] Failed to initialize pthread attributes of resource meas: '%s'\n", strerror(errno));
+		pthread_mutex_destroy(&meas->mutex);
+		return -1;
+	}
 
-	/* TODO acerion 2023.08.21 check return values and report status through return statement. */
+	if (0 != pthread_create(&meas->thread_id, &meas->thread_attr, resouce_meas_thread, meas)) {
+		fprintf(stderr, "[EE] Failed to start thread of resource meas: '%s'\n", strerror(errno));
+		pthread_attr_destroy(&meas->thread_attr);
+		pthread_mutex_destroy(&meas->mutex);
+		return -1;
+	}
+
+	return 0;
 }
 
 
