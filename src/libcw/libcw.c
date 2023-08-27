@@ -1110,6 +1110,15 @@ int cw_queue_tone(int usecs, int frequency)
 	CW_TONE_INIT(&tone, frequency, usecs, CW_SLOPE_MODE_STANDARD_SLOPES);
 	int rv = cw_tq_enqueue_internal(cw_generator->tq, &tone);
 
+	if (frequency > 0) {
+		/* Enqueueing a mark must reset counter of spaces. */
+		cw_generator->space_units_count = 0;
+	} else {
+		/* This function doesn't allow us to recognize whether an ims, ics or
+		   iws space has been enqueued, so we can't tell what value to assign
+		   to space_units_count. */
+	}
+
 	return rv;
 }
 

@@ -2256,13 +2256,13 @@ cw_ret_t cw_gen_enqueue_ics_internal(cw_gen_t * gen)
 		/* This ics is appended after already enqueued ims. Duration of the
 		   tone that we enqueue here should be shorter by ims. The ims and
 		   current shortened tone will together form 3-units ics. */
-		ics_duration = gen->durations.ics_duration - (UNITS_PER_IMS * gen->durations.unit_duration);
+		ics_duration = gen->durations.ics_duration - gen->durations.ims_duration;
 		break;
 	case UNITS_PER_ICS:
 	case UNITS_PER_IWS:
 		/* libcw API provides functions for enqueueing ics or iws, so it's
 		   possible that application will enqueue multiple ics spaces or mix
-		   of ics and iws. So enqueue this ics in its full length. */
+		   of ics and iws. So enqueue this ics in its full duration. */
 		ics_duration = gen->durations.ics_duration;
 		break;
 	default:
@@ -2336,13 +2336,13 @@ cw_ret_t cw_gen_enqueue_iws_internal(cw_gen_t * gen)
 		   of a word, when ' ' space character is played). Duration of the
 		   tone that we enqueue here should be shorter by ims. The ims and
 		   current shortened tone will together form 7-unit iws. */
-		iws_duration = gen->durations.iws_duration - (UNITS_PER_IMS * gen->durations.unit_duration);
+		iws_duration = gen->durations.iws_duration - gen->durations.ims_duration;
 		break;
 	case UNITS_PER_ICS:
 		/* This iws is appended after already enqueued ics. Duration of the
 		   tone that we enqueue here should be shorter by ics. The ics and
 		   current shortened tone will together form 7-unit iws. */
-		iws_duration = gen->durations.iws_duration - (UNITS_PER_ICS * gen->durations.unit_duration);
+		iws_duration = gen->durations.iws_duration - gen->durations.ics_duration;
 		break;
 	case UNITS_PER_IWS:
 		/* This is probably a situation when application wants to enqueue two
@@ -2989,32 +2989,38 @@ cw_ret_t cw_gen_enqueue_ik_symbol_no_ims_internal(cw_gen_t * gen, char symbol)
 {
 	cw_tone_t tone = { 0 };
 
+	/* In all other places the assignment to gen->space_units_count happens
+	   after call to cw_tq_enqueue_internal(). To keep this convention I need
+	   this temporary var. */
+	int units_count = 0;
+
 	switch (symbol) {
 	case CW_DOT_REPRESENTATION:
 		CW_TONE_INIT(&tone, gen->frequency, gen->durations.dot_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		/* Enqueueing a mark means resetting of spaces counter. */
-		gen->space_units_count = 0;
+		units_count = 0;
 		break;
 
 	case CW_DASH_REPRESENTATION:
 		CW_TONE_INIT(&tone, gen->frequency, gen->durations.dash_duration, CW_SLOPE_MODE_STANDARD_SLOPES);
 		/* Enqueueing a mark means resetting of spaces counter. */
-		gen->space_units_count = 0;
+		units_count = 0;
 		break;
 
 	case CW_SYMBOL_IMS:
 		CW_TONE_INIT(&tone, 0, gen->durations.ims_duration, CW_SLOPE_MODE_NO_SLOPES);
 		/* Enqueueing an ims. Record this fact in space units counter. */
-		gen->space_units_count = UNITS_PER_IMS;
+		units_count = UNITS_PER_IMS;
 		break;
 	default:
 		cw_assert (0, MSG_PREFIX "unknown iambic keyer symbol '%d'", symbol);
 		/* Reset on error. */
-		gen->space_units_count = 0;
+		units_count = 0;
 		break;
 	}
 
 	const cw_ret_t cwret = cw_tq_enqueue_internal(gen->tq, &tone);
+	gen->space_units_count = units_count;
 	return cwret;
 }
 
