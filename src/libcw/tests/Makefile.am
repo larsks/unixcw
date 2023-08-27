@@ -106,8 +106,14 @@ libcw_tests_SOURCES = \
 
 
 
-libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_TESTS
-#libcw_tests_CFLAGS = -I../../
+
+libcw_tests_CPPFLAGS  = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_TESTS
+# Part of attempt to detect test functions that aren't called by test program.
+# https://stackoverflow.com/a/4857905
+libcw_tests_CPPFLAGS += -ffunction-sections
+
+
+
 
 # Target-specific linker flags (objects to link). Order is important:
 # first static libraries then dynamic. Otherwise linker may not find
@@ -118,6 +124,20 @@ libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib_rec_tests.a
 libcw_tests_LDADD += $(top_builddir)/src/cwutils/lib/libcwutils.a
 libcw_tests_LDADD += $(top_builddir)/src/test_framework/basic_utils/lib.a
 libcw_tests_LDADD += $(INTL_LIB) -lm -lpthread $(DL_LIB) -L../.libs -lcw_test
+
+
+
+
+# Part of attempt to detect test functions that aren't called by test program.
+# https://stackoverflow.com/a/4857905
+# Lookg for something like this in output of linker:
+#
+# libtool: link: gcc -g -O2 [...]
+# [...]
+# /usr/bin/ld: removing unused section '.text.test_straight_key' in file 'libcw_tests-libcw_key_tests.o'
+# [...]
+# make[4]: Leaving directory '/home/kamil/unixcw/git_repo/src/libcw/tests'
+libcw_tests_LDFLAGS = -Wl,--gc-sections -Wl,--print-gc-sections
 
 
 

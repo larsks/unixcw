@@ -185,6 +185,9 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+libcw_tests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libcw_tests_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -676,8 +679,10 @@ libcw_tests_SOURCES = \
 	test_sets.c \
 	test_main.c
 
-libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils -DLIBCW_UNIT_TESTS
-#libcw_tests_CFLAGS = -I../../
+# Part of attempt to detect test functions that aren't called by test program.
+# https://stackoverflow.com/a/4857905
+libcw_tests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/cwutils \
+	-DLIBCW_UNIT_TESTS -ffunction-sections
 
 # Target-specific linker flags (objects to link). Order is important:
 # first static libraries then dynamic. Otherwise linker may not find
@@ -687,6 +692,17 @@ libcw_tests_LDADD = $(top_builddir)/src/cwutils/lib_libcw_tests.a \
 	$(top_builddir)/src/cwutils/lib/libcwutils.a \
 	$(top_builddir)/src/test_framework/basic_utils/lib.a \
 	$(INTL_LIB) -lm -lpthread $(DL_LIB) -L../.libs -lcw_test
+
+# Part of attempt to detect test functions that aren't called by test program.
+# https://stackoverflow.com/a/4857905
+# Lookg for something like this in output of linker:
+#
+# libtool: link: gcc -g -O2 [...]
+# [...]
+# /usr/bin/ld: removing unused section '.text.test_straight_key' in file 'libcw_tests-libcw_key_tests.o'
+# [...]
+# make[4]: Leaving directory '/home/kamil/unixcw/git_repo/src/libcw/tests'
+libcw_tests_LDFLAGS = -Wl,--gc-sections -Wl,--print-gc-sections
 EXTRA_DIST = \
 	$(check_SCRIPTS) \
 	count_functions_under_test.py
@@ -758,7 +774,7 @@ gen/libcw_tests-cw_gen_get_timing_parameters_internal.$(OBJEXT):  \
 
 libcw_tests$(EXEEXT): $(libcw_tests_OBJECTS) $(libcw_tests_DEPENDENCIES) $(EXTRA_libcw_tests_DEPENDENCIES) 
 	@rm -f libcw_tests$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(libcw_tests_OBJECTS) $(libcw_tests_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(libcw_tests_LINK) $(libcw_tests_OBJECTS) $(libcw_tests_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
