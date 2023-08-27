@@ -275,15 +275,28 @@ cw_test_set_t cw_test_sets[] = {
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_remove_last_character, false),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_forever_internal, false),
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_enqueue_character_no_ics, !g_is_quick),
-
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_state_callback, false),
-#if LIBCW_WITH_DEV
-			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, !g_is_quick),
-#endif
 
 			LIBCW_TEST_FUNCTION_INSERT(NULL, true),
 		}
 	},
+
+	/* Only some sound systems support pcm file output with raw samples. */
+	{
+		LIBCW_TEST_SET_VALID,
+		LIBCW_TEST_API_MODERN,
+
+		{ LIBCW_TEST_TOPIC_GEN, LIBCW_TEST_TOPIC_MAX }, /* Topics. */
+		{ CW_AUDIO_OSS, CW_AUDIO_ALSA, CW_AUDIO_PA, CW_AUDIO_NONE /* Guard. */ }, /* Sound systems. */
+
+		{
+#if LIBCW_WITH_DEV
+			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, !g_is_quick),
+#endif
+			LIBCW_TEST_FUNCTION_INSERT(NULL, true),
+		}
+	},
+
 	{
 		LIBCW_TEST_SET_VALID,
 		LIBCW_TEST_API_MODERN,
