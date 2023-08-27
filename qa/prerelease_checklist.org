@@ -12,6 +12,11 @@ bug).
 The goals of this development cycle are:
 1.
 
+* TODO Add -Werror to CFLAGS
+During development phase you don't want to introduce any issues that can be
+caught by compiler. -Werror will make sure that you will fix them before they
+slip into repo.
+
 * DONE Do the actual coding
 
 Do whatever you planned to do for given release (see first point in this
@@ -30,11 +35,20 @@ Review changes in code, documentation and other files to catch and fix
 problems, and to do last-minute necessary minor improvements.
 
 Review all changes done since previous release.
-Update comments and other documentation (and/or add missing items)
-Update @reviewedon tags in functions' top-level comments while doing the review.
-Don't be afraid to do refactoring if you notice opportunities or necessity to do so.
-Do fix any problems that you find during the review.
-Note down (in README.dev.org) any problems that won't be fixed in this release.
+
+Update comments and other documentation.
+
+Update @reviewedon tags in functions' top-level comments while doing the
+review.
+
+Don't be afraid to do refactoring if you notice opportunities or necessity to
+do so.
+
+Try to fix problems that you find during the review - especially those that
+may affect end user.
+
+Note down (as "tickets" in README.dev.org or as TODO/FIXME notes in code) any
+problems that won't be fixed in this release.
 
 * TODO Review changes - documentation and test scenarios template
 1. Review changes in code, documentation and other files. Based on that, make
@@ -102,6 +116,22 @@ more or less correctly. Fix any issues you will find.
 While running qa/build_debian_packages.sh, pay attention to compiler
 warnings. Debian's build scripts may use different complier flags.
 
+* TODO Remove -Werror from CFLAGS
+At this stage of this list there should be no more changes in code. Remove
+-Werror from CFLAGS because after this stage there should be no occasions on
+which you would introduce problems in code.
+
+You don't want to have -Werror in code that you release: computers on which
+this code will be compiled by your users may have different version of
+compiler, and that compiler may discover some issues. You don't want to break
+compilation on users' computers due to -Werror.
+
+* TODO Make sure that debug and optimization compiler flags are correct
+
+Make sure that CFLAGS of code that is almost ready for release doesn't
+contain "-g -O". Do this before testing phase so that the code that you test
+has been compiled with options similar to options used for release.
+
 * TODO Do the testing per test scenarios
 
 Test your software using test scenarios that you have created. See if you
@@ -110,6 +140,14 @@ down bugs that you have found and fixed, you may want to check for them when
 testing next release, to see if you haven't reintroduced them.
 
 The test scenarios describe both manual and automatic tests.
+
+
+* TODO Make sure that debug and optimization compiler flags are correct (again)
+
+Make sure that CFLAGS of code that is almost ready for release doesn't
+contain "-g -O". Do this test for a second time (after testing phase): maybe
+you have added the flags during fixing of some issues found during testing
+phase.
 
 
 * TODO Localization
