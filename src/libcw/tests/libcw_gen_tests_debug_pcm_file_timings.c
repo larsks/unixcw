@@ -189,7 +189,7 @@ static int elements_set_ideal_durations(cw_elements_t * elements, const cw_gen_d
 			        i, elements->array[i].type);
 			return -1;
 		}
-		elements->array[i].duration = (cw_element_time_t) duration;
+		elements->array[i].timespan = (cw_element_time_t) duration;
 	}
 
 	return 0;
@@ -348,9 +348,9 @@ static void print_test_results(FILE * file, const cw_elements_t * string_element
 		        i,
 		        string_elements->array[i].state == cw_state_mark ? "mark" : "space",
 		        cw_element_type_get_representation(string_elements->array[i].type),
-		        string_elements->array[i].duration,
+		        string_elements->array[i].timespan,
 		        wav_elements->array[i].state == cw_state_mark ? "mark" : "space",
-		        wav_elements->array[i].duration);
+		        wav_elements->array[i].timespan);
 	}
 
 	if (0) {
@@ -406,12 +406,12 @@ static void evaluate_test_results(cw_test_executor_t * cte, const cw_elements_t 
 			continue;
 		}
 
-		const double threshold = 1.0; /* 1% of difference is still allowed. */
-		const double duration_expected = string_element->duration;
-		const double duration_actual = wav_element->duration;
-		const double diff_percent = 100.0 * (duration_actual - duration_expected) / duration_expected;
+		const double threshold = 1.0; /* [percentages]. 1% of difference is still allowed. */
+		const double timespan_expected = string_element->timespan;
+		const double timespan_actual = wav_element->timespan;
+		const double diff_percent = 100.0 * (timespan_actual - timespan_expected) / timespan_expected;
 		fprintf(stderr, "[DEBUG] string = %12.2f, wav = %12.2f, diff = %7.3f%%, threshold = %.1f%%\n",
-		        string_element->duration, wav_element->duration, diff_percent, threshold);
+		        string_element->timespan, wav_element->timespan, diff_percent, threshold);
 		if (fabs(diff_percent) > threshold) {
 			durations_mismatch++;
 		}

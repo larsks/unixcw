@@ -41,9 +41,9 @@ void cw_elements_print_to_file(FILE * file, const cw_elements_t * elements)
 {
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		if (cw_state_mark == elements->array[i].state) {
-			fprintf(file, "mark:   %11.2fus, '%c'\n", elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
+			fprintf(file, "mark:   %11.2fus, '%c'\n", elements->array[i].timespan, cw_element_type_get_representation(elements->array[i].type));
 		} else {
-			fprintf(file, "space:  %11.2fus, '%c'\n", elements->array[i].duration, cw_element_type_get_representation(elements->array[i].type));
+			fprintf(file, "space:  %11.2fus, '%c'\n", elements->array[i].timespan, cw_element_type_get_representation(elements->array[i].type));
 		}
 	}
 }
@@ -51,7 +51,7 @@ void cw_elements_print_to_file(FILE * file, const cw_elements_t * elements)
 
 
 
-int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_element_time_t duration)
+int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_element_time_t timespan)
 {
 	if (elements->curr_count >= elements->max_count) {
 		fprintf(stderr, "[ERROR] Reached limit of items in elements, can't add another item\n");
@@ -60,12 +60,12 @@ int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_el
 
 	if (state == cw_state_mark) {
 		elements->array[elements->curr_count].state = cw_state_mark;
-		elements->array[elements->curr_count].duration = duration;
+		elements->array[elements->curr_count].timespan = timespan;
 		elements->curr_count++;
 		return 0;
 	} else if (state == cw_state_space) {
 		elements->array[elements->curr_count].state = cw_state_space;
-		elements->array[elements->curr_count].duration = duration;
+		elements->array[elements->curr_count].timespan = timespan;
 		elements->curr_count++;
 		return 0;
 	} else {

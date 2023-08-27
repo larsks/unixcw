@@ -65,7 +65,7 @@ typedef double cw_element_time_t;  /* microseconds */
 
 
 typedef struct cw_element_t {
-	cw_element_time_t duration;   /* microseconds; TODO (acerion) 2023.08.12: rename to "time"; "duration" has integer type. */
+	cw_element_time_t timespan;   /* [microseconds]. Duration of element, with float type. The name of the field is chosen to be different than "duration" which has integer type. */
 	cw_element_type_t type;
 	cw_state_t state;
 } cw_element_t;
@@ -95,12 +95,12 @@ typedef struct cw_elements_t {
 
    @param[in/out] elements Elements structure to which to append new element
    @param[in] state State of the new element
-   @param[in] duration Duration of the new element
+   @param[in] timespan Duration of the new element
 
    @return 0 on success
    @return -1 on failure
 */
-int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_element_time_t duration);
+int cw_elements_append_element(cw_elements_t * elements, cw_state_t state, cw_element_time_t timespan);
 
 
 

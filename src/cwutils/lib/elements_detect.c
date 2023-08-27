@@ -137,8 +137,8 @@ int cw_elements_detect_from_wav(int input_fd, cw_elements_t * elements, cw_eleme
 	   ends. This ending of current element must be reflected in
 	   'elements'. */
 	const cw_element_time_t current_timestamp = sample_i * sample_spacing; /* TODO: "sample_i" or "sample_i - 1"? */
-	const cw_element_time_t current_duration = current_timestamp - prev_element_start_ts;
-	if (0 != cw_elements_append_element(elements, current_state, current_duration)) {
+	const cw_element_time_t current_timespan = current_timestamp - prev_element_start_ts;
+	if (0 != cw_elements_append_element(elements, current_state, current_timespan)) {
 		fprintf(stderr, "[ERROR] Failed to append last element from wav\n");
 		return -1;
 	}

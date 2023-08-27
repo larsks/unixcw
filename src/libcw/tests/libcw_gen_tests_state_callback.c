@@ -257,20 +257,20 @@ static void gen_callback_fn(void * callback_arg, int state)
 		   and currently calculated duration is how long *previous* element
 		   was. */
 		prev_element = &string_elements->array[this_idx - 1];
-		prev_element->duration = cw_timestamp_compare_internal(&prev_timestamp, &now_timestamp);
+		prev_element->timespan = cw_timestamp_compare_internal(&prev_timestamp, &now_timestamp);
 	}
 
 	if (execute_nonessential) {
 		int prev_duration_expected = 0;
 		cw_element_type_to_duration(prev_element->type, callback_data->durations, &prev_duration_expected);
-		const double divergence = 100.0 * (prev_element->duration - prev_duration_expected) / (1.0 * prev_duration_expected);
+		const double divergence = 100.0 * (prev_element->timespan - prev_duration_expected) / (1.0 * prev_duration_expected);
 
 #if 0 /* For debugging only. */
 		fprintf(stderr, "[DEBUG] prev element type = '%c', prev duration = %12.2f, prev duration expected = %7d\n",
 		        cw_element_type_get_representation(prev_element->type), prev_element->duration, prev_duration_expected);
 #endif
 		fprintf(stderr, "[INFO ] Element %3zd, state %d, type = '%c'; previous element: duration = %12.2f us, divergence = %8.3f%%\n",
-		        this_idx, state, cw_element_type_get_representation(this_element->type), prev_element->duration, divergence);
+		        this_idx, state, cw_element_type_get_representation(this_element->type), prev_element->timespan, divergence);
 	}
 }
 
@@ -423,19 +423,19 @@ static void calculate_test_results(const cw_elements_t * elements, test_data_t *
 		const cw_element_t * element = &elements->array[i];
 		switch (element->type) {
 		case cw_element_type_dot:
-			cw_element_stats_update(&stats_dot, element->duration);
+			cw_element_stats_update(&stats_dot, element->timespan);
 			break;
 		case cw_element_type_dash:
-			cw_element_stats_update(&stats_dash, element->duration);
+			cw_element_stats_update(&stats_dash, element->timespan);
 			break;
 		case cw_element_type_ims:
-			cw_element_stats_update(&stats_ims, element->duration);
+			cw_element_stats_update(&stats_ims, element->timespan);
 			break;
 		case cw_element_type_ics:
-			cw_element_stats_update(&stats_ics, element->duration);
+			cw_element_stats_update(&stats_ics, element->timespan);
 			break;
 		case cw_element_type_iws:
-			cw_element_stats_update(&stats_iws, element->duration);
+			cw_element_stats_update(&stats_iws, element->timespan);
 			break;
 		case cw_element_type_none: /* TODO: should we somehow log this? */
 		default:

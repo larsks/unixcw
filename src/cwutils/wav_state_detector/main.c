@@ -120,7 +120,7 @@ static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_
 
 	for (size_t e = 0; e < elements->curr_count; e++) {
 		cw_element_time_t this_element_span = 0.0;
-		while (this_element_span < elements->array[e].duration) {
+		while (this_element_span < elements->array[e].timespan) {
 			if (elements->array[e].state == cw_state_mark) {
 				write(fd, &high, sizeof (high));
 			} else {
