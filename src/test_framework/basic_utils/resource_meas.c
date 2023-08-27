@@ -38,6 +38,8 @@
 
 #include <tests/test_framework.h>
 
+#include <cwutils/sleep.h>
+
 #include "resource_meas.h"
 
 
@@ -62,7 +64,7 @@ static void * resouce_meas_thread(void * arg)
 	resource_meas * meas = (resource_meas *) arg;
 	while (1) {
 		resource_meas_do_measurement(meas);
-		usleep(CW_MSECS_PER_SEC * meas->meas_interval_msecs); /* TODO acerion 2023.08.21 use non-interruptible sleep. */
+		cw_millisleep_internal(meas->meas_interval_msecs);
 	}
 
 	return NULL;

@@ -31,8 +31,8 @@
 
 #include <libcw.h>
 #include <libcw_rec.h>
-#include "libcw/libcw_rec.h"
 
+#include "sleep.h"
 #include "cw_easy_rec.h"
 
 
@@ -244,7 +244,10 @@ static void * thread_fn(void * arg)
 {
 	cw_easy_rec_t * easy_rec = (cw_easy_rec_t *) arg;
 	while (easy_rec->run_thread) {
-		usleep(1000); /* TODO acerion 2023.08.21: replace with uninterruptible sleep function. */
+		/* This program is polling a receiver for data. Polling
+		   happens at given interval. */
+		cw_millisleep_internal(CW_REC_MINIMAL_POLL_PERIOD_MSECS);
+
 		cw_easy_rec_data_t erd = { 0 };
 		if (cw_easy_rec_poll_data_internal(easy_rec, &erd)) {
 			if (easy_rec->receive_callback) {

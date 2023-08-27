@@ -200,6 +200,25 @@ enum {
 	CW_TONE_SLOPE_SHAPE_RECTANGULAR      /* Slope changes from zero for sample n, to full amplitude of tone in sample n+1. */
 };
 
+
+
+
+/*
+  Client programs can get data from libcw receiver by polling the receiver.
+  The polling should be done periodically every N milliseconds.
+
+  This constant is a recommended value for polling, calculated for highest
+  receive speed supported by libcw. The client program may use dynamic value
+  of polling, depending on client's estimate of receive speed.
+
+  At 60WPM, a dot is 20ms. Based on that I'm guesstimating the minimum
+  period for polling a receiver to be that much.
+*/
+#define CW_REC_MINIMAL_POLL_PERIOD_MSECS (10) /* [milliseconds] */
+
+
+
+
 typedef struct cw_gen_struct cw_gen_t;
 
 

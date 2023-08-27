@@ -66,6 +66,7 @@
 #include <cwutils/cw_rec_tester.h>
 #include <cwutils/cw_easy_legacy_receiver.h>
 #include <cwutils/cw_easy_legacy_receiver_internal.h>
+#include <cwutils/sleep.h>
 
 
 
@@ -487,9 +488,10 @@ static int legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool poll_re
 	easy_rec->get_representation = poll_representation;
 
 	while (tester.generating_in_progress) {
-		/* At 60WPM, a dot is 20ms, so polling for the maximum speed library
-		   needs a 10ms timeout. */
-		usleep(10 * 1000);
+		/* This program is polling a receiver for data. Polling
+		   happens at given interval. */
+		cw_millisleep_internal(CW_REC_MINIMAL_POLL_PERIOD_MSECS);
+
 		receiver_poll_data(easy_rec);
 		int new_speed = 0;
 		if (cwtest_param_ranger_get_next(&tester.speed_ranger, &new_speed)) {

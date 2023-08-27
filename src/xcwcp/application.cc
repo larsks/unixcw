@@ -323,10 +323,10 @@ void Application::start()
 
 	clear_status();
 
-	/* At 60WPM, a dot is 20ms, so polling for the maximum speed
-	   library needs a 10ms timeout. */
+	/* This program is polling a receiver for data. Polling happens at
+	   given interval. */
 	poll_timer->setSingleShot(false);
-	poll_timer->start(10);
+	poll_timer->start(CW_REC_MINIMAL_POLL_PERIOD_MSECS);
 
 	return;
 }

@@ -65,6 +65,7 @@
 #include "libcw_debug.h"
 #include "libcw_utils.h"
 #include <cwutils/cw_cmdline.h>
+#include <cwutils/sleep.h>
 
 #include "test_framework.h"
 #include <test_framework/basic_utils/param_ranger.h>
@@ -76,7 +77,14 @@
 
    Let the resources measurement tool go back to zero, so that
    e.g. high CPU usage in test N is visible only in that test, but not
-   in test N+1 that will be executed right after test N. */
+   in test N+1 that will be executed right after test N.
+
+   TODO acerion 2023.08.27: sometimes, to make the tests faster, the tester
+   may request the pause to be zero. We can't make the pause value dependent
+   on value of meas interval. The meas will either have to be interrupted, or
+   the meas will have to provide wait() method to allow waiting for meas to
+   complete its current cycle of meas.
+*/
 #define LIBCW_TEST_INTER_TEST_PAUSE_MSECS (2 * LIBCW_TEST_MEAS_CPU_MEAS_INTERVAL_MSECS)
 
 #define MSG_BUF_SIZE 1024
@@ -1560,7 +1568,7 @@ static cwt_retv iterate_over_test_objects(cw_test_executor_t * cte, cw_test_obje
 
 
 		if (cte->use_resource_meas) {
-			usleep(CW_MSECS_PER_SEC * LIBCW_TEST_INTER_TEST_PAUSE_MSECS);
+			cw_millisleep_internal(LIBCW_TEST_INTER_TEST_PAUSE_MSECS);
 			/*
 			  First stop the test, then display CPU usage summary.
 
