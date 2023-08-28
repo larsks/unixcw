@@ -91,13 +91,16 @@ void cw_easy_legacy_receiver_start(cw_easy_legacy_receiver_t * easy_rec);
 
    Call this function periodically on a receiver.
 
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+   @reviewedon 2023.08.28
+
    @param[in] easy_rec Easy receiver from which to try to poll the character
    @param[out] erd Data of easy receiver, filled on successful poll.
 
-   @return true if receiver has received a character (@p erd is updated accordingly)
-   @return false if receiver didn't receive a character
+   @return CW_SUCCESS if receiver has received a character (@p erd is updated accordingly)
+   @return CW_FAILURE if receiver didn't receive a character
 */
-bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
+int cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
 
 
 
@@ -115,13 +118,16 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
    Call this function if cw_easy_legacy_receiver_is_pending_iws() returns
    true.
 
+   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
+   @reviewedon 2023.08.28
+
    @param[in] easy_rec Easy receiver from which to try to poll the character
    @param[out] erd Data of easy receiver, filled on successful poll.
 
-   @return true if receiver has received a space (@p erd is updated accordingly)
-   @return false if receiver didn't receive a space
+   @return CW_SUCCESS if receiver has received a space (@p erd is updated accordingly)
+   @return CW_FAILURE if receiver didn't receive a space
 */
-bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
+int cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd);
 
 
 

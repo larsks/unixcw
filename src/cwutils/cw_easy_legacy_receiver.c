@@ -268,7 +268,7 @@ bool cw_easy_legacy_receiver_poll(cw_easy_legacy_receiver_t * easy_rec, int (* c
 	if (easy_rec->is_pending_iws) {
 		/* Check if receiver received the pending inter-word-space. */
 		cw_rec_data_t erd = { 0 };
-		if (cw_easy_legacy_receiver_poll_iws(easy_rec, &erd)) {
+		if (CW_SUCCESS == cw_easy_legacy_receiver_poll_iws(easy_rec, &erd)) {
 			if (callback) {
 				callback(&erd);
 			}
@@ -279,7 +279,7 @@ bool cw_easy_legacy_receiver_poll(cw_easy_legacy_receiver_t * easy_rec, int (* c
 			   receiver may have received another
 			   character.  Try to get it too. */
 			memset(&erd, 0, sizeof (erd));
-			if (cw_easy_legacy_receiver_poll_character(easy_rec, &erd)) {
+			if (CW_SUCCESS == cw_easy_legacy_receiver_poll_character(easy_rec, &erd)) {
 				if (callback) {
 					callback(&erd);
 				}
@@ -290,7 +290,7 @@ bool cw_easy_legacy_receiver_poll(cw_easy_legacy_receiver_t * easy_rec, int (* c
 		/* Not awaiting a possible space, so just poll the
 		   next possible received character. */
 		cw_rec_data_t erd = { 0 };
-		if (cw_easy_legacy_receiver_poll_character(easy_rec, &erd)) {
+		if (CW_SUCCESS == cw_easy_legacy_receiver_poll_character(easy_rec, &erd)) {
 			if (callback) {
 				callback(&erd);
 			}
@@ -340,10 +340,7 @@ bool cw_easy_legacy_receiver_poll_data(cw_easy_legacy_receiver_t * easy_rec, cw_
 
 
 
-/**
-   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
-*/
-bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
+int cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
 {
 	/* Don't use receiver.easy_rec->main_timer - it is used exclusively for
 	   marking initial "key down" events. Use local throw-away
@@ -382,7 +379,7 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
 
 		//fprintf(stderr, "[DD] Received character '%c'\n", erd->character);
 
-		return true;
+		return CW_SUCCESS;
 
 	} else {
 		/* Handle receive error detected on trying to read a character. */
@@ -413,20 +410,14 @@ bool cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec
 			perror("cw_receive_character");
 		}
 
-		return false;
+		return CW_FAILURE;
 	}
 }
 
 
 
 
-/**
-   TODO: can we return true when a space has been successfully polled,
-   instead of returning it through erd?
-
-   @reviewedon 2023.08.27: made sure that the function was correctly moved from xcwcp
-*/
-bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
+int cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_rec_data_t * erd)
 {
 	/* We expect the receiver to contain a character, but we don't
 	   ask for it this time. The receiver should also store
@@ -457,7 +448,7 @@ bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_r
 
 		cw_clear_receive_buffer();
 		easy_rec->is_pending_iws = false;
-		return true; /* Inter-word-space has been polled. */
+		return CW_SUCCESS; /* Inter-word-space has been polled. */
 	} else {
 		/* We don't reset easy_rec->is_pending_iws. The
 		   space that currently lasts, and isn't long enough
@@ -470,7 +461,7 @@ bool cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_r
 		   beginning of new character within the same
 		   word. And since a new character begins, the flag
 		   will be reset (elsewhere). */
-		return false; /* Inter-word-space has not been polled. */
+		return CW_FAILURE; /* Inter-word-space has not been polled. */
 	}
 }
 
