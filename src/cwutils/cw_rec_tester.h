@@ -25,8 +25,24 @@ extern "C"
 /**
    Used to determine size of input data and of buffer for received
    (polled from receiver) characters.
+
+   Size includes space for terminating NUL.
 */
-#define REC_TEST_BUFFER_SIZE 4096
+#define REC_TEST_INPUT_BUFFER_SIZE 4096
+
+
+
+
+/**
+   Size of buffer storing received data.
+
+   It is larger than size of input data because I expect that imperfect
+   receiver may claim to receive more characters than the actual number of
+   characters to receive.
+
+   Size includes space for terminating NUL.
+*/
+#define REC_TEST_RECEIVED_BUFFER_SIZE (10 * REC_TEST_INPUT_BUFFER_SIZE)
 
 
 
@@ -39,7 +55,7 @@ typedef struct cw_rec_tester_t {
 
 	pthread_t receiver_test_code_thread_id;
 
-	char input_string[REC_TEST_BUFFER_SIZE];
+	char input_string[REC_TEST_INPUT_BUFFER_SIZE];
 
 	/* Iterator to the array above. */
 	size_t input_string_i;
@@ -47,7 +63,7 @@ typedef struct cw_rec_tester_t {
 	/* Array large enough to contain characters received (polled)
 	   correctly and possible additional characters received
 	   incorrectly. */
-	char received_string[10 * REC_TEST_BUFFER_SIZE];
+	char received_string[10 * REC_TEST_RECEIVED_BUFFER_SIZE];
 
 	/* Iterator to the array above. */
 	size_t received_string_i;
@@ -162,7 +178,7 @@ void cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester, bool *
    The tester also does an additional poll and a cross-check from the tested
    receiver to double-check the received @p erd.
 
-   @reviewedon 2023.08.21
+   @reviewedon 2023.08.28
 
    @param[in/out] tester Tester of easy legacy receiver
    @param[in] erd Data received by tester easy legacy receiver
@@ -185,7 +201,7 @@ int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, st
    The tester also does an additional poll and a cross-check from the tested
    receiver to double-check the received @p erd.
 
-   @reviewedon 2023.08.21
+   @reviewedon 2023.08.28
 
    @param[in/out] tester Tester of easy legacy receiver
    @param[in] erd Data received by tester easy legacy receiver

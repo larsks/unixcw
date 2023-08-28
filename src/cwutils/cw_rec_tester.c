@@ -117,7 +117,7 @@ static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_
 	if (make_short) {
 		/* Short text for occasions where I need a quick test. */
 #define BASIC_SET_SHORT "one two three four paris"
-		const char input[REC_TEST_BUFFER_SIZE] = BASIC_SET_SHORT;
+		const char input[REC_TEST_INPUT_BUFFER_SIZE] = BASIC_SET_SHORT;
 		snprintf(tester->input_string, sizeof (tester->input_string), "%s", input);
 	} else {
 		/* Long text for longer tests. */
@@ -125,7 +125,7 @@ static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_
 	"the quick brown fox jumps over the lazy dog. 01234567890 paris paris paris "    \
 	"abcdefghijklmnopqrstuvwxyz0123456789\"'$()+,-./:;=?_@<>!&^~ paris paris paris " \
 	"one two three four five six seven eight nine ten eleven paris paris paris "
-		const char input[REC_TEST_BUFFER_SIZE] = BASIC_SET_LONG BASIC_SET_LONG;
+		const char input[REC_TEST_INPUT_BUFFER_SIZE] = BASIC_SET_LONG BASIC_SET_LONG;
 		snprintf(tester->input_string, sizeof (tester->input_string), "%s", input);
 	}
 }
@@ -551,7 +551,11 @@ int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, st
 {
 	fprintf(stderr, "[II] Character: '%c'\n", erd->character);
 
-	/* TODO acerion 2023.08.21: check for iterator-in-range. */
+	if (tester->received_string_i >= (REC_TEST_RECEIVED_BUFFER_SIZE - 1)) {
+		fprintf(stderr, "[EE] Tester's buffer overrun on character: iterator = %zd, size = %d\n",
+		        tester->received_string_i, REC_TEST_RECEIVED_BUFFER_SIZE);
+		return CW_FAILURE;
+	}
 	tester->received_string[tester->received_string_i++] = erd->character;
 
 	/*
@@ -615,7 +619,11 @@ int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct
 		return CW_FAILURE;
 	}
 
-	/* TODO acerion 2023.08.21: check for iterator-in-range. */
+	if (tester->received_string_i >= (REC_TEST_RECEIVED_BUFFER_SIZE - 1)) {
+		fprintf(stderr, "[EE] Tester's buffer overrun on space: iterator = %zd, size = %d\n",
+		        tester->received_string_i, REC_TEST_RECEIVED_BUFFER_SIZE);
+		return CW_FAILURE;
+	}
 	tester->received_string[tester->received_string_i++] = ' ';
 
 	/*
