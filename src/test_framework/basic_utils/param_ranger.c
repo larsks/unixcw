@@ -73,12 +73,8 @@ bool cwtest_param_ranger_get_next(cwtest_param_ranger_t * ranger, int * new_valu
 	FILE * file = stderr;
 
 	if (ranger->interval_sec) {
-		/* Generate new value only after specific time
-		   interval has passed since last value was
-		   returned. */
-
-		/* TODO acerion 2023.08.23: don't call time(): it relies on a wall
-		   clock that may change non-monotonically. */
+		/* Generate new value only after specific time interval has passed
+		   since last value was returned. */
 		const time_t now_timestamp = time(NULL);
 		if (now_timestamp < ranger->previous_timestamp + ranger->interval_sec) {
 			/* Don't generate new value yet. */
