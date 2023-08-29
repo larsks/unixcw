@@ -60,6 +60,11 @@ typedef struct callback_data {
 
 
 
+static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_system, int * tolerance);
+
+
+
+
 /**
    @brief Callback called by easy receiver on each receive event
 
@@ -176,6 +181,11 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 {
 	cte->print_test_header(cte, "%s", __func__);
 
+	int tolerance = 0;
+	if (0 != get_tolerance(cte, cte->current_gen_conf.sound_system, &tolerance)) {
+		return cwt_retv_err;
+	}
+
 	/* Tested generator. */
 	cw_gen_t * gen = NULL;
 	if (0 != gen_setup(cte, &gen)) {
@@ -188,15 +198,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cw_easy_rec_t * easy_rec = cw_easy_rec_new();
 	cw_easy_rec_set_speed(easy_rec, cw_gen_get_speed(gen));
 
-	/*
-	  15%; few times lower than the default. With relatively low and constant
-	  generator speed this should be enough. With 10% and PulseAudio I
-	  already experienced problems.
-
-	  TODO acerion 2023.08.26: the value of tolerance should be different for
-	  different sound systems.
-	*/
-	cw_easy_rec_set_tolerance(easy_rec, 15);
+	cw_easy_rec_set_tolerance(easy_rec, tolerance);
 
 	/* Helper receiver will be notified through callback about each change of
 	   tested generator's state (mark/space). */
@@ -262,5 +264,68 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cte->print_test_footer(cte, __func__);
 
 	return cwt_retv_ok;
+}
+
+
+
+
+/**
+   @brief Get receiver's minimal tolerance for given sound system
+
+   With different sound systems the receiver may be more or less tolerant to
+   timings of incoming Morse code. This function is a wrapper that maps a
+   sound system to a tolerance. If you want to know what is the minimal
+   tolerance with which a receiver will receive correctly for given sound
+   system, then use this function.
+
+   @reviewedon 2023.08.29
+
+   @param[in/out] cte Text executor - used only for logging
+   @param[in] sound_system Sound system for which to get receiver tolerance
+   @param[out] tolerance The receiver's minimal tolerance for given sound system
+
+   @return 0 if getting a tolerance succeeded
+   @return -1 otherwise (e.g. @p sound_system has unexpected value)
+*/
+static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_system, int * tolerance)
+{
+	/* Definitions necessary just to avoid "magic number" warnings. */
+#define TOLERANCE_CONSOLE  5 /* TODO acerion 2023.08.29: update after tests with console sound system. */
+#define TOLERANCE_OSS      6 /* TODO acerion 2023.08.29: update after tests with OSS sound system. */
+	/* FIXME acerion 2023.08.29: on my main PC even with MAX tolerance I
+	   can't get a clean pass for ALSA. Something is clearly wrong with ALSA
+	   sound system. I've got similar results when I back-ported the test to
+	   unixcw 3.6.0. */
+#define TOLERANCE_ALSA    CW_TOLERANCE_MAX
+	/* At 12 wpm and 10% I experienced problems. With 12% it was ok. 15%
+	   should be safe for all my test machines. */
+#define TOLERANCE_PA      15
+
+	switch (sound_system) {
+	case CW_AUDIO_NULL:
+	case CW_AUDIO_CONSOLE:
+		*tolerance = TOLERANCE_CONSOLE;
+		break;
+	case CW_AUDIO_OSS:
+		*tolerance = TOLERANCE_OSS;
+		break;
+	case CW_AUDIO_ALSA:
+		*tolerance = TOLERANCE_ALSA;
+		break;
+	case CW_AUDIO_PA:
+		 *tolerance = TOLERANCE_PA;
+		break;
+	case CW_AUDIO_SOUNDCARD:
+		/* Tests are for specific sound systems, not for catch-all
+		   "soundcard" sound system. */
+		kite_log(cte, LOG_ERR, "Unexpected sound system %d\n", sound_system);
+		return -1;
+	case CW_AUDIO_NONE:
+	default:
+		kite_log(cte, LOG_ERR, "Unknown sound system %d\n", sound_system);
+		return -1;
+	};
+
+	return 0;
 }
 
