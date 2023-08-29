@@ -290,6 +290,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_system, int * tolerance)
 {
 	/* Definitions necessary just to avoid "magic number" warnings. */
+#define TOLERANCE_NULL     5 /* TODO acerion 2023.08.29: update after tests with Null sound system. */
 #define TOLERANCE_CONSOLE  5 /* TODO acerion 2023.08.29: update after tests with console sound system. */
 #define TOLERANCE_OSS      6 /* TODO acerion 2023.08.29: update after tests with OSS sound system. */
 	/* FIXME acerion 2023.08.29: on my main PC even with MAX tolerance I
@@ -303,6 +304,8 @@ static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_syste
 
 	switch (sound_system) {
 	case CW_AUDIO_NULL:
+		*tolerance = TOLERANCE_NULL;
+		break;
 	case CW_AUDIO_CONSOLE:
 		*tolerance = TOLERANCE_CONSOLE;
 		break;
@@ -316,8 +319,9 @@ static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_syste
 		 *tolerance = TOLERANCE_PA;
 		break;
 	case CW_AUDIO_SOUNDCARD:
-		/* Tests are for specific sound systems, not for catch-all
-		   "soundcard" sound system. */
+		/* This sound system is known, but not expected in this
+		   place. Tests are for specific sound systems, not for
+		   catch-all "soundcard" sound system. */
 		kite_log(cte, LOG_ERR, "Unexpected sound system %d\n", sound_system);
 		return -1;
 	case CW_AUDIO_NONE:
