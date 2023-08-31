@@ -109,8 +109,8 @@ check_PROGRAMS = libcw_tests$(EXEEXT)
 
 # Functional tests that require samples sink file. The file is available only
 # when dev support is enabled.
-@LIBCW_WITH_DEV_TRUE@am__append_1 = libcw_gen_tests_debug_pcm_file_timings.c \
-@LIBCW_WITH_DEV_TRUE@	libcw_gen_tests_debug_pcm_file_timings.h
+@ENABLE_DEV_PCM_SAMPLES_FILE_TRUE@am__append_1 = libcw_gen_tests_debug_pcm_file_timings.c \
+@ENABLE_DEV_PCM_SAMPLES_FILE_TRUE@	libcw_gen_tests_debug_pcm_file_timings.h
 
 subdir = src/libcw/tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -164,7 +164,7 @@ am__objects_2 = libcw_tests-libcw_data_tests.$(OBJEXT) \
 	libcw_tests-libcw_key_tests.$(OBJEXT) \
 	libcw_tests-libcw_debug_tests.$(OBJEXT) \
 	libcw_tests-libcw_tq_tests.$(OBJEXT)
-@LIBCW_WITH_DEV_TRUE@am__objects_3 = libcw_tests-libcw_gen_tests_debug_pcm_file_timings.$(OBJEXT)
+@ENABLE_DEV_PCM_SAMPLES_FILE_TRUE@am__objects_3 = libcw_tests-libcw_gen_tests_debug_pcm_file_timings.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 am__objects_5 = libcw_tests-libcw_test_tq_short_space.$(OBJEXT)
 am__objects_6 = libcw_tests-test_framework.$(OBJEXT)

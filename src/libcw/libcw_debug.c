@@ -372,65 +372,16 @@ void cw_dev_debug_print_generator_setup_internal(const cw_gen_t * gen)
 	fprintf(stderr, "frequency:            %d Hz\n",  gen->frequency);
 	fprintf(stderr, "sound buffer size:    %d\n",     gen->buffer_n_samples);
 
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	fprintf(stderr, "debug sink file:      %s\n",     gen->dev_raw_sink != -1 ? "opened" : "not opened");
 	if (gen->dev_raw_sink != -1) {
 		fprintf(stderr, "debug sink file path: '%s'\n", gen->dev_raw_sink_path);
 	}
-
-	return;
-}
-
-
-
-
-/**
-   @brief Write generator's samples to debug file
-
-   This function does any actual writing only for generators
-   configured to use OSS, Alsa and PulseAudio sound sinks. Using the
-   function on generators configured with other sound sinks doesn't
-   produce any output and the function always returns CW_SUCCESS.
-
-   @internal
-   @reviewed 2020-08-01
-   @endinternal
-
-   @param[in] gen generator
-
-   @return CW_SUCCESS on write success
-   @return CW_FAILURE otherwise
-*/
-int cw_dev_debug_raw_sink_write_internal(cw_gen_t * gen)
-{
-	if (gen->sound_system != CW_AUDIO_OSS
-	    && gen->sound_system != CW_AUDIO_ALSA
-	    && gen->sound_system != CW_AUDIO_PA) {
-
-		return CW_SUCCESS;
-	}
-
-	if (gen->dev_raw_sink != -1) {
-#if CW_DEV_RAW_SINK_MARKERS
-		/* FIXME: this will cause memory access error at
-		   the end, when generator is destroyed in the
-		   other thread */
-		gen->buffer[0] = 0x7fff;
-		gen->buffer[1] = 0x7fff;
-		gen->buffer[samples - 2] = 0x8000;
-		gen->buffer[samples - 1] = 0x8000;
+#else
+	fprintf(stderr, "debug sink file:      disabled\n");
 #endif
 
-		const size_t n_bytes = sizeof (gen->buffer[0]) * gen->buffer_n_samples;
-
-		int rv = write(gen->dev_raw_sink, gen->buffer, n_bytes);
-		if (rv == -1) {
-			cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_STDLIB, CW_DEBUG_ERROR,
-				      MSG_PREFIX "write error: %s (gen->dev_raw_sink = %ld, gen->buffer = %ld, n_bytes = %zu)", strerror(errno), (long) gen->dev_raw_sink, (long) gen->buffer, n_bytes);
-			return CW_FAILURE;
-		}
-	}
-
-	return CW_SUCCESS;
+	return;
 }
 
 
@@ -479,6 +430,22 @@ void cw_debug_event_internal(cw_debug_t * debug_object, uint32_t flag, uint32_t 
 
 
 
+#endif /* #if LIBCW_WITH_DEV */
+
+
+
+
+
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
+
+
+
+
+/* Put markers at the beginning and end of buffers (frames) sent to raw sink - or not. */
+#define CW_DEV_RAW_SINK_MARKERS   0
+
+
+
 
 void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen)
 {
@@ -513,5 +480,41 @@ void cw_dev_debug_raw_sink_close_internal(cw_gen_t * gen)
 
 
 
-#endif /* #if LIBCW_WITH_DEV */
+int cw_dev_debug_raw_sink_write_internal(cw_gen_t * gen)
+{
+	if (gen->sound_system != CW_AUDIO_OSS
+	    && gen->sound_system != CW_AUDIO_ALSA
+	    && gen->sound_system != CW_AUDIO_PA) {
+
+		return CW_SUCCESS;
+	}
+
+	if (gen->dev_raw_sink != -1) {
+#if CW_DEV_RAW_SINK_MARKERS
+		/* FIXME: this will cause memory access error at
+		   the end, when generator is destroyed in the
+		   other thread */
+		gen->buffer[0] = 0x7fff;
+		gen->buffer[1] = 0x7fff;
+		gen->buffer[samples - 2] = 0x8000;
+		gen->buffer[samples - 1] = 0x8000;
+#endif
+
+		const size_t n_bytes = sizeof (gen->buffer[0]) * gen->buffer_n_samples;
+
+		int rv = write(gen->dev_raw_sink, gen->buffer, n_bytes);
+		if (rv == -1) {
+			cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_STDLIB, CW_DEBUG_ERROR,
+				      MSG_PREFIX "write error: %s (gen->dev_raw_sink = %ld, gen->buffer = %ld, n_bytes = %zu)", strerror(errno), (long) gen->dev_raw_sink, (long) gen->buffer, n_bytes);
+			return CW_FAILURE;
+		}
+	}
+
+	return CW_SUCCESS;
+}
+
+
+
+
+#endif /* #ifdef ENABLE_DEV_PCM_SAMPLES_FILE */
 

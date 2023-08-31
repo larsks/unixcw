@@ -95,6 +95,7 @@
 #include "libcw_console.h"
 #include "libcw_data.h"
 #include "libcw_debug.h"
+#include "libcw_debug_internal.h"
 #include "libcw_gen.h"
 #include "libcw_gen_internal.h"
 #include "libcw_null.h"
@@ -587,7 +588,7 @@ cw_gen_t * cw_gen_new(const cw_gen_config_t * gen_conf)
 	{
 		/* gen->sound_system = sound_system; */ /* We handle this field below. */
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 		gen->dev_raw_sink = -1;
 #endif
 
@@ -1726,7 +1727,7 @@ int cw_gen_write_to_soundcard_internal(cw_gen_t * gen, cw_tone_t * tone)
 			   buffer is ready to be pushed to sound
 			   sink. */
 			gen->write_buffer_to_sound_device(gen);
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 			cw_dev_debug_raw_sink_write_internal(gen);
 #endif
 			gen->buffer_sub_start = 0;

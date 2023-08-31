@@ -322,7 +322,7 @@ cw_ret_t cw_oss_open_and_configure_sound_device_internal(cw_gen_t * gen, const c
 	/* Mark sound sink as now open for business. */
 	gen->sound_device_is_open = true;
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_open_internal(gen);
 #endif
 
@@ -566,7 +566,7 @@ void cw_oss_close_sound_device_internal(cw_gen_t * gen)
 	gen->oss_data.sound_sink_fd = -1;
 	gen->sound_device_is_open = false;
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_close_internal(gen);
 #endif
 	return;

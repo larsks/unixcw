@@ -35,7 +35,7 @@ extern "C"
 
 
 
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 #include "libcw_gen.h"
 
 
@@ -70,6 +70,28 @@ void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen);
    @param[in/out] gen generator for which to close the sink file
 */
 void cw_dev_debug_raw_sink_close_internal(cw_gen_t * gen);
+
+
+
+
+/**
+   @brief Write generator's samples to debug file
+
+   This function does any actual writing only for generators
+   configured to use OSS, Alsa and PulseAudio sound sinks. Using the
+   function on generators configured with other sound sinks doesn't
+   produce any output and the function always returns CW_SUCCESS.
+
+   @internal
+   @reviewed 2020-08-01
+   @endinternal
+
+   @param[in] gen generator
+
+   @return CW_SUCCESS on write success
+   @return CW_FAILURE otherwise
+*/
+int cw_dev_debug_raw_sink_write_internal(cw_gen_t * gen);
 
 
 

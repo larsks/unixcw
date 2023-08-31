@@ -41,18 +41,6 @@ enum { CW_SYMBOL_IMS = ' ' };
 
 
 
-/* This is used in libcw_gen and libcw_debug. */
-#if LIBCW_WITH_DEV
-#define CW_DEV_RAW_SINK           1  /* Create and use /tmp/cw_file.<sound system>.raw file with sound samples written as raw data. */
-#define CW_DEV_RAW_SINK_MARKERS   0  /* Put markers at the beginning and end of buffers (frames) sent to raw sink. */
-#else
-#define CW_DEV_RAW_SINK           0
-#define CW_DEV_RAW_SINK_MARKERS   0
-#endif
-
-
-
-
 /**
    @brief Parameters describing timing of different elements (marks and
    spaces) produced by a generator
@@ -338,7 +326,7 @@ struct cw_gen_struct {
 
 	bool sound_device_is_open;
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	/* Output file descriptor for debug data (console, OSS, ALSA,
 	   PulseAudio). */
 	int dev_raw_sink;

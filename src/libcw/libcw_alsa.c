@@ -489,7 +489,7 @@ static cw_ret_t cw_alsa_open_and_configure_sound_device_internal(cw_gen_t * gen,
 		gen->buffer_n_samples = period_size;
 	}
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_open_internal(gen);
 #endif
 
@@ -523,7 +523,7 @@ static void cw_alsa_close_sound_device_internal(cw_gen_t * gen)
 		dlclose(cw_alsa.lib_handle);
 	}
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_close_internal(gen);
 #endif
 	return;

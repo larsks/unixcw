@@ -107,6 +107,31 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+**** TODO Misc tests
+
+***** TODO pcm sample file is disabled in regular builds
+
+Confirm that by default libcw doesn't create a debug file into which raw PCM
+samples are being written.
+
+*Steps*
+
+1. Confirm that in /tmp there is no file called
+   "cw_file_<parameters>_pcm.raw" from previous runs of programs/tests.
+
+2. Build package
+./configure && make
+
+3. Start a program that uses libcw to generate sound. Play any string.
+./src/cw/cw
+
+4. Exit the program.
+
+5. Confirm that in /tmp there is no file called
+   "cw_file_<parameters>_pcm.raw" from _current_ run of program done in
+   step 3.
+
+
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
 

@@ -1,5 +1,8 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define as 1 if you want to enable writing raw PCM samples to debug file. */
+#undef ENABLE_DEV_PCM_SAMPLES_FILE
+
 /* Define to 1 if you have the `cosf' function. */
 #undef HAVE_COSF
 

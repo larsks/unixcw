@@ -417,7 +417,7 @@ static cw_ret_t cw_pa_open_and_configure_sound_device_internal(cw_gen_t * gen, c
 			      MSG_PREFIX "open device: pa_simple_get_latency() failed: %s", g_cw_pa_lib_handle.pa_strerror(error));
 	}
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_open_internal(gen);
 #endif
 	assert (gen && gen->pa_data.simple);
@@ -459,7 +459,7 @@ static void cw_pa_close_sound_device_internal(cw_gen_t * gen)
 
 	gen->sound_device_is_open = false;
 
-#if CW_DEV_RAW_SINK
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 	cw_dev_debug_raw_sink_close_internal(gen);
 #endif
 	return;

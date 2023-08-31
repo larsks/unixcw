@@ -646,6 +646,8 @@ QT5_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
+ENABLE_DEV_PCM_SAMPLES_FILE_FALSE
+ENABLE_DEV_PCM_SAMPLES_FILE_TRUE
 ENABLE_DEV_RECEIVER_TEST_FALSE
 ENABLE_DEV_RECEIVER_TEST_TRUE
 LIBCW_VERSION
@@ -800,6 +802,7 @@ enable_cwcp
 enable_xcwcp
 enable_dev_receiver_test
 enable_dev
+enable_dev_pcm_samples_file
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1475,6 +1478,8 @@ Optional Features:
                           Enable test code embedded in receiver
   --enable-dev            enable development support (messages/debug
                           code/asserts)
+  --enable-dev-pcm-samples-file
+                          enable writing raw PCM samples to debug file)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -17353,6 +17358,8 @@ $as_echo "no" >&6; }
 fi
 
 
+
+
 # Include test code in receiver code? This will mostly matter for "receiver"
 # functionality of xcwcp: xcwcp will get an additional option in "modes"
 # menu, with which a receiver can be auto-tested.
@@ -17383,6 +17390,8 @@ fi
 
 
 
+
+
 # Enable development debugging? No by default.
 # Check whether --enable-dev was given.
 if test "${enable_dev+set}" = set; then :
@@ -17401,6 +17410,45 @@ else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+
+
+
+
+# Enable writing raw PCM samples from libcw generator to disc file for
+# debugging purposes?
+# Check whether --enable-dev_pcm_samples_file was given.
+if test "${enable_dev_pcm_samples_file+set}" = set; then :
+  enableval=$enable_dev_pcm_samples_file;
+else
+  enable_dev_pcm_samples_file=no
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable writing raw PCM samples to debug file" >&5
+$as_echo_n "checking whether to enable writing raw PCM samples to debug file... " >&6; }
+if test "$enable_dev_pcm_samples_file" = "yes" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+ if test "$enable_dev_pcm_samples_file" = "yes"; then
+  ENABLE_DEV_PCM_SAMPLES_FILE_TRUE=
+  ENABLE_DEV_PCM_SAMPLES_FILE_FALSE='#'
+else
+  ENABLE_DEV_PCM_SAMPLES_FILE_TRUE='#'
+  ENABLE_DEV_PCM_SAMPLES_FILE_FALSE=
+fi
+
+if test "$enable_dev_pcm_samples_file" = "yes" ; then
+
+$as_echo "#define ENABLE_DEV_PCM_SAMPLES_FILE 1" >>confdefs.h
+
+fi
+
+
 
 
 # #####
@@ -18863,6 +18911,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_DEV_RECEIVER_TEST_TRUE}" && test -z "${ENABLE_DEV_RECEIVER_TEST_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_DEV_RECEIVER_TEST\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_TRUE}" && test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_DEV_PCM_SAMPLES_FILE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBCW_WITH_DEV_TRUE}" && test -z "${LIBCW_WITH_DEV_FALSE}"; then
@@ -21304,50 +21356,53 @@ fi
 
 # Put this at the very end, so that these are the last lines seen by
 # user on console with low number of rows.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------" >&5
-$as_echo "$as_me: ----------------------------------------------------------" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: ------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------" >&5
-$as_echo "$as_me: ------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   operating system:  ......................  $host_os" >&5
-$as_echo "$as_me:   operating system:  ......................  $host_os" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build libcw:  ...........................  yes" >&5
-$as_echo "$as_me:   build libcw:  ...........................  yes" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       libcw soname version:  ..............  $LIBCW_VERSION" >&5
-$as_echo "$as_me:       libcw soname version:  ..............  $LIBCW_VERSION" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       include console buzzer support:  ....  $WITH_CONSOLE" >&5
-$as_echo "$as_me:       include console buzzer support:  ....  $WITH_CONSOLE" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       include OSS support:  ...............  $WITH_OSS" >&5
-$as_echo "$as_me:       include OSS support:  ...............  $WITH_OSS" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       include ALSA support:  ..............  $WITH_ALSA" >&5
-$as_echo "$as_me:       include ALSA support:  ..............  $WITH_ALSA" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       include PulseAudio support:  ........  $WITH_PULSEAUDIO" >&5
-$as_echo "$as_me:       include PulseAudio support:  ........  $WITH_PULSEAUDIO" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cw:  ..............................  $WITH_CW" >&5
-$as_echo "$as_me:   build cw:  ..............................  $WITH_CW" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwgen:  ...........................  $WITH_CWGEN" >&5
-$as_echo "$as_me:   build cwgen:  ...........................  $WITH_CWGEN" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwcp:  ............................  $WITH_CWCP" >&5
-$as_echo "$as_me:   build cwcp:  ............................  $WITH_CWCP" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   build xcwcp:  ...........................  $WITH_XCWCP" >&5
-$as_echo "$as_me:   build xcwcp:  ...........................  $WITH_XCWCP" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: ------------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------------" >&5
+$as_echo "$as_me: ------------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------------" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   operating system:  .....................................  $host_os" >&5
+$as_echo "$as_me:   operating system:  .....................................  $host_os" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build libcw:  ..........................................  yes" >&5
+$as_echo "$as_me:   build libcw:  ..........................................  yes" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       libcw soname version:  .............................  $LIBCW_VERSION" >&5
+$as_echo "$as_me:       libcw soname version:  .............................  $LIBCW_VERSION" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       include console buzzer support:  ...................  $WITH_CONSOLE" >&5
+$as_echo "$as_me:       include console buzzer support:  ...................  $WITH_CONSOLE" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       include OSS support:  ..............................  $WITH_OSS" >&5
+$as_echo "$as_me:       include OSS support:  ..............................  $WITH_OSS" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       include ALSA support:  .............................  $WITH_ALSA" >&5
+$as_echo "$as_me:       include ALSA support:  .............................  $WITH_ALSA" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       include PulseAudio support:  .......................  $WITH_PULSEAUDIO" >&5
+$as_echo "$as_me:       include PulseAudio support:  .......................  $WITH_PULSEAUDIO" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cw:  .............................................  $WITH_CW" >&5
+$as_echo "$as_me:   build cw:  .............................................  $WITH_CW" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwgen:  ..........................................  $WITH_CWGEN" >&5
+$as_echo "$as_me:   build cwgen:  ..........................................  $WITH_CWGEN" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build cwcp:  ...........................................  $WITH_CWCP" >&5
+$as_echo "$as_me:   build cwcp:  ...........................................  $WITH_CWCP" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   build xcwcp:  ..........................................  $WITH_XCWCP" >&5
+$as_echo "$as_me:   build xcwcp:  ..........................................  $WITH_XCWCP" >&6;}
 if test "$WITH_XCWCP" = 'yes' ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 LIBS:  ..........................  $QT5_LIBS" >&5
-$as_echo "$as_me:       Qt5 LIBS:  ..........................  $QT5_LIBS" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 MOC:  ...........................  $MOC" >&5
-$as_echo "$as_me:       Qt5 MOC:  ...........................  $MOC" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 CFLAGS:  ........................  $QT5_CFLAGS" >&5
-$as_echo "$as_me:       Qt5 CFLAGS:  ........................  $QT5_CFLAGS" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 LIBS:  .........................................  $QT5_LIBS" >&5
+$as_echo "$as_me:       Qt5 LIBS:  .........................................  $QT5_LIBS" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 MOC:  ..........................................  $MOC" >&5
+$as_echo "$as_me:       Qt5 MOC:  ..........................................  $MOC" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 CFLAGS:  .......................................  $QT5_CFLAGS" >&5
+$as_echo "$as_me:       Qt5 CFLAGS:  .......................................  $QT5_CFLAGS" >&6;}
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}:   CFLAGS:  ................................  $CFLAGS" >&5
-$as_echo "$as_me:   CFLAGS:  ................................  $CFLAGS" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   CFLAGS:  ...............................................  $CFLAGS" >&5
+$as_echo "$as_me:   CFLAGS:  ...............................................  $CFLAGS" >&6;}
 if test "$WITH_DEV" = 'yes' ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}:   enable dev support: .....................  yes" >&5
-$as_echo "$as_me:   enable dev support: .....................  yes" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}:   enable dev support: ................................  yes" >&5
+$as_echo "$as_me:   enable dev support: ................................  yes" >&6;}
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}:   development support options:" >&5
 $as_echo "$as_me:   development support options:" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable test code embedded in receiver:  $enable_dev_receiver_test" >&5
-$as_echo "$as_me:       enable test code embedded in receiver:  $enable_dev_receiver_test" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------" >&5
-$as_echo "$as_me: ----------------------------------------------------------" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&5
+$as_echo "$as_me:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable test code embedded in receiver: .............  $enable_dev_receiver_test" >&5
+$as_echo "$as_me:       enable test code embedded in receiver: .............  $enable_dev_receiver_test" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------" >&6;}
+

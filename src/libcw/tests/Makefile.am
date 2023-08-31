@@ -86,7 +86,7 @@ functional_test_files =
 
 # Functional tests that require samples sink file. The file is available only
 # when dev support is enabled.
-if LIBCW_WITH_DEV
+if ENABLE_DEV_PCM_SAMPLES_FILE
 functional_test_files+=libcw_gen_tests_debug_pcm_file_timings.c \
 	libcw_gen_tests_debug_pcm_file_timings.h
 endif

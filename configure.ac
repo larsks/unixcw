@@ -262,6 +262,8 @@ else
 fi
 
 
+
+
 # Include test code in receiver code? This will mostly matter for "receiver"
 # functionality of xcwcp: xcwcp will get an additional option in "modes"
 # menu, with which a receiver can be auto-tested.
@@ -279,6 +281,8 @@ fi
 AM_CONDITIONAL([ENABLE_DEV_RECEIVER_TEST], [test $enable_dev_receiver_test = "yes"])
 
 
+
+
 # Enable development debugging? No by default.
 AC_ARG_ENABLE(dev,
     AS_HELP_STRING([--enable-dev], [enable development support (messages/debug code/asserts)]),
@@ -291,6 +295,30 @@ if test "$enable_dev" = "yes" ; then
 else
     AC_MSG_RESULT(no)
 fi
+
+
+
+
+# Enable writing raw PCM samples from libcw generator to disc file for
+# debugging purposes?
+AC_ARG_ENABLE(dev_pcm_samples_file,
+    AS_HELP_STRING([--enable-dev-pcm-samples-file], [enable writing raw PCM samples to debug file)]),
+    [],
+    [enable_dev_pcm_samples_file=no])
+
+AC_MSG_CHECKING([whether to enable writing raw PCM samples to debug file])
+if test "$enable_dev_pcm_samples_file" = "yes" ; then
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+
+AM_CONDITIONAL([ENABLE_DEV_PCM_SAMPLES_FILE], test "$enable_dev_pcm_samples_file" = "yes")
+if test "$enable_dev_pcm_samples_file" = "yes" ; then
+   AC_DEFINE([ENABLE_DEV_PCM_SAMPLES_FILE], [1], [Define as 1 if you want to enable writing raw PCM samples to debug file.])
+fi
+
+
 
 
 # #####
@@ -707,29 +735,31 @@ AC_OUTPUT
 
 # Put this at the very end, so that these are the last lines seen by
 # user on console with low number of rows.
-AC_MSG_NOTICE([----------------------------------------------------------])
-AC_MSG_NOTICE([------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------])
-AC_MSG_NOTICE([  operating system:  ......................  $host_os])
-AC_MSG_NOTICE([  build libcw:  ...........................  yes])
-AC_MSG_NOTICE([      libcw soname version:  ..............  $LIBCW_VERSION])
-AC_MSG_NOTICE([      include console buzzer support:  ....  $WITH_CONSOLE])
-AC_MSG_NOTICE([      include OSS support:  ...............  $WITH_OSS])
-AC_MSG_NOTICE([      include ALSA support:  ..............  $WITH_ALSA])
-AC_MSG_NOTICE([      include PulseAudio support:  ........  $WITH_PULSEAUDIO])
-AC_MSG_NOTICE([  build cw:  ..............................  $WITH_CW])
-AC_MSG_NOTICE([  build cwgen:  ...........................  $WITH_CWGEN])
-AC_MSG_NOTICE([  build cwcp:  ............................  $WITH_CWCP])
-AC_MSG_NOTICE([  build xcwcp:  ...........................  $WITH_XCWCP])
+AC_MSG_NOTICE([----------------------------------------------------------------------])
+AC_MSG_NOTICE([------------------ $PACKAGE_NAME $PACKAGE_VERSION build configuration ------------------])
+AC_MSG_NOTICE([  operating system:  .....................................  $host_os])
+AC_MSG_NOTICE([  build libcw:  ..........................................  yes])
+AC_MSG_NOTICE([      libcw soname version:  .............................  $LIBCW_VERSION])
+AC_MSG_NOTICE([      include console buzzer support:  ...................  $WITH_CONSOLE])
+AC_MSG_NOTICE([      include OSS support:  ..............................  $WITH_OSS])
+AC_MSG_NOTICE([      include ALSA support:  .............................  $WITH_ALSA])
+AC_MSG_NOTICE([      include PulseAudio support:  .......................  $WITH_PULSEAUDIO])
+AC_MSG_NOTICE([  build cw:  .............................................  $WITH_CW])
+AC_MSG_NOTICE([  build cwgen:  ..........................................  $WITH_CWGEN])
+AC_MSG_NOTICE([  build cwcp:  ...........................................  $WITH_CWCP])
+AC_MSG_NOTICE([  build xcwcp:  ..........................................  $WITH_XCWCP])
 if test "$WITH_XCWCP" = 'yes' ; then
-    AC_MSG_NOTICE([      Qt5 LIBS:  ..........................  $QT5_LIBS])
-    AC_MSG_NOTICE([      Qt5 MOC:  ...........................  $MOC])
-    AC_MSG_NOTICE([      Qt5 CFLAGS:  ........................  $QT5_CFLAGS])
+    AC_MSG_NOTICE([      Qt5 LIBS:  .........................................  $QT5_LIBS])
+    AC_MSG_NOTICE([      Qt5 MOC:  ..........................................  $MOC])
+    AC_MSG_NOTICE([      Qt5 CFLAGS:  .......................................  $QT5_CFLAGS])
 fi
-AC_MSG_NOTICE([  CFLAGS:  ................................  $CFLAGS])
+AC_MSG_NOTICE([  CFLAGS:  ...............................................  $CFLAGS])
 if test "$WITH_DEV" = 'yes' ; then
-    AC_MSG_NOTICE([  enable dev support: .....................  yes])
+    AC_MSG_NOTICE([  enable dev support: ................................  yes])
 fi
 
 AC_MSG_NOTICE([  development support options:])
-AC_MSG_NOTICE([      enable test code embedded in receiver:  $enable_dev_receiver_test])
-AC_MSG_NOTICE([----------------------------------------------------------])
+AC_MSG_NOTICE([      enable writing raw PCM samples to debug file: ......  $enable_dev_pcm_samples_file])
+AC_MSG_NOTICE([      enable test code embedded in receiver: .............  $enable_dev_receiver_test])
+AC_MSG_NOTICE([----------------------------------------------------------------------])
+

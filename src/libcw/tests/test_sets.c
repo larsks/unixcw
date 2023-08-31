@@ -290,7 +290,7 @@ cw_test_set_t cw_test_sets[] = {
 		{ CW_AUDIO_OSS, CW_AUDIO_ALSA, CW_AUDIO_PA, CW_AUDIO_NONE /* Guard. */ }, /* Sound systems. */
 
 		{
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_PCM_SAMPLES_FILE
 			LIBCW_TEST_FUNCTION_INSERT(test_cw_gen_debug_pcm_file_timings, !g_is_quick),
 #endif
 			LIBCW_TEST_FUNCTION_INSERT(NULL, true),
