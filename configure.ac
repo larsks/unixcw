@@ -262,19 +262,21 @@ else
 fi
 
 
-# Build receiver test in xcwcp? No by default.
-AC_ARG_ENABLE(xcwcp_rec_test,
-    AS_HELP_STRING([--enable-xcwcp-rec-test], [Include receiver test in xcwcp]),
+# Include test code in receiver code? This will mostly matter for "receiver"
+# functionality of xcwcp: xcwcp will get an additional option in "modes"
+# menu, with which a receiver can be auto-tested.
+AC_ARG_ENABLE(dev_receiver_test,
+    AS_HELP_STRING([--enable-dev-receiver-test], [Enable test code embedded in receiver]),
     [],
-    [enable_xcwcp_rec_test=no])
+    [enable_dev_receiver_test=no])
 
-AC_MSG_CHECKING([whether to build xcwcp with receiver test])
-if test "$enable_xcwcp_rec_test" = "yes" ; then
+AC_MSG_CHECKING([whether to enable test code embedded in receiver])
+if test "$enable_dev_receiver_test" = "yes" ; then
     AC_MSG_RESULT(yes)
 else
     AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL([WITH_XCWCP_REC_TEST], [test $enable_xcwcp_rec_test = "yes"])
+AM_CONDITIONAL([ENABLE_DEV_RECEIVER_TEST], [test $enable_dev_receiver_test = "yes"])
 
 
 # Enable development debugging? No by default.
@@ -719,9 +721,6 @@ AC_MSG_NOTICE([  build cwgen:  ...........................  $WITH_CWGEN])
 AC_MSG_NOTICE([  build cwcp:  ............................  $WITH_CWCP])
 AC_MSG_NOTICE([  build xcwcp:  ...........................  $WITH_XCWCP])
 if test "$WITH_XCWCP" = 'yes' ; then
-    if test "$enable_xcwcp_rec_test" = 'yes' ; then
-        AC_MSG_NOTICE([      include dev receiver test:  .........  $enable_xcwcp_rec_test])
-    fi
     AC_MSG_NOTICE([      Qt5 LIBS:  ..........................  $QT5_LIBS])
     AC_MSG_NOTICE([      Qt5 MOC:  ...........................  $MOC])
     AC_MSG_NOTICE([      Qt5 CFLAGS:  ........................  $QT5_CFLAGS])
@@ -730,4 +729,7 @@ AC_MSG_NOTICE([  CFLAGS:  ................................  $CFLAGS])
 if test "$WITH_DEV" = 'yes' ; then
     AC_MSG_NOTICE([  enable dev support: .....................  yes])
 fi
+
+AC_MSG_NOTICE([  development support options:])
+AC_MSG_NOTICE([      enable test code embedded in receiver:  $enable_dev_receiver_test])
 AC_MSG_NOTICE([----------------------------------------------------------])

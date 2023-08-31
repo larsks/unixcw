@@ -305,7 +305,7 @@ void Application::start()
 
 	sender->clear();
 	receiver->clear();
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef ENABLE_DEV_RECEIVER_TEST
 	if (current_mode()->is_receiver_test()) {
 		receiver->start_test_code();
 	}
@@ -352,7 +352,7 @@ void Application::stop()
 	poll_timer->stop();
 	sender->clear();
 	receiver->clear();
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef ENABLE_DEV_RECEIVER_TEST
 	if (current_mode()->is_receiver_test()) {
 		receiver->stop_test_code();
 	}

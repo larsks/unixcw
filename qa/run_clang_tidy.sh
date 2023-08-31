@@ -13,6 +13,6 @@ echo "root = " $root
 
 
 
-clang-tidy-11 $path_to_check -- -I$HOME/include -I$root/src/cwutils/ -I$root/src/ -DXCWCP_WITH_REC_TEST
+clang-tidy-11 $path_to_check -- -I$HOME/include -I$root/src/cwutils/ -I$root/src/ -DENABLE_DEV_RECEIVER_TEST
 
 

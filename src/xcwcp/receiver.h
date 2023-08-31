@@ -80,7 +80,7 @@ namespace cw {
 		/* Clear out queued data on stop, mode change, etc. */
 		void clear();
 
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef ENABLE_DEV_RECEIVER_TEST
 		void start_test_code();
 		void stop_test_code();
 		cw_rec_tester_t rec_tester = {};

@@ -140,7 +140,7 @@ namespace cw {
 
 
 
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef ENABLE_DEV_RECEIVER_TEST
 	class ReceiverTestMode : public Mode {
 	public:
 		ReceiverTestMode(const std::string &descr) : Mode (descr) { }

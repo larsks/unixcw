@@ -358,7 +358,7 @@ int cw_easy_legacy_receiver_poll_character(cw_easy_legacy_receiver_t * easy_rec,
 	erd->errno_val = errno;
 	if (CW_SUCCESS == cwret) {
 
-#ifdef XCWCP_WITH_REC_TEST /* TODO acerion 2023.08.21: this should not say "XCWCP_*" because this code is not in xcwcp. */
+#ifdef ENABLE_DEV_RECEIVER_TEST
 		if (CW_SUCCESS != cw_rec_tester_on_character(easy_rec->rec_tester, erd, &timer)) {
 			fprintf(stderr, "[EE] Testing a receiver on receiving a character returns error\n");
 			/* FIXME acerion 2022.02.19: this is a library code,
@@ -437,7 +437,7 @@ int cw_easy_legacy_receiver_poll_iws(cw_easy_legacy_receiver_t * easy_rec, cw_re
 	if (erd->is_iws) {
 		//fprintf(stderr, "End of word '%c'\n\n", erd->character);
 
-#ifdef XCWCP_WITH_REC_TEST /* TODO acerion 2023.08.21: this should not say "XCWCP_*" because this code is not in xcwcp. */
+#ifdef ENABLE_DEV_RECEIVER_TEST
 		if (CW_SUCCESS != cw_rec_tester_on_space(easy_rec->rec_tester, erd, &timer)) {
 			fprintf(stderr, "[EE] Testing a receiver on receiving a space returns error\n");
 			/* FIXME acerion 2022.02.19: this is a library code,

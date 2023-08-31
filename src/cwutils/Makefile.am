@@ -25,6 +25,11 @@ check_PROGRAMS=cw_dictionary_tests
 
 CFLAGS += $(AM_CPPFLAGS)
 
+if ENABLE_DEV_RECEIVER_TEST
+CPPFLAGS += -DENABLE_DEV_RECEIVER_TEST
+endif
+
+
 
 # source code files used to build cw_dictionary_tests program
 cw_dictionary_tests_SOURCES = dictionary.c memory.c i18n.c cw_config.c cw_common.c
@@ -50,8 +55,7 @@ lib_cw_a_SOURCES          = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h
 lib_cwcp_a_SOURCES        = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h sleep.c sleep.h
 
 lib_xcwcp_a_SOURCES       = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h sleep.c sleep.h
-if WITH_XCWCP_REC_TEST
-lib_xcwcp_a_CPPFLAGS      =-DXCWCP_WITH_REC_TEST
+if ENABLE_DEV_RECEIVER_TEST
 lib_xcwcp_a_LIBADD        = $(top_builddir)/src/test_framework/basic_utils/lib.a
 endif
 

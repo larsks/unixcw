@@ -111,7 +111,7 @@ ModeSetHelper::ModeSetHelper()
 	modes.push_back(new KeyboardMode("Send Keyboard CW"));
 	modes.push_back(new ReceiveMode("Receive Keyed CW"));
 
-#ifdef XCWCP_WITH_REC_TEST
+#ifdef ENABLE_DEV_RECEIVER_TEST
 	// Use "==" prefix and postfix to make the text more noticeable in modes
 	// drop-down menu.
 	modes.push_back(new ReceiverTestMode("== Run Receiver Test =="));

@@ -646,8 +646,8 @@ QT5_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-WITH_XCWCP_REC_TEST_FALSE
-WITH_XCWCP_REC_TEST_TRUE
+ENABLE_DEV_RECEIVER_TEST_FALSE
+ENABLE_DEV_RECEIVER_TEST_TRUE
 LIBCW_VERSION
 LDCONFIG
 GZIP
@@ -798,7 +798,7 @@ enable_cwgen
 enable_cw
 enable_cwcp
 enable_xcwcp
-enable_xcwcp_rec_test
+enable_dev_receiver_test
 enable_dev
 '
       ac_precious_vars='build_alias
@@ -1471,7 +1471,8 @@ Optional Features:
                           interface)
   --disable-xcwcp         do not build xcwcp (application with Qt5 user
                           interface)
-  --enable-xcwcp-rec-test Include receiver test in xcwcp
+  --enable-dev-receiver-test
+                          Enable test code embedded in receiver
   --enable-dev            enable development support (messages/debug
                           code/asserts)
 
@@ -17352,30 +17353,32 @@ $as_echo "no" >&6; }
 fi
 
 
-# Build receiver test in xcwcp? No by default.
-# Check whether --enable-xcwcp_rec_test was given.
-if test "${enable_xcwcp_rec_test+set}" = set; then :
-  enableval=$enable_xcwcp_rec_test;
+# Include test code in receiver code? This will mostly matter for "receiver"
+# functionality of xcwcp: xcwcp will get an additional option in "modes"
+# menu, with which a receiver can be auto-tested.
+# Check whether --enable-dev_receiver_test was given.
+if test "${enable_dev_receiver_test+set}" = set; then :
+  enableval=$enable_dev_receiver_test;
 else
-  enable_xcwcp_rec_test=no
+  enable_dev_receiver_test=no
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build xcwcp with receiver test" >&5
-$as_echo_n "checking whether to build xcwcp with receiver test... " >&6; }
-if test "$enable_xcwcp_rec_test" = "yes" ; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable test code embedded in receiver" >&5
+$as_echo_n "checking whether to enable test code embedded in receiver... " >&6; }
+if test "$enable_dev_receiver_test" = "yes" ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
- if test $enable_xcwcp_rec_test = "yes"; then
-  WITH_XCWCP_REC_TEST_TRUE=
-  WITH_XCWCP_REC_TEST_FALSE='#'
+ if test $enable_dev_receiver_test = "yes"; then
+  ENABLE_DEV_RECEIVER_TEST_TRUE=
+  ENABLE_DEV_RECEIVER_TEST_FALSE='#'
 else
-  WITH_XCWCP_REC_TEST_TRUE='#'
-  WITH_XCWCP_REC_TEST_FALSE=
+  ENABLE_DEV_RECEIVER_TEST_TRUE='#'
+  ENABLE_DEV_RECEIVER_TEST_FALSE=
 fi
 
 
@@ -18858,8 +18861,8 @@ if test -z "${HOST_IS_FREEBSD_TRUE}" && test -z "${HOST_IS_FREEBSD_FALSE}"; then
   as_fn_error $? "conditional \"HOST_IS_FREEBSD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${WITH_XCWCP_REC_TEST_TRUE}" && test -z "${WITH_XCWCP_REC_TEST_FALSE}"; then
-  as_fn_error $? "conditional \"WITH_XCWCP_REC_TEST\" was never defined.
+if test -z "${ENABLE_DEV_RECEIVER_TEST_TRUE}" && test -z "${ENABLE_DEV_RECEIVER_TEST_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_DEV_RECEIVER_TEST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBCW_WITH_DEV_TRUE}" && test -z "${LIBCW_WITH_DEV_FALSE}"; then
@@ -21328,10 +21331,6 @@ $as_echo "$as_me:   build cwcp:  ............................  $WITH_CWCP" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:   build xcwcp:  ...........................  $WITH_XCWCP" >&5
 $as_echo "$as_me:   build xcwcp:  ...........................  $WITH_XCWCP" >&6;}
 if test "$WITH_XCWCP" = 'yes' ; then
-    if test "$enable_xcwcp_rec_test" = 'yes' ; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}:       include dev receiver test:  .........  $enable_xcwcp_rec_test" >&5
-$as_echo "$as_me:       include dev receiver test:  .........  $enable_xcwcp_rec_test" >&6;}
-    fi
     { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 LIBS:  ..........................  $QT5_LIBS" >&5
 $as_echo "$as_me:       Qt5 LIBS:  ..........................  $QT5_LIBS" >&6;}
     { $as_echo "$as_me:${as_lineno-$LINENO}:       Qt5 MOC:  ...........................  $MOC" >&5
@@ -21345,5 +21344,10 @@ if test "$WITH_DEV" = 'yes' ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}:   enable dev support: .....................  yes" >&5
 $as_echo "$as_me:   enable dev support: .....................  yes" >&6;}
 fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}:   development support options:" >&5
+$as_echo "$as_me:   development support options:" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable test code embedded in receiver:  $enable_dev_receiver_test" >&5
+$as_echo "$as_me:       enable test code embedded in receiver:  $enable_dev_receiver_test" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------" >&5
 $as_echo "$as_me: ----------------------------------------------------------" >&6;}
