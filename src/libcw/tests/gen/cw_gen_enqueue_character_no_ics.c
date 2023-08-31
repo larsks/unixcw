@@ -290,9 +290,18 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_system, int * tolerance)
 {
 	/* Definitions necessary just to avoid "magic number" warnings. */
-#define TOLERANCE_NULL     5 /* TODO acerion 2023.08.29: update after tests with Null sound system. */
-#define TOLERANCE_CONSOLE  5 /* TODO acerion 2023.08.29: update after tests with console sound system. */
-#define TOLERANCE_OSS      6 /* TODO acerion 2023.08.29: update after tests with OSS sound system. */
+
+	/* At 12 wpm and 5% I experienced problems. With 12% it was ok. 15%
+	   should be safe for all my test machines. */
+#define TOLERANCE_NULL    10
+
+	/* TODO acerion 2023.08.29: update after tests with console sound
+	   system. */
+#define TOLERANCE_CONSOLE  5
+
+	/* TODO acerion 2023.08.29: update after tests with OSS sound system. */
+#define TOLERANCE_OSS      6
+
 	/* FIXME acerion 2023.08.29: on my main PC even with MAX tolerance I
 	   can't get a clean pass for ALSA. Something is clearly wrong with ALSA
 	   sound system. I've got similar results when I back-ported the test to
