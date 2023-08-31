@@ -29,7 +29,7 @@ reviewing code, you need to be able to say "This is where I need to stop".
 Constant making changes in code won't help you "freeze" your code and make a
 release.
 
-* STARTED Review changes - quality check
+* DONE Review changes - quality check
 
 Review changes in code, documentation and other files to catch and fix
 problems, and to do last-minute necessary minor improvements.
@@ -50,7 +50,7 @@ may affect end user.
 Note down (as "tickets" in README.dev.org or as TODO/FIXME notes in code) any
 problems that won't be fixed in this release.
 
-* TODO Static code analysis
+* STARTED Static code analysis
 Run the following tools for static code analysis, on entire code base,
 including tests:
 1. clang-tidy (through qa/run_clang_tidy.sh)
