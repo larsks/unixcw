@@ -1,18 +1,21 @@
+#!/bin/bash
+
+# Run clang-tidy on file or directory.
+# Call this script from project's main directory.
+# Pass to it a single argument: path to dir or file that you want to test.
+
 if [ "$#" -ne 1 ]; then
     echo "wrong args"
     exit
 fi
 
 path_to_check=$1
-
-echo "path_to_check = "$path_to_check
-
 root=`pwd`
 
-echo "root = " $root
+echo "path_to_check = "$path_to_check
+echo "root          = "$root
+sleep 2
 
-
-
-clang-tidy-11 $path_to_check -- -I$HOME/include -I$root/src/cwutils/ -I$root/src/ -DENABLE_DEV_RECEIVER_TEST
+run-clang-tidy-11 -p=$root $path_to_check
 
 

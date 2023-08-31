@@ -51,15 +51,23 @@ Note down (as "tickets" in README.dev.org or as TODO/FIXME notes in code) any
 problems that won't be fixed in this release.
 
 * STARTED Static code analysis
-Run the following tools for static code analysis, on entire code base,
-including tests:
-1. clang-tidy (through qa/run_clang_tidy.sh)
-2. cppcheck
+
+TODO: some functionalities in the package are disabled by default (mostly the
+debug functionalities). You may want to enable them through ./configure
+before running the static analysis.
 
 These checks should be a part of Continuous Integration pipeline, but:
-1. they are not (yet),
+1. they are not (yet) (TODO: make them part of CI),
 2. an additional 'manual' check of results should ensure that no serious
    issues have crept in.
+
+** STARTED clang-tidy
+
+Prepare the package for clang-tidy and run the clang-tidy:
+1. ./configure --enable-dev-pcm-samples-file && bear -- make && bear --append -- make check
+2. run-clang-tidy-11
+
+** TODO cppcheck
 
 * TODO Come up with new version numbers
 
