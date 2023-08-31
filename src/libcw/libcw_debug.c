@@ -299,7 +299,7 @@ bool cw_debug_has_flag(const cw_debug_t * debug_object, uint32_t flag)
 
 
 
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_LIBCW_DEBUGGING
 
 
 
@@ -430,8 +430,8 @@ void cw_debug_event_internal(cw_debug_t * debug_object, uint32_t flag, uint32_t 
 
 
 
-#endif /* #if LIBCW_WITH_DEV */
 
+#endif /* #ifdef ENABLE_DEV_LIBCW_DEBUGGING */
 
 
 

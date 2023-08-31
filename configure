@@ -637,9 +637,6 @@ LD_LINKS_SO
 CC_LINKS_SO
 CFLAG_PIC
 SRC_SUBDIRS
-LIBCW_NDEBUG
-LIBCW_WITH_DEV_FALSE
-LIBCW_WITH_DEV_TRUE
 MOC
 QT5_LIBS
 QT5_CFLAGS
@@ -648,6 +645,9 @@ PKG_CONFIG_PATH
 PKG_CONFIG
 ENABLE_DEV_PCM_SAMPLES_FILE_FALSE
 ENABLE_DEV_PCM_SAMPLES_FILE_TRUE
+LIBCW_NDEBUG
+ENABLE_DEV_LIBCW_DEBUGGING_FALSE
+ENABLE_DEV_LIBCW_DEBUGGING_TRUE
 ENABLE_DEV_RECEIVER_TEST_FALSE
 ENABLE_DEV_RECEIVER_TEST_TRUE
 LIBCW_VERSION
@@ -801,7 +801,7 @@ enable_cw
 enable_cwcp
 enable_xcwcp
 enable_dev_receiver_test
-enable_dev
+enable_dev_libcw_debugging
 enable_dev_pcm_samples_file
 '
       ac_precious_vars='build_alias
@@ -1475,8 +1475,9 @@ Optional Features:
   --disable-xcwcp         do not build xcwcp (application with Qt5 user
                           interface)
   --enable-dev-receiver-test
-                          Enable test code embedded in receiver
-  --enable-dev            enable development support (messages/debug
+                          enable test code embedded in receiver
+  --enable-dev-libcw-debugging
+                          enable additional debugs in libcw (messages/debug
                           code/asserts)
   --enable-dev-pcm-samples-file
                           enable writing raw PCM samples to debug file)
@@ -17392,24 +17393,45 @@ fi
 
 
 
-# Enable development debugging? No by default.
-# Check whether --enable-dev was given.
-if test "${enable_dev+set}" = set; then :
-  enableval=$enable_dev;
+# Additional debugs in libcw.
+# Check whether --enable-dev_libcw_debugging was given.
+if test "${enable_dev_libcw_debugging+set}" = set; then :
+  enableval=$enable_dev_libcw_debugging;
 else
-  enable_dev=no
+  enable_dev_libcw_debugging=no
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable development support" >&5
-$as_echo_n "checking whether to enable development support... " >&6; }
-if test "$enable_dev" = "yes" ; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable additional debugs in libcw" >&5
+$as_echo_n "checking whether to enable additional debugs in libcw... " >&6; }
+if test "$enable_dev_libcw_debugging" = "yes" ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+
+ if test "$enable_dev_libcw_debugging" = "yes"; then
+  ENABLE_DEV_LIBCW_DEBUGGING_TRUE=
+  ENABLE_DEV_LIBCW_DEBUGGING_FALSE='#'
+else
+  ENABLE_DEV_LIBCW_DEBUGGING_TRUE='#'
+  ENABLE_DEV_LIBCW_DEBUGGING_FALSE=
+fi
+
+if test "$enable_dev_libcw_debugging" = "yes" ; then
+
+$as_echo "#define ENABLE_DEV_LIBCW_DEBUGGING 1" >>confdefs.h
+
+fi
+
+if test "$ENABLE_DEV_LIBCW_DEBUGGING" = 'yes' ; then
+    LIBCW_NDEBUG=""
+else
+    LIBCW_NDEBUG="-DNDEBUG"
+fi
+
 
 
 
@@ -18024,36 +18046,6 @@ $as_echo "QT5 LIBS is $QT5_LIBS" >&6; }
 
 
 fi
-fi
-
-
-
-# Development support tools.
- if test "$enable_dev" = "yes"; then
-  LIBCW_WITH_DEV_TRUE=
-  LIBCW_WITH_DEV_FALSE='#'
-else
-  LIBCW_WITH_DEV_TRUE='#'
-  LIBCW_WITH_DEV_FALSE=
-fi
-
-if test "$enable_dev" = "yes" ; then
-   WITH_DEV='yes'
-
-$as_echo "#define LIBCW_WITH_DEV 1" >>confdefs.h
-
-else
-   WITH_DEV='no'
-
-$as_echo "#define LIBCW_WITH_DEV 0" >>confdefs.h
-
-fi
-
-
-if test "$WITH_DEV" = 'yes' ; then
-    LIBCW_NDEBUG=""
-else
-    LIBCW_NDEBUG="-DNDEBUG"
 fi
 
 
@@ -18763,7 +18755,6 @@ fi
 
 
 
-
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -18913,12 +18904,12 @@ if test -z "${ENABLE_DEV_RECEIVER_TEST_TRUE}" && test -z "${ENABLE_DEV_RECEIVER_
   as_fn_error $? "conditional \"ENABLE_DEV_RECEIVER_TEST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_TRUE}" && test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_DEV_PCM_SAMPLES_FILE\" was never defined.
+if test -z "${ENABLE_DEV_LIBCW_DEBUGGING_TRUE}" && test -z "${ENABLE_DEV_LIBCW_DEBUGGING_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_DEV_LIBCW_DEBUGGING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LIBCW_WITH_DEV_TRUE}" && test -z "${LIBCW_WITH_DEV_FALSE}"; then
-  as_fn_error $? "conditional \"LIBCW_WITH_DEV\" was never defined.
+if test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_TRUE}" && test -z "${ENABLE_DEV_PCM_SAMPLES_FILE_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_DEV_PCM_SAMPLES_FILE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -21353,7 +21344,6 @@ fi
 
 
 
-
 # Put this at the very end, so that these are the last lines seen by
 # user on console with low number of rows.
 { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------" >&5
@@ -21392,17 +21382,16 @@ $as_echo "$as_me:       Qt5 CFLAGS:  .......................................  $Q
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}:   CFLAGS:  ...............................................  $CFLAGS" >&5
 $as_echo "$as_me:   CFLAGS:  ...............................................  $CFLAGS" >&6;}
-if test "$WITH_DEV" = 'yes' ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}:   enable dev support: ................................  yes" >&5
-$as_echo "$as_me:   enable dev support: ................................  yes" >&6;}
-fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}:   development support options:" >&5
 $as_echo "$as_me:   development support options:" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&5
-$as_echo "$as_me:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:       enable test code embedded in receiver: .............  $enable_dev_receiver_test" >&5
 $as_echo "$as_me:       enable test code embedded in receiver: .............  $enable_dev_receiver_test" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable additional debugs in libcw: .................  $enable_dev_libcw_debugging" >&5
+$as_echo "$as_me:       enable additional debugs in libcw: .................  $enable_dev_libcw_debugging" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&5
+$as_echo "$as_me:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&6;}
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------" >&5
 $as_echo "$as_me: ----------------------------------------------------------------------" >&6;}
 

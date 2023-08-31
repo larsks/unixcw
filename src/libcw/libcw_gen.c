@@ -317,7 +317,7 @@ cw_ret_t cw_gen_start(cw_gen_t * gen)
 		   usleep() here, otherwise a generator may
 		   work incorrectly */
 		usleep(100000);
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_LIBCW_DEBUGGING
 		cw_dev_debug_print_generator_setup_internal(gen);
 #endif
 		return CW_SUCCESS;
@@ -479,7 +479,7 @@ cw_ret_t cw_gen_silence_internal(cw_gen_t * gen)
 
 cw_gen_t * cw_gen_new(const cw_gen_config_t * gen_conf)
 {
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_LIBCW_DEBUGGING
 	fprintf(stderr, "libcw build %s %s\n", __DATE__, __TIME__);
 #endif
 
@@ -1092,7 +1092,7 @@ void * cw_gen_dequeue_and_generate_internal(void * arg)
 #endif
 
 
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_LIBCW_DEBUGGING
 		cw_debug_ev (&cw_debug_object_ev, 0, tone.frequency ? CW_DEBUG_EVENT_TONE_HIGH : CW_DEBUG_EVENT_TONE_LOW);
 #endif
 
@@ -1208,7 +1208,7 @@ void * cw_gen_dequeue_and_generate_internal(void * arg)
 			gen->silencing_initialized = false;
 		}
 
-#if LIBCW_WITH_DEV
+#ifdef ENABLE_DEV_LIBCW_DEBUGGING
 		cw_debug_ev (&cw_debug_object_ev, 0, tone.frequency ? CW_DEBUG_EVENT_TONE_LOW : CW_DEBUG_EVENT_TONE_HIGH);
 #endif
 		/* And finally, at the very end... */

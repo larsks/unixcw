@@ -268,7 +268,7 @@ fi
 # functionality of xcwcp: xcwcp will get an additional option in "modes"
 # menu, with which a receiver can be auto-tested.
 AC_ARG_ENABLE(dev_receiver_test,
-    AS_HELP_STRING([--enable-dev-receiver-test], [Enable test code embedded in receiver]),
+    AS_HELP_STRING([--enable-dev-receiver-test], [enable test code embedded in receiver]),
     [],
     [enable_dev_receiver_test=no])
 
@@ -283,18 +283,30 @@ AM_CONDITIONAL([ENABLE_DEV_RECEIVER_TEST], [test $enable_dev_receiver_test = "ye
 
 
 
-# Enable development debugging? No by default.
-AC_ARG_ENABLE(dev,
-    AS_HELP_STRING([--enable-dev], [enable development support (messages/debug code/asserts)]),
+# Additional debugs in libcw.
+AC_ARG_ENABLE(dev_libcw_debugging,
+    AS_HELP_STRING([--enable-dev-libcw-debugging], [enable additional debugs in libcw (messages/debug code/asserts)]),
     [],
-    [enable_dev=no])
+    [enable_dev_libcw_debugging=no])
 
-AC_MSG_CHECKING([whether to enable development support])
-if test "$enable_dev" = "yes" ; then
+AC_MSG_CHECKING([whether to enable additional debugs in libcw])
+if test "$enable_dev_libcw_debugging" = "yes" ; then
     AC_MSG_RESULT(yes)
 else
     AC_MSG_RESULT(no)
 fi
+
+AM_CONDITIONAL(ENABLE_DEV_LIBCW_DEBUGGING, test "$enable_dev_libcw_debugging" = "yes")
+if test "$enable_dev_libcw_debugging" = "yes" ; then
+   AC_DEFINE([ENABLE_DEV_LIBCW_DEBUGGING], [1], [Define as 1 if you want to enable additional debugs in libcw.])
+fi
+
+if test "$ENABLE_DEV_LIBCW_DEBUGGING" = 'yes' ; then
+    LIBCW_NDEBUG=""
+else
+    LIBCW_NDEBUG="-DNDEBUG"
+fi
+AC_SUBST(LIBCW_NDEBUG)
 
 
 
@@ -471,25 +483,6 @@ else
 			   ])
 fi
 
-
-
-# Development support tools.
-AM_CONDITIONAL(LIBCW_WITH_DEV, test "$enable_dev" = "yes")
-if test "$enable_dev" = "yes" ; then
-   WITH_DEV='yes'
-   AC_DEFINE([LIBCW_WITH_DEV], [1], [Define as 1 if you want to enable development support.])
-else
-   WITH_DEV='no'
-   AC_DEFINE([LIBCW_WITH_DEV], [0], [Define as 1 if you want to enable development support.])
-fi
-
-
-if test "$WITH_DEV" = 'yes' ; then
-    LIBCW_NDEBUG=""
-else
-    LIBCW_NDEBUG="-DNDEBUG"
-fi
-AC_SUBST(LIBCW_NDEBUG)
 
 
 
@@ -726,9 +719,7 @@ fi
 
 
 
-
 AC_OUTPUT
-
 
 
 
@@ -754,12 +745,11 @@ if test "$WITH_XCWCP" = 'yes' ; then
     AC_MSG_NOTICE([      Qt5 CFLAGS:  .......................................  $QT5_CFLAGS])
 fi
 AC_MSG_NOTICE([  CFLAGS:  ...............................................  $CFLAGS])
-if test "$WITH_DEV" = 'yes' ; then
-    AC_MSG_NOTICE([  enable dev support: ................................  yes])
-fi
 
 AC_MSG_NOTICE([  development support options:])
-AC_MSG_NOTICE([      enable writing raw PCM samples to debug file: ......  $enable_dev_pcm_samples_file])
 AC_MSG_NOTICE([      enable test code embedded in receiver: .............  $enable_dev_receiver_test])
+AC_MSG_NOTICE([      enable additional debugs in libcw: .................  $enable_dev_libcw_debugging])
+AC_MSG_NOTICE([      enable writing raw PCM samples to debug file: ......  $enable_dev_pcm_samples_file])
+
 AC_MSG_NOTICE([----------------------------------------------------------------------])
 
