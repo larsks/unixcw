@@ -70,7 +70,7 @@ static bool is_sending_active = false;
 #define CWCP_PARAM_WIDTH (15 + 1)
 
 
-static cw_config_t *config = NULL; /* program-specific configuration */
+static cw_config_t *config; /* program-specific configuration */
 static bool generator = false;     /* have we created a generator? */
 
 

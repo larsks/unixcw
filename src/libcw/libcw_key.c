@@ -286,8 +286,16 @@ void cw_key_register_receiver(volatile cw_key_t * key, cw_rec_t * rec)
 */
 cw_ret_t cw_key_sk_set_value_internal(volatile cw_key_t * key, cw_key_value_t key_value)
 {
-	cw_assert (key, MSG_PREFIX_SK "key is NULL");
-	cw_assert (key->gen, MSG_PREFIX_SK "gen is NULL");
+	if (NULL == key) {
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_KEYING, CW_DEBUG_ERROR,
+		              MSG_PREFIX_SK "%s(): key is NULL", __func__);
+		return CW_FAILURE;
+	}
+	if (NULL == key->gen) {
+		cw_debug_msg (&cw_debug_object, CW_DEBUG_KEYING, CW_DEBUG_ERROR,
+		              MSG_PREFIX_SK "%s(): gen in key is NULL", __func__);
+		return CW_FAILURE;
+	}
 
 #if 0 /* Disabled on 2020-08-03. Timer moved to iambic keyer only. */
 	struct timeval t;

@@ -66,7 +66,7 @@ static void write_to_cw_sender (const char *format, ...)
 static void signal_handler(int signal_number);
 static void cw_atexit(void);
 
-static cw_config_t *config = NULL; /* program-specific configuration */
+static cw_config_t *config; /* program-specific configuration */
 static bool generator = false;     /* have we created a generator? */
 static bool g_is_running = false;
 

@@ -983,12 +983,23 @@ cw_rec_test_vector * cw_rec_test_vector_factory(cw_test_executor_t * cte, charac
 			   space). We want to turn inter-character-space
 			   of previous point into inter-word-space,
 			   hence 'out_idx - 1'. */
-			cw_rec_test_point * prev_point = vec->points[out_idx - 1];
-			const int space_idx = prev_point->n_tone_durations - 1;   /* Index of last space (inter-character-space, to become inter-word-space). */
-			prev_point->tone_durations[space_idx] = dot_duration * 6; /* dot_duration * 5 is the minimal inter-word-space. */
-			prev_point->is_last_in_word = true;
+			if (out_idx == 0) {
+				/*
+				  There is no 'previous point' yet! We can't turn any ics into iws.
 
-			continue;
+				  TODO acerion 2023.09.02: how to handle this case? Perhaps
+				  this situation may occur when input string starts with
+				  space.
+				*/
+				kite_log(cte, LOG_WARNING, "Unexpected condition: out_idx == 0\n");
+			} else {
+				cw_rec_test_point * prev_point = vec->points[out_idx - 1];
+				const int space_idx = prev_point->n_tone_durations - 1;   /* Index of last space (inter-character-space, to become inter-word-space). */
+				prev_point->tone_durations[space_idx] = dot_duration * 6; /* dot_duration * 5 is the minimal inter-word-space. */
+				prev_point->is_last_in_word = true;
+
+				continue;
+			}
 		} else {
 			/* A regular character, handled below. */
 		}

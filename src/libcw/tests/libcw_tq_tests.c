@@ -175,7 +175,10 @@ int test_cw_tq_prev_index_internal(cw_test_executor_t * cte)
 	cte->print_test_header(cte, __func__);
 
 	cw_tone_queue_t * tq = cw_tq_new_internal();
-	cte->assert2(cte, NULL != tq, "failed to create new tone queue");
+	if (NULL == tq) {
+		kite_log(cte, LOG_ERR, "failed to create new tone queue");
+		return -1;
+	}
 
 	struct {
 		size_t current_index;
@@ -233,7 +236,10 @@ int test_cw_tq_next_index_internal(cw_test_executor_t * cte)
 	cte->print_test_header(cte, __func__);
 
 	cw_tone_queue_t * tq = cw_tq_new_internal();
-	cte->assert2(cte, NULL != tq, "failed to create new tone queue");
+	if (NULL == tq) {
+		kite_log(cte, LOG_ERR, "failed to create new tone queue");
+		return -1;
+	}
 
 	struct {
 		size_t current_index;
