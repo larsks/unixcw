@@ -1254,7 +1254,7 @@ int cw_get_maximum_phonetic_length(void)
 int cw_lookup_phonetic(char character, char * phonetic)
 {
 	/* Coerce to uppercase, and verify the input argument. */
-	character = toupper(character);
+	character = toupper((int) character);
 	if (character >= 'A' && character <= 'Z') {
 		if (NULL != phonetic) {
 			strncpy(phonetic, g_phonetics_table[character - 'A'], g_phonetics_table_maximum_phonetic_length);

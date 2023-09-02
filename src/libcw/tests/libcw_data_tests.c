@@ -771,7 +771,7 @@ static int test_phonetic_lookups_internal_sub(cw_test_executor_t * cte, char * p
 			   the first letter of phonetic should
 			   be the same as the looked up
 			   letter. */
-			reverse_failure = (phonetic_buffer[0] != toupper((char) i));
+			reverse_failure = (phonetic_buffer[0] != toupper(i));
 			if (!cte->expect_op_int_errors_only(cte, false, "==", reverse_failure, "phonetic lookup: reverse lookup for phonetic \"%s\" ('%c' / #%d)", phonetic_buffer, (char) i, i)) {
 				reverse_failure = true;
 				break;

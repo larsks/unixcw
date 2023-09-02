@@ -228,7 +228,7 @@ void queue_display_add_character(void)
 {
 	/* Append the last queued character to the text display. */
 	if (queue_get_length() > 0) {
-		waddch(text_subwindow, toupper(queue_data[queue_tail]));
+		waddch(text_subwindow, toupper((int) queue_data[queue_tail]));
 		wrefresh(text_subwindow);
 	}
 
@@ -391,7 +391,7 @@ void queue_enqueue_string(const char *word)
 	bool is_queue_notify = false;
 	for (int i = 0; word[i] != '\0'; i++) {
 
-		char c = toupper(word[i]);
+		char c = toupper((int) word[i]);
 		if (cw_character_is_valid(c)) {
 			/* Calculate the new character queue tail.  If
 			   the new value will not hit the current

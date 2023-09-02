@@ -302,7 +302,7 @@ int get_option(int argc, char *const argv[],
 			long_options[long_count].name = long_names[long_count];
 			long_options[long_count].has_arg = needs_arg;
 			long_options[long_count].flag = NULL;
-			long_options[long_count].val = element[0];
+			long_options[long_count].val = (int) element[0];
 			long_count++;
 
 			/* Set the end sentry to all zeroes. */
@@ -834,7 +834,7 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 
 		dest_idx = 0;
 		for (size_t i = 0; i < optarg_len; i++) {
-			const int val = optarg[i];
+			const int val = (int) optarg[i];
 			if (NULL == strchr(LIBCW_TEST_ALL_SOUND_SYSTEMS, val)) {
 				fprintf(stderr, "Unsupported sound system '%c'\n", val);
 				goto help_and_error;
@@ -910,7 +910,7 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 
 		dest_idx = 0;
 		for (size_t i = 0; i < optarg_len; i++) {
-			const int val = optarg[i];
+			const int val = (int) optarg[i];
 			if (NULL == strchr(LIBCW_TEST_ALL_TOPICS, val)) {
 				fprintf(stderr, "Unsupported test area '%c'\n", val);
 				goto help_and_error;
