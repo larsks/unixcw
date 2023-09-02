@@ -61,11 +61,25 @@ These checks should be a part of Continuous Integration pipeline, but:
 2. an additional 'manual' check of results should ensure that no serious
    issues have crept in.
 
-** STARTED clang-tidy
+** DONE clang-tidy
 
-Prepare the package for clang-tidy and run the clang-tidy:
-1. ./configure --enable-dev-pcm-samples-file && bear -- make && bear --append -- make check
-2. run-clang-tidy-11
+Use "run-clang-tidy" wrapper program (should be installed from some Linux
+package). The wrapper will use .clang-tidy config file present in package's
+root dir.
+
+"bear" program should be installed from a Linux package.
+
+1. Prepare the project's source code package for clang-tidy: configure it and
+   build compilation database:
+
+    ./configure --enable-dev-receiver-test --enable-dev-libcw-debugging --enable-dev-pcm-samples-file
+    bear -- make && bear --append -- make check
+
+2. Run clang-tidy:
+
+    run-clang-tidy-11
+
+3. Fix reported issues.
 
 ** TODO cppcheck
 
@@ -165,6 +179,9 @@ the package:
    - qa/test_scenarios/template.org: add, remove or update test cases
    - package documentation (NEWS/README/README.dev.org/man pages/installation
      instructions, other)
+
+
+
 * TODO Localization
 
 If you use gettext or any other tool to facilitate localization of your
