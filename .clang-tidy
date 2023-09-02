@@ -34,7 +34,6 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   -misc-redundant-expression,
   -misc-throw-by-value-catch-by-reference,
-  -cert-dcl03-c,
   -cert-dcl37-c,
   -cert-dcl51-cpp,
   -cert-err34-c,
