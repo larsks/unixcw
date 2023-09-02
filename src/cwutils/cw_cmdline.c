@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
- * Copyright (C) 2011-2021  Kamil Ignacak (acerion@wp.pl)
+ * Copyright (C) 2011-2023  Kamil Ignacak (acerion@wp.pl)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -90,28 +90,9 @@ const char *cw_program_basename(const char *argv0)
 
 
 
-
-/**
-   \brief Combine command line options and environment options
-
-   Build a new argc and argv by combining command line and environment
-   options.
-
-   The new values are held in the heap, and the malloc'ed addresses
-   are not retained, so do not call this function repeatedly,
-   otherwise it will leak memory.
-
-   Combined values are returned through \p new_argc and \p new_argv.
-
-   \param env_variable - name of environment variable to read from
-   \param argc - argc of program's main()
-   \param argv - argv[] of program's main()
-   \param new_argc - combined argc
-   \param new_argv[] - combined argv
-*/
-int combine_arguments(const char *env_variable,
-		      int argc, char *const argv[],
-		      /* out */ int *new_argc, /* out */ char **new_argv[])
+int combine_arguments(const char * env_variable,
+                      int argc, char * const argv[],
+                      int * new_argc, char ** new_argv[])
 {
 	/* Begin with argv[0], which stays in place. */
 	char **local_argv = malloc(sizeof (*local_argv));
@@ -161,7 +142,6 @@ int combine_arguments(const char *env_variable,
 
 	return CW_SUCCESS;
 }
-
 
 
 

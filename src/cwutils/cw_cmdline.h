@@ -36,13 +36,36 @@ extern "C" {
 
 extern const char *cw_program_basename(const char *argv0);
 
+
+
+
 /**
+   @brief Combine program's command line options and environment options
+
+   Build a new argc and argv by combining command line and environment
+   options.
+
+   The new values are held in the heap, and the malloc'ed addresses are not
+   retained, so do not call this function repeatedly, otherwise it will leak
+   memory.
+
+   TODO acerion 2023.09.02: fix memory leaks.
+   TODO acerion 2023.09.02: describe ownership of resources returned by this function.
+
+   Combined values are returned through @p new_argc and @p new_argv.
+
+   @param[in] env_variable Name of environment variable to read from
+   @param[in] argc argc of program's main() function
+   @param[in] argv argv[] of program's main() function
+   @param[out] new_argc Combined argc
+   @param[out] new_argv Combined argv
+
    @return CW_SUCCESS on success
    @return CW_FAILURE otherwise
 */
-extern int combine_arguments(const char *env_variable,
-			     int argc, char *const argv[],
-			     int *new_argc, char **new_argv[]);
+extern int combine_arguments(const char * env_variable,
+                             int argc, char * const argv[],
+                             int * new_argc, char ** new_argv[]);
 
 
 
