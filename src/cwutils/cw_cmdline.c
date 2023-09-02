@@ -104,35 +104,56 @@ int combine_arguments(const char * env_variable,
 	local_argv[local_argc++] = argv[0];
 
 	/* If options are given in an environment variable, add these next. */
-	char *env_options = getenv(env_variable);
+	char * env_options = getenv(env_variable);
+	char * options = NULL;
 	if (env_options) {
-		char *options = strdup(env_options);
+		options = strdup(env_options);
 		if (NULL == options) {
 			fprintf(stderr, "strdup() failure\n"); /* TODO: better error handling. */
+			free(local_argv);
+			local_argv = NULL;
 			return CW_FAILURE;
 		}
 
+		int env_options_count = 0;
 		for (char *option = strtok(options, " \t");
 		     option;
 		     option = strtok(NULL, " \t")) {
 
-			local_argv = realloc(local_argv, sizeof (*local_argv) * (local_argc + 1));
-			if (NULL == local_argv) {
+			char ** realloced = realloc(local_argv, sizeof (*local_argv) * (local_argc + 1));
+			if (NULL == realloced) {
 				fprintf(stderr, "realloc() error\n"); /* TODO: better error handling. */
+				free(local_argv);
+				local_argv = NULL;
+				free(options);
+				options = NULL;
 				return CW_FAILURE;
 			}
+			local_argv = realloced;
 			local_argv[local_argc++] = option;
+			env_options_count++;
+		}
+
+		if (NULL != options && 0 == env_options_count) {
+			/* String duplicated/allocated with strdup(env_options) is not
+			   put in local_argv[], so it's not needed anymore. */
+			free(options);
+			options = NULL;
 		}
 	}
 
 	/* Append the options given on the command line itself. */
 	for (int arg = 1; arg < argc; arg++) {
-		local_argv = realloc(local_argv,
-				     sizeof (*local_argv) * (local_argc + 1));
-		if (NULL == local_argv) {
+		char ** realloced = realloc(local_argv, sizeof (*local_argv) * (local_argc + 1));
+		if (NULL == realloced) {
 			fprintf(stderr, "realloc() error\n"); /* TODO: better error handling. */
+			free(local_argv);
+			local_argv = NULL;
+			free(options);
+			options = NULL;
 			return CW_FAILURE;
 		}
+		local_argv = realloced;
 		local_argv[local_argc++] = argv[arg];
 	}
 
@@ -242,6 +263,8 @@ int get_option(int argc, char *const argv[],
 			option_string = realloc(option_string, strlen(option_string) + 3);
 			if (NULL == option_string) {
 				fprintf(stderr, "realloc() error\n"); /* TODO: better error handling. */
+				free(options);
+				options = NULL;
 				return false;
 			}
 			strncat(option_string, element, needs_arg ? 2 : 1);
@@ -255,11 +278,15 @@ int get_option(int argc, char *const argv[],
 						  sizeof (*long_names) * (long_count + 1));
 			if (NULL == long_names) {
 				fprintf(stderr, "realloc() error\n"); /* TODO: better error handling. */
+				free(options);
+				options = NULL;
 				return false;
 			}
 			long_names[long_count] = strdup(element + (needs_arg ? 3 : 2));
 			if (NULL == long_names[long_count]) {
 				fprintf(stderr, "strdup() failure\n"); /* TODO: better error handling. */
+				free(options);
+				options = NULL;
 				return false;
 			}
 
@@ -268,6 +295,8 @@ int get_option(int argc, char *const argv[],
 					       sizeof (*long_options) * (long_count + 2));
 			if (NULL == long_options) {
 				fprintf(stderr, "realloc() error\n"); /* TODO: better error handling. */
+				free(options);
+				options = NULL;
 				return false;
 			}
 			long_options[long_count].name = long_names[long_count];
