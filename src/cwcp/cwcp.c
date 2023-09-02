@@ -244,7 +244,9 @@ void queue_display_add_character(void)
 */
 void queue_display_delete_character(void)
 {
-	int y, x, max_x;
+	int y;
+	int x;
+	int max_x;
 	__attribute__((unused)) int max_y;
 
 	/* Get the text display dimensions and current coordinates. */
@@ -278,7 +280,9 @@ void queue_display_delete_character(void)
 */
 void queue_display_highlight_character(bool is_highlight)
 {
-	int y, x, max_x;
+	int y;
+	int x;
+	int max_x;
 	__attribute__((unused)) int max_y;
 
 	/* Get the text display dimensions and current coordinates. */
@@ -296,7 +300,8 @@ void queue_display_highlight_character(bool is_highlight)
 	   unhighlight, and then restore the cursor position so that
 	   it remains unchanged. */
 	if (y >= 0) {
-		int saved_y, saved_x;
+		int saved_y;
+		int saved_x;
 
 		getyx(text_subwindow, saved_y, saved_x);
 		wmove(text_subwindow, y, x);
@@ -1093,7 +1098,8 @@ void ui_initialize(void)
 {
 	static bool is_initialized = false;
 
-	int max_y, max_x;
+	int max_y;
+	int max_x;
 
 	/* Create the over-arching screen window. */
 	screen = ui_init_screen();
@@ -1559,7 +1565,7 @@ void ui_poll_user_input(int fd, int usecs)
 		struct timeval timeout;
 
 		/* Set up a the file descriptor set and timeout information. */
-		FD_ZERO(&read_set);
+		FD_ZERO(&read_set); // NOLINT(readability-isolate-declaration) // NOLINT because I can't fix problem in sys/select.h
 		FD_SET(fd, &read_set);
 		timeout.tv_sec = usecs / 1000000;
 		timeout.tv_usec = usecs % 1000000;

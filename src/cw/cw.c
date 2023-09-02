@@ -167,7 +167,8 @@ write_to_cw_sender (const char *format, ...)
 static void
 parse_stream_query (FILE *stream)
 {
-  int c, value;
+  int c;
+  int value;
 
   c = toupper (getc_unlocked (stream));
   switch (c)
@@ -223,7 +224,8 @@ parse_stream_query (FILE *stream)
 static void
 parse_stream_cwquery (FILE *stream)
 {
-  int c, value;
+  int c;
+  int value;
   const char *format;
 
   c = toupper (getc_unlocked (stream));
@@ -432,7 +434,8 @@ parse_stream_command (FILE *stream)
 static void
 send_cw_character (int c, int is_partial)
 {
-  int character, status;
+  int character;
+  int status;
 
   /* Convert all whitespace into a single space. */
   character = isspace (c) ? ' ' : c;

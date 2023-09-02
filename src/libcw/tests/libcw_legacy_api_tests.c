@@ -243,7 +243,8 @@ int legacy_api_test_cw_wait_for_tone(cw_test_executor_t * cte)
 	{
 		cw_set_volume(70);
 
-		int freq_min, freq_max;
+		int freq_min;
+		int freq_max;
 		cw_get_frequency_limits(&freq_min, &freq_max);
 		const int delta_freq = ((freq_max - freq_min) / (n_tones_to_add - 1));      /* Delta of frequency in loops. */
 
@@ -355,7 +356,8 @@ int legacy_api_test_cw_wait_for_tone_queue(cw_test_executor_t * cte)
 	{
 		cw_set_volume(70);
 
-		int freq_min, freq_max;
+		int freq_min;
+		int freq_max;
 		cw_get_frequency_limits(&freq_min, &freq_max);
 		const int delta_freq = ((freq_max - freq_min) / (n_tones_to_add - 1));
 
@@ -434,7 +436,8 @@ int legacy_api_test_cw_queue_tone(cw_test_executor_t * cte)
 	cw_set_volume(70);
 	int duration = 20000;
 
-	int freq_min, freq_max;
+	int freq_min;
+	int freq_max;
 	cw_get_frequency_limits(&freq_min, &freq_max);
 	const int freq_delta = 10;
 

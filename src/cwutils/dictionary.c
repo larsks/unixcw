@@ -334,8 +334,10 @@ bool cw_dictionary_parse_is_section(const char *line, char **name_ptr)
 static const char **
 dictionary_build_wordlist (char *wordlist_data)
 {
-  const char **wordlist, *word;
-  int size, allocation;
+  const char **wordlist;
+  const char *word;
+  int size;
+  int allocation;
 
   /* Split contents into a wordlist, and store each word retrieved. */
   size = allocation = 0;
@@ -555,7 +557,8 @@ cw_dictionary_t *cw_dictionaries_create_from_stream(FILE *stream, const char *fi
 */
 cw_dictionary_t *cw_dictionaries_create_default(void)
 {
-	cw_dictionary_t *head = NULL, *tail = NULL;
+	cw_dictionary_t *head = NULL;
+	cw_dictionary_t *tail = NULL;
 
 	head = dictionary_new_const (NULL, _("Letter Groups"), CW_ALPHABETIC);
 	tail = dictionary_new_const (head, _("Number Groups"), CW_NUMERIC);

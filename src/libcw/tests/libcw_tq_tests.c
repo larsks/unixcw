@@ -1005,7 +1005,8 @@ cwt_retv test_cw_tq_enqueue_internal_tone_validity(cw_test_executor_t * cte)
 	cw_ret_t cwret;
 
 
-	int freq_min, freq_max;
+	int freq_min;
+	int freq_max;
 	cw_get_frequency_limits(&freq_min, &freq_max);
 
 
@@ -1191,7 +1192,8 @@ int test_cw_tq_gen_operations_A(cw_test_executor_t * cte)
 	}
 	/* Notice that we start the generator later. */
 
-	int freq_min, freq_max;
+	int freq_min;
+	int freq_max;
 	cw_get_frequency_limits(&freq_min, &freq_max);
 
 	const int duration = 100000;  /* Duration of tone. */
@@ -1368,7 +1370,8 @@ int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 
 	const int duration = 4000;
 
-	int freq_min, freq_max;
+	int freq_min;
+	int freq_max;
 	cw_get_frequency_limits(&freq_min, &freq_max);
 	const int freq_delta = 1;
 

@@ -66,7 +66,6 @@ Checks: >
   -readability-braces-around-statements,
   -readability-else-after-return,
   -readability-redundant-control-flow,
-  -readability-isolate-declaration,
   -readability-inconsistent-declaration-parameter-name,
   -readability-implicit-bool-conversion,
   -readability-convert-member-functions-to-static,
