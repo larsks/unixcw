@@ -13,25 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
-# Copyright (C) 2001-2006  Simon Baldwin (simon_baldwin@yahoo.com)
-# Copyright (C) 2011-2021  Kamil Ignacak (acerion@wp.pl)
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -106,9 +87,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = cw_dictionary_tests$(EXEEXT)
-@ENABLE_DEV_RECEIVER_TEST_TRUE@am__append_1 = -DENABLE_DEV_RECEIVER_TEST
-subdir = src/cwutils
+check_PROGRAMS = cwutils_tests$(EXEEXT)
+TESTS = cwutils_tests$(EXEEXT)
+subdir = src/cwutils/tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -121,65 +102,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-AM_V_AR = $(am__v_AR_@AM_V@)
-am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
-am__v_AR_0 = @echo "  AR      " $@;
-am__v_AR_1 = 
-lib_cw_a_AR = $(AR) $(ARFLAGS)
-lib_cw_a_LIBADD =
-am_lib_cw_a_OBJECTS = i18n.$(OBJEXT) cw_config.$(OBJEXT) \
-	cw_cmdline.$(OBJEXT) memory.$(OBJEXT) cw_common.$(OBJEXT) \
-	sleep.$(OBJEXT)
-lib_cw_a_OBJECTS = $(am_lib_cw_a_OBJECTS)
-lib_cwcp_a_AR = $(AR) $(ARFLAGS)
-lib_cwcp_a_LIBADD =
-am_lib_cwcp_a_OBJECTS = i18n.$(OBJEXT) cw_config.$(OBJEXT) \
-	cw_cmdline.$(OBJEXT) memory.$(OBJEXT) cw_common.$(OBJEXT) \
-	dictionary.$(OBJEXT) sleep.$(OBJEXT)
-lib_cwcp_a_OBJECTS = $(am_lib_cwcp_a_OBJECTS)
-lib_cwgen_a_AR = $(AR) $(ARFLAGS)
-lib_cwgen_a_LIBADD =
-am_lib_cwgen_a_OBJECTS = i18n.$(OBJEXT) cw_config.$(OBJEXT) \
-	cw_cmdline.$(OBJEXT) memory.$(OBJEXT) sleep.$(OBJEXT)
-lib_cwgen_a_OBJECTS = $(am_lib_cwgen_a_OBJECTS)
-lib_libcw_tests_a_AR = $(AR) $(ARFLAGS)
-lib_libcw_tests_a_LIBADD =
-am_lib_libcw_tests_a_OBJECTS = cw_easy_rec.$(OBJEXT) i18n.$(OBJEXT) \
-	cw_config.$(OBJEXT) cw_cmdline.$(OBJEXT) memory.$(OBJEXT) \
-	cw_common.$(OBJEXT) sleep.$(OBJEXT)
-lib_libcw_tests_a_OBJECTS = $(am_lib_libcw_tests_a_OBJECTS)
-lib_rec_tests_a_AR = $(AR) $(ARFLAGS)
-lib_rec_tests_a_DEPENDENCIES =  \
-	$(top_builddir)/src/test_framework/basic_utils/lib.a
-am_lib_rec_tests_a_OBJECTS = cw_rec_tester.$(OBJEXT) \
-	cw_easy_legacy_receiver.$(OBJEXT) sleep.$(OBJEXT)
-lib_rec_tests_a_OBJECTS = $(am_lib_rec_tests_a_OBJECTS)
-lib_xcwcp_a_AR = $(AR) $(ARFLAGS)
-@ENABLE_DEV_RECEIVER_TEST_TRUE@lib_xcwcp_a_DEPENDENCIES = $(top_builddir)/src/test_framework/basic_utils/lib.a
-am_lib_xcwcp_a_OBJECTS = i18n.$(OBJEXT) cw_config.$(OBJEXT) \
-	cw_cmdline.$(OBJEXT) memory.$(OBJEXT) cw_common.$(OBJEXT) \
-	dictionary.$(OBJEXT) cw_easy_legacy_receiver.$(OBJEXT) \
-	sleep.$(OBJEXT)
-lib_xcwcp_a_OBJECTS = $(am_lib_xcwcp_a_OBJECTS)
-am_cw_dictionary_tests_OBJECTS =  \
-	cw_dictionary_tests-dictionary.$(OBJEXT) \
-	cw_dictionary_tests-memory.$(OBJEXT) \
-	cw_dictionary_tests-i18n.$(OBJEXT) \
-	cw_dictionary_tests-cw_config.$(OBJEXT) \
-	cw_dictionary_tests-cw_common.$(OBJEXT)
-cw_dictionary_tests_OBJECTS = $(am_cw_dictionary_tests_OBJECTS)
-am__DEPENDENCIES_1 =
-cw_dictionary_tests_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_cwutils_tests_OBJECTS = cwutils_tests-main.$(OBJEXT) \
+	cwutils_tests-cmdline_combine_arguments.$(OBJEXT)
+cwutils_tests_OBJECTS = $(am_cwutils_tests_OBJECTS)
+cwutils_tests_DEPENDENCIES = $(top_builddir)/src/cwutils/lib_cw.a
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-cw_dictionary_tests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(cw_dictionary_tests_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -195,17 +125,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/cw_cmdline.Po \
-	./$(DEPDIR)/cw_common.Po ./$(DEPDIR)/cw_config.Po \
-	./$(DEPDIR)/cw_dictionary_tests-cw_common.Po \
-	./$(DEPDIR)/cw_dictionary_tests-cw_config.Po \
-	./$(DEPDIR)/cw_dictionary_tests-dictionary.Po \
-	./$(DEPDIR)/cw_dictionary_tests-i18n.Po \
-	./$(DEPDIR)/cw_dictionary_tests-memory.Po \
-	./$(DEPDIR)/cw_easy_legacy_receiver.Po \
-	./$(DEPDIR)/cw_easy_rec.Po ./$(DEPDIR)/cw_rec_tester.Po \
-	./$(DEPDIR)/dictionary.Po ./$(DEPDIR)/i18n.Po \
-	./$(DEPDIR)/memory.Po ./$(DEPDIR)/sleep.Po
+am__depfiles_remade =  \
+	./$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po \
+	./$(DEPDIR)/cwutils_tests-main.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -225,35 +147,13 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lib_cw_a_SOURCES) $(lib_cwcp_a_SOURCES) \
-	$(lib_cwgen_a_SOURCES) $(lib_libcw_tests_a_SOURCES) \
-	$(lib_rec_tests_a_SOURCES) $(lib_xcwcp_a_SOURCES) \
-	$(cw_dictionary_tests_SOURCES)
-DIST_SOURCES = $(lib_cw_a_SOURCES) $(lib_cwcp_a_SOURCES) \
-	$(lib_cwgen_a_SOURCES) $(lib_libcw_tests_a_SOURCES) \
-	$(lib_rec_tests_a_SOURCES) $(lib_xcwcp_a_SOURCES) \
-	$(cw_dictionary_tests_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
-	ctags-recursive dvi-recursive html-recursive info-recursive \
-	install-data-recursive install-dvi-recursive \
-	install-exec-recursive install-html-recursive \
-	install-info-recursive install-pdf-recursive \
-	install-ps-recursive install-recursive installcheck-recursive \
-	installdirs-recursive pdf-recursive ps-recursive \
-	tags-recursive uninstall-recursive
+SOURCES = $(cwutils_tests_SOURCES)
+DIST_SOURCES = $(cwutils_tests_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
-am__recursive_targets = \
-  $(RECURSIVE_TARGETS) \
-  $(RECURSIVE_CLEAN_TARGETS) \
-  $(am__extra_recursive_targets)
-AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
-	check recheck distdir distdir-am
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -457,6 +357,7 @@ am__set_TESTS_bases = \
   bases=`echo $$bases`
 AM_TESTSUITE_SUMMARY_HEADER = ' for $(PACKAGE_STRING)'
 RECHECK_LOGS = $(TEST_LOGS)
+AM_RECURSIVE_TARGETS = check recheck
 TEST_SUITE_LOG = test-suite.log
 TEST_EXTENSIONS = @EXEEXT@ .test
 LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
@@ -477,35 +378,9 @@ TEST_LOGS = $(am__test_logs2:.test.log=.log)
 TEST_LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
-DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp \
 	$(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-am__relativize = \
-  dir0=`pwd`; \
-  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
-  sed_rest='s,^[^/]*/*,,'; \
-  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
-  sed_butlast='s,/*[^/]*$$,,'; \
-  while test -n "$$dir1"; do \
-    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
-    if test "$$first" != "."; then \
-      if test "$$first" = ".."; then \
-        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
-        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
-      else \
-        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
-        if test "$$first2" = "$$first"; then \
-          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
-        else \
-          dir2="../$$dir2"; \
-        fi; \
-        dir0="$$dir0"/"$$first"; \
-      fi; \
-    fi; \
-    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
-  done; \
-  reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -517,10 +392,10 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CC_LINKS_SO = @CC_LINKS_SO@
-CFLAGS = @CFLAGS@ $(AM_CPPFLAGS)
+CFLAGS = @CFLAGS@
 CFLAG_PIC = @CFLAG_PIC@
 CPP = @CPP@
-CPPFLAGS = @CPPFLAGS@ $(am__append_1)
+CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -644,45 +519,17 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = lib tests
+cwutils_tests_SOURCES = main.c \
+	cmdline_combine_arguments.c \
+	cmdline_combine_arguments.h
 
-# source code files used to build cw_dictionary_tests program
-cw_dictionary_tests_SOURCES = dictionary.c memory.c i18n.c cw_config.c cw_common.c
-
-# target-specific preprocessor flags (#defs and include dirs)
-cw_dictionary_tests_CPPFLAGS = $(AM_CPPFLAGS) -DCW_DICTIONARY_UNIT_TESTS -I${top_srcdir}/src/
-
-# Target-specific linker flags (objects to link).
-cw_dictionary_tests_LDADD = -L$(top_builddir)/src/libcw/.libs -lcw $(INTL_LIB)
-
-# target-specific compiler flags
-cw_dictionary_tests_CFLAGS = -rdynamic
-
-# no header from this dir should be installed
-# noinst_HEADERS = cw_cmdline.h cw_copyright.h cw_config.h cw_common.h cw_words.h dictionary.h i18n.h memory.h
-
-# convenience libraries
-noinst_LIBRARIES = lib_cw.a lib_cwcp.a lib_cwgen.a lib_xcwcp.a lib_libcw_tests.a lib_rec_tests.a
-lib_cw_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h sleep.c sleep.h
-lib_cwcp_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h sleep.c sleep.h
-lib_xcwcp_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h dictionary.c dictionary.h cw_words.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h sleep.c sleep.h
-@ENABLE_DEV_RECEIVER_TEST_TRUE@lib_xcwcp_a_LIBADD = $(top_builddir)/src/test_framework/basic_utils/lib.a
-lib_cwgen_a_SOURCES = cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h sleep.c sleep.h
-lib_libcw_tests_a_SOURCES = cw_easy_rec.c cw_easy_rec.h cw_copyright.h i18n.c i18n.h cw_config.c cw_config.h cw_cmdline.c cw_cmdline.h memory.c memory.h cw_common.c cw_common.h sleep.c sleep.h
-lib_rec_tests_a_SOURCES = cw_rec_tester.c cw_rec_tester.h cw_easy_legacy_receiver.c cw_easy_legacy_receiver.h cw_easy_legacy_receiver_internal.h sleep.c sleep.h
-lib_rec_tests_a_LIBADD = $(top_builddir)/src/test_framework/basic_utils/lib.a
-
-# Test targets; no self-test, but make sure all is built.
-#check: all
-
-# CLEANFILES extends list of files that need to be removed when
-# calling "make clean"
-CLEANFILES = greptest.sh
-TESTS = $(check_SCRIPTS)
-
-# run test programs (only libcwunittests unit tests suite)
-check_SCRIPTS = greptest.sh
-all: all-recursive
+cwutils_tests_CPPFLAGS = -I$(top_srcdir)/src
+# TODO acerion 2023.09.02: I decided to re-use existing lib_cw.a (which is
+# built for cw program, not for the test program). Re-think building multiple
+# convenience libraries in cwutils. Maybe we could have just one, with all
+# the functions in it?
+cwutils_tests_LDADD = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.libs -lcw
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .log .o .obj .test .test$(EXEEXT) .trs
@@ -695,9 +542,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/cwutils/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/cwutils/tests/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/cwutils/Makefile
+	  $(AUTOMAKE) --foreign src/cwutils/tests/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -725,42 +572,9 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-
-lib_cw.a: $(lib_cw_a_OBJECTS) $(lib_cw_a_DEPENDENCIES) $(EXTRA_lib_cw_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_cw.a
-	$(AM_V_AR)$(lib_cw_a_AR) lib_cw.a $(lib_cw_a_OBJECTS) $(lib_cw_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_cw.a
-
-lib_cwcp.a: $(lib_cwcp_a_OBJECTS) $(lib_cwcp_a_DEPENDENCIES) $(EXTRA_lib_cwcp_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_cwcp.a
-	$(AM_V_AR)$(lib_cwcp_a_AR) lib_cwcp.a $(lib_cwcp_a_OBJECTS) $(lib_cwcp_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_cwcp.a
-
-lib_cwgen.a: $(lib_cwgen_a_OBJECTS) $(lib_cwgen_a_DEPENDENCIES) $(EXTRA_lib_cwgen_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_cwgen.a
-	$(AM_V_AR)$(lib_cwgen_a_AR) lib_cwgen.a $(lib_cwgen_a_OBJECTS) $(lib_cwgen_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_cwgen.a
-
-lib_libcw_tests.a: $(lib_libcw_tests_a_OBJECTS) $(lib_libcw_tests_a_DEPENDENCIES) $(EXTRA_lib_libcw_tests_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_libcw_tests.a
-	$(AM_V_AR)$(lib_libcw_tests_a_AR) lib_libcw_tests.a $(lib_libcw_tests_a_OBJECTS) $(lib_libcw_tests_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_libcw_tests.a
-
-lib_rec_tests.a: $(lib_rec_tests_a_OBJECTS) $(lib_rec_tests_a_DEPENDENCIES) $(EXTRA_lib_rec_tests_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_rec_tests.a
-	$(AM_V_AR)$(lib_rec_tests_a_AR) lib_rec_tests.a $(lib_rec_tests_a_OBJECTS) $(lib_rec_tests_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_rec_tests.a
-
-lib_xcwcp.a: $(lib_xcwcp_a_OBJECTS) $(lib_xcwcp_a_DEPENDENCIES) $(EXTRA_lib_xcwcp_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f lib_xcwcp.a
-	$(AM_V_AR)$(lib_xcwcp_a_AR) lib_xcwcp.a $(lib_xcwcp_a_OBJECTS) $(lib_xcwcp_a_LIBADD)
-	$(AM_V_at)$(RANLIB) lib_xcwcp.a
-
-cw_dictionary_tests$(EXEEXT): $(cw_dictionary_tests_OBJECTS) $(cw_dictionary_tests_DEPENDENCIES) $(EXTRA_cw_dictionary_tests_DEPENDENCIES) 
-	@rm -f cw_dictionary_tests$(EXEEXT)
-	$(AM_V_CCLD)$(cw_dictionary_tests_LINK) $(cw_dictionary_tests_OBJECTS) $(cw_dictionary_tests_LDADD) $(LIBS)
+cwutils_tests$(EXEEXT): $(cwutils_tests_OBJECTS) $(cwutils_tests_DEPENDENCIES) $(EXTRA_cwutils_tests_DEPENDENCIES) 
+	@rm -f cwutils_tests$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(cwutils_tests_OBJECTS) $(cwutils_tests_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -768,21 +582,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_cmdline.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_common.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_config.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-cw_common.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-cw_config.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-dictionary.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-i18n.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_dictionary_tests-memory.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_easy_legacy_receiver.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_easy_rec.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cw_rec_tester.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dictionary.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i18n.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memory.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sleep.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cwutils_tests-main.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -814,75 +615,33 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-cw_dictionary_tests-dictionary.o: dictionary.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-dictionary.o -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-dictionary.Tpo -c -o cw_dictionary_tests-dictionary.o `test -f 'dictionary.c' || echo '$(srcdir)/'`dictionary.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-dictionary.Tpo $(DEPDIR)/cw_dictionary_tests-dictionary.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dictionary.c' object='cw_dictionary_tests-dictionary.o' libtool=no @AMDEPBACKSLASH@
+cwutils_tests-main.o: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwutils_tests-main.o -MD -MP -MF $(DEPDIR)/cwutils_tests-main.Tpo -c -o cwutils_tests-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwutils_tests-main.Tpo $(DEPDIR)/cwutils_tests-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='cwutils_tests-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-dictionary.o `test -f 'dictionary.c' || echo '$(srcdir)/'`dictionary.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwutils_tests-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
 
-cw_dictionary_tests-dictionary.obj: dictionary.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-dictionary.obj -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-dictionary.Tpo -c -o cw_dictionary_tests-dictionary.obj `if test -f 'dictionary.c'; then $(CYGPATH_W) 'dictionary.c'; else $(CYGPATH_W) '$(srcdir)/dictionary.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-dictionary.Tpo $(DEPDIR)/cw_dictionary_tests-dictionary.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dictionary.c' object='cw_dictionary_tests-dictionary.obj' libtool=no @AMDEPBACKSLASH@
+cwutils_tests-main.obj: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwutils_tests-main.obj -MD -MP -MF $(DEPDIR)/cwutils_tests-main.Tpo -c -o cwutils_tests-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwutils_tests-main.Tpo $(DEPDIR)/cwutils_tests-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='cwutils_tests-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-dictionary.obj `if test -f 'dictionary.c'; then $(CYGPATH_W) 'dictionary.c'; else $(CYGPATH_W) '$(srcdir)/dictionary.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwutils_tests-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
 
-cw_dictionary_tests-memory.o: memory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-memory.o -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-memory.Tpo -c -o cw_dictionary_tests-memory.o `test -f 'memory.c' || echo '$(srcdir)/'`memory.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-memory.Tpo $(DEPDIR)/cw_dictionary_tests-memory.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='memory.c' object='cw_dictionary_tests-memory.o' libtool=no @AMDEPBACKSLASH@
+cwutils_tests-cmdline_combine_arguments.o: cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwutils_tests-cmdline_combine_arguments.o -MD -MP -MF $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo -c -o cwutils_tests-cmdline_combine_arguments.o `test -f 'cmdline_combine_arguments.c' || echo '$(srcdir)/'`cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmdline_combine_arguments.c' object='cwutils_tests-cmdline_combine_arguments.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-memory.o `test -f 'memory.c' || echo '$(srcdir)/'`memory.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwutils_tests-cmdline_combine_arguments.o `test -f 'cmdline_combine_arguments.c' || echo '$(srcdir)/'`cmdline_combine_arguments.c
 
-cw_dictionary_tests-memory.obj: memory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-memory.obj -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-memory.Tpo -c -o cw_dictionary_tests-memory.obj `if test -f 'memory.c'; then $(CYGPATH_W) 'memory.c'; else $(CYGPATH_W) '$(srcdir)/memory.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-memory.Tpo $(DEPDIR)/cw_dictionary_tests-memory.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='memory.c' object='cw_dictionary_tests-memory.obj' libtool=no @AMDEPBACKSLASH@
+cwutils_tests-cmdline_combine_arguments.obj: cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cwutils_tests-cmdline_combine_arguments.obj -MD -MP -MF $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo -c -o cwutils_tests-cmdline_combine_arguments.obj `if test -f 'cmdline_combine_arguments.c'; then $(CYGPATH_W) 'cmdline_combine_arguments.c'; else $(CYGPATH_W) '$(srcdir)/cmdline_combine_arguments.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo $(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmdline_combine_arguments.c' object='cwutils_tests-cmdline_combine_arguments.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-memory.obj `if test -f 'memory.c'; then $(CYGPATH_W) 'memory.c'; else $(CYGPATH_W) '$(srcdir)/memory.c'; fi`
-
-cw_dictionary_tests-i18n.o: i18n.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-i18n.o -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-i18n.Tpo -c -o cw_dictionary_tests-i18n.o `test -f 'i18n.c' || echo '$(srcdir)/'`i18n.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-i18n.Tpo $(DEPDIR)/cw_dictionary_tests-i18n.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='i18n.c' object='cw_dictionary_tests-i18n.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-i18n.o `test -f 'i18n.c' || echo '$(srcdir)/'`i18n.c
-
-cw_dictionary_tests-i18n.obj: i18n.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-i18n.obj -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-i18n.Tpo -c -o cw_dictionary_tests-i18n.obj `if test -f 'i18n.c'; then $(CYGPATH_W) 'i18n.c'; else $(CYGPATH_W) '$(srcdir)/i18n.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-i18n.Tpo $(DEPDIR)/cw_dictionary_tests-i18n.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='i18n.c' object='cw_dictionary_tests-i18n.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-i18n.obj `if test -f 'i18n.c'; then $(CYGPATH_W) 'i18n.c'; else $(CYGPATH_W) '$(srcdir)/i18n.c'; fi`
-
-cw_dictionary_tests-cw_config.o: cw_config.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-cw_config.o -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-cw_config.Tpo -c -o cw_dictionary_tests-cw_config.o `test -f 'cw_config.c' || echo '$(srcdir)/'`cw_config.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-cw_config.Tpo $(DEPDIR)/cw_dictionary_tests-cw_config.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_config.c' object='cw_dictionary_tests-cw_config.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-cw_config.o `test -f 'cw_config.c' || echo '$(srcdir)/'`cw_config.c
-
-cw_dictionary_tests-cw_config.obj: cw_config.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-cw_config.obj -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-cw_config.Tpo -c -o cw_dictionary_tests-cw_config.obj `if test -f 'cw_config.c'; then $(CYGPATH_W) 'cw_config.c'; else $(CYGPATH_W) '$(srcdir)/cw_config.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-cw_config.Tpo $(DEPDIR)/cw_dictionary_tests-cw_config.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_config.c' object='cw_dictionary_tests-cw_config.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-cw_config.obj `if test -f 'cw_config.c'; then $(CYGPATH_W) 'cw_config.c'; else $(CYGPATH_W) '$(srcdir)/cw_config.c'; fi`
-
-cw_dictionary_tests-cw_common.o: cw_common.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-cw_common.o -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-cw_common.Tpo -c -o cw_dictionary_tests-cw_common.o `test -f 'cw_common.c' || echo '$(srcdir)/'`cw_common.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-cw_common.Tpo $(DEPDIR)/cw_dictionary_tests-cw_common.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_common.c' object='cw_dictionary_tests-cw_common.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-cw_common.o `test -f 'cw_common.c' || echo '$(srcdir)/'`cw_common.c
-
-cw_dictionary_tests-cw_common.obj: cw_common.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -MT cw_dictionary_tests-cw_common.obj -MD -MP -MF $(DEPDIR)/cw_dictionary_tests-cw_common.Tpo -c -o cw_dictionary_tests-cw_common.obj `if test -f 'cw_common.c'; then $(CYGPATH_W) 'cw_common.c'; else $(CYGPATH_W) '$(srcdir)/cw_common.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cw_dictionary_tests-cw_common.Tpo $(DEPDIR)/cw_dictionary_tests-cw_common.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cw_common.c' object='cw_dictionary_tests-cw_common.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cw_dictionary_tests_CPPFLAGS) $(CPPFLAGS) $(cw_dictionary_tests_CFLAGS) $(CFLAGS) -c -o cw_dictionary_tests-cw_common.obj `if test -f 'cw_common.c'; then $(CYGPATH_W) 'cw_common.c'; else $(CYGPATH_W) '$(srcdir)/cw_common.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cwutils_tests-cmdline_combine_arguments.obj `if test -f 'cmdline_combine_arguments.c'; then $(CYGPATH_W) 'cmdline_combine_arguments.c'; else $(CYGPATH_W) '$(srcdir)/cmdline_combine_arguments.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -890,61 +649,14 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run 'make' without going through this Makefile.
-# To change the values of 'make' variables: instead of editing Makefiles,
-# (1) if the variable is set in 'config.status', edit 'config.status'
-#     (which will cause the Makefiles to be regenerated when you run 'make');
-# (2) otherwise, pass the desired values on the 'make' command line.
-$(am__recursive_targets):
-	@fail=; \
-	if $(am__make_keepgoing); then \
-	  failcom='fail=yes'; \
-	else \
-	  failcom='exit 1'; \
-	fi; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-recursive
+tags: tags-am
 TAGS: tags
 
 tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	set x; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	$(am__define_uniq_tagged_files); \
 	shift; \
 	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
@@ -957,7 +669,7 @@ tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	      $$unique; \
 	  fi; \
 	fi
-ctags: ctags-recursive
+ctags: ctags-am
 
 CTAGS: ctags
 ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
@@ -970,7 +682,7 @@ GTAGS:
 	here=`$(am__cd) $(top_builddir) && pwd` \
 	  && $(am__cd) $(top_srcdir) \
 	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscopelist: cscopelist-recursive
+cscopelist: cscopelist-am
 
 cscopelist-am: $(am__tagged_files)
 	list='$(am__tagged_files)'; \
@@ -1109,7 +821,7 @@ $(TEST_SUITE_LOG): $(TEST_LOGS)
 	fi;								\
 	$$success || exit 1
 
-check-TESTS: $(check_PROGRAMS) $(check_SCRIPTS)
+check-TESTS: $(check_PROGRAMS)
 	@list='$(RECHECK_LOGS)';           test -z "$$list" || rm -f $$list
 	@list='$(RECHECK_LOGS:.log=.trs)'; test -z "$$list" || rm -f $$list
 	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
@@ -1119,7 +831,7 @@ check-TESTS: $(check_PROGRAMS) $(check_SCRIPTS)
 	log_list=`echo $$log_list`; trs_list=`echo $$trs_list`; \
 	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$log_list"; \
 	exit $$?;
-recheck: all $(check_PROGRAMS) $(check_SCRIPTS)
+recheck: all $(check_PROGRAMS)
 	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 	@set +e; $(am__set_TESTS_bases); \
 	bases=`for i in $$bases; do echo $$i; done \
@@ -1130,9 +842,9 @@ recheck: all $(check_PROGRAMS) $(check_SCRIPTS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-greptest.sh.log: greptest.sh
-	@p='greptest.sh'; \
-	b='greptest.sh'; \
+cwutils_tests.log: cwutils_tests$(EXEEXT)
+	@p='cwutils_tests$(EXEEXT)'; \
+	b='cwutils_tests'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1185,47 +897,21 @@ distdir-am: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    $(am__make_dryrun) \
-	      || test -d "$(distdir)/$$subdir" \
-	      || $(MKDIR_P) "$(distdir)/$$subdir" \
-	      || exit 1; \
-	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
-	    $(am__relativize); \
-	    new_distdir=$$reldir; \
-	    dir1=$$subdir; dir2="$(top_distdir)"; \
-	    $(am__relativize); \
-	    new_top_distdir=$$reldir; \
-	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
-	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
-	    ($(am__cd) $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$new_top_distdir" \
-	        distdir="$$new_distdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-		am__skip_mode_fix=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-recursive
-all-am: Makefile $(LIBRARIES)
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+check: check-am
+all-am: Makefile
+installdirs:
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	if test -z '$(STRIP)'; then \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
@@ -1242,7 +928,6 @@ mostlyclean-generic:
 	-test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -1251,130 +936,97 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES mostlyclean-am
+	mostlyclean-am
 
-distclean: distclean-recursive
-		-rm -f ./$(DEPDIR)/cw_cmdline.Po
-	-rm -f ./$(DEPDIR)/cw_common.Po
-	-rm -f ./$(DEPDIR)/cw_config.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-cw_common.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-cw_config.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-dictionary.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-i18n.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-memory.Po
-	-rm -f ./$(DEPDIR)/cw_easy_legacy_receiver.Po
-	-rm -f ./$(DEPDIR)/cw_easy_rec.Po
-	-rm -f ./$(DEPDIR)/cw_rec_tester.Po
-	-rm -f ./$(DEPDIR)/dictionary.Po
-	-rm -f ./$(DEPDIR)/i18n.Po
-	-rm -f ./$(DEPDIR)/memory.Po
-	-rm -f ./$(DEPDIR)/sleep.Po
+distclean: distclean-am
+		-rm -f ./$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+	-rm -f ./$(DEPDIR)/cwutils_tests-main.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
 html-am:
 
-info: info-recursive
+info: info-am
 
 info-am:
 
 install-data-am:
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-dvi-am:
 
 install-exec-am:
 
-install-html: install-html-recursive
+install-html: install-html-am
 
 install-html-am:
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
 install-pdf-am:
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
-		-rm -f ./$(DEPDIR)/cw_cmdline.Po
-	-rm -f ./$(DEPDIR)/cw_common.Po
-	-rm -f ./$(DEPDIR)/cw_config.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-cw_common.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-cw_config.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-dictionary.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-i18n.Po
-	-rm -f ./$(DEPDIR)/cw_dictionary_tests-memory.Po
-	-rm -f ./$(DEPDIR)/cw_easy_legacy_receiver.Po
-	-rm -f ./$(DEPDIR)/cw_easy_rec.Po
-	-rm -f ./$(DEPDIR)/cw_rec_tester.Po
-	-rm -f ./$(DEPDIR)/dictionary.Po
-	-rm -f ./$(DEPDIR)/i18n.Po
-	-rm -f ./$(DEPDIR)/memory.Po
-	-rm -f ./$(DEPDIR)/sleep.Po
+maintainer-clean: maintainer-clean-am
+		-rm -f ./$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+	-rm -f ./$(DEPDIR)/cwutils_tests-main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
 uninstall-am:
 
-.MAKE: $(am__recursive_targets) check-am install-am install-strip
+.MAKE: check-am install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
-	am--depfiles check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am recheck tags tags-am \
-	uninstall uninstall-am
+.PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
+	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
+	cscopelist-am ctags ctags-am distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	recheck tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 
-
--include $(top_builddir)/Makefile.inc
-greptest.sh:
-	echo './cw_dictionary_tests | grep "test result: success"' > greptest.sh
-	chmod +x greptest.sh
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

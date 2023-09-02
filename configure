@@ -18732,7 +18732,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile src/cwutils/lib/Makefile src/test_framework/Makefile src/test_framework/basic_utils/Makefile"
+ac_config_files="$ac_config_files Makefile.inc Makefile src/Makefile src/libcw/Makefile src/libcw/tests/Makefile src/cwutils/Makefile src/cwutils/lib/Makefile src/cwutils/tests/Makefile src/test_framework/Makefile src/test_framework/basic_utils/Makefile"
 
 
 if test "$WITH_CWGEN" = 'yes' ; then
@@ -19896,6 +19896,7 @@ do
     "src/libcw/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/libcw/tests/Makefile" ;;
     "src/cwutils/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/Makefile" ;;
     "src/cwutils/lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/lib/Makefile" ;;
+    "src/cwutils/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwutils/tests/Makefile" ;;
     "src/test_framework/Makefile") CONFIG_FILES="$CONFIG_FILES src/test_framework/Makefile" ;;
     "src/test_framework/basic_utils/Makefile") CONFIG_FILES="$CONFIG_FILES src/test_framework/basic_utils/Makefile" ;;
     "src/cwgen/Makefile") CONFIG_FILES="$CONFIG_FILES src/cwgen/Makefile" ;;
@@ -21389,8 +21390,8 @@ $as_echo "$as_me:   development support options:" >&6;}
 $as_echo "$as_me:       enable test code embedded in receiver: .............  $enable_dev_receiver_test" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}:       enable additional debugs in libcw: .................  $enable_dev_libcw_debugging" >&5
 $as_echo "$as_me:       enable additional debugs in libcw: .................  $enable_dev_libcw_debugging" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&5
-$as_echo "$as_me:       enable writing raw PCM samplest to debug file: .....  $enable_dev_pcm_samples_file" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}:       enable writing raw PCM samples to debug file: ......  $enable_dev_pcm_samples_file" >&5
+$as_echo "$as_me:       enable writing raw PCM samples to debug file: ......  $enable_dev_pcm_samples_file" >&6;}
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------" >&5
 $as_echo "$as_me: ----------------------------------------------------------------------" >&6;}

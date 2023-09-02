@@ -699,6 +699,7 @@ AC_CONFIG_FILES([Makefile.inc
 	src/libcw/tests/Makefile
 	src/cwutils/Makefile
 	src/cwutils/lib/Makefile
+	src/cwutils/tests/Makefile
 	src/test_framework/Makefile
 	src/test_framework/basic_utils/Makefile
 	])
