@@ -81,7 +81,7 @@ extern volatile cw_key_t cw_key;
 static void test_helper_tq_callback(void * ptr);
 
 /* Helper function for iambic key tests. */
-static void legacy_api_test_iambic_key_paddles_common(cw_test_executor_t * cte, const int intended_dot_paddle, const int intended_dash_paddle, char character, int n_elements);
+static void legacy_api_test_iambic_key_paddles_common(cw_test_executor_t * cte, int intended_dot_paddle, int intended_dash_paddle, char character, int n_elements);
 
 /**
    @reviewed on 2019-10-13

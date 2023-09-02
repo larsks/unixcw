@@ -74,7 +74,6 @@ Checks: >
   -readability-static-accessed-through-instance,
   -readability-make-member-function-const,
   -readability-uppercase-literal-suffix,
-  -readability-avoid-const-params-in-decls,
   -readability-non-const-parameter,
   -hicpp-avoid-c-arrays,
   -hicpp-braces-around-statements,
