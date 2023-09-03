@@ -497,9 +497,9 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 	char va_buf[VA_BUF_SIZE] = { 0 };
 	char msg_buf[MSG_BUF_SIZE] = { 0 };
 
-	bool errors_only = false;
 	bool success = 0 == strcasecmp(expected_value, received_value);
 	if (success) {
+		const bool errors_only = false; /* In the future this may be function's argument (see other 'expect' functions). */
 		if (!errors_only) {
 			self->stats->successes++;
 
