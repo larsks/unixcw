@@ -454,7 +454,7 @@ void cw_dev_debug_raw_sink_open_internal(cw_gen_t * gen)
 	const size_t sample_size = sizeof (cw_sample_t) * CHAR_BIT;
 
 	snprintf(gen->dev_raw_sink_path, sizeof (gen->dev_raw_sink_path),
-	         "/tmp/cw_file_%s_%uHz_mono_signed_%zdbit_pcm.raw",
+	         "/tmp/cw_file_%s_%uHz_mono_signed_%zubit_pcm.raw",
 	         cw_get_audio_system_label(gen->sound_system),
 	         gen->sample_rate,
 	         sample_size);

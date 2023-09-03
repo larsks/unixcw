@@ -682,7 +682,7 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 		if (optarg && strlen(optarg)) {
 			const size_t len_max = sizeof (config->gen_conf.sound_device) - 1;
 			if (strlen(optarg) >= len_max) {
-				fprintf(stderr, "%s: device name can't be longer than %zd characters\n", config->program_name, len_max);
+				fprintf(stderr, "%s: device name can't be longer than %zu characters\n", config->program_name, len_max);
 				return CW_FAILURE;
 			}
 			snprintf(config->gen_conf.sound_device, sizeof (config->gen_conf.sound_device), "%s", optarg);

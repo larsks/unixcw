@@ -231,11 +231,11 @@ static void gen_callback_fn(void * callback_arg, int state)
 		/* Check that state is consistent with element. */
 		if (state) {
 			if (cw_element_type_dot != this_element->type && cw_element_type_dash != this_element->type) {
-				fprintf(stderr, "[ERROR] Unexpected element #%03zd: '%c' for state 'closed'\n", this_idx, cw_element_type_get_representation(this_element->type));
+				fprintf(stderr, "[ERROR] Unexpected element #%03zu: '%c' for state 'closed'\n", this_idx, cw_element_type_get_representation(this_element->type));
 			}
 		} else {
 			if (cw_element_type_iws != this_element->type && cw_element_type_ics != this_element->type && cw_element_type_ims != this_element->type) {
-				fprintf(stderr, "[ERROR] Unexpected element #%03zd: '%c' for state 'open'\n", this_idx, cw_element_type_get_representation(this_element->type));
+				fprintf(stderr, "[ERROR] Unexpected element #%03zu: '%c' for state 'open'\n", this_idx, cw_element_type_get_representation(this_element->type));
 			}
 		}
 	}
@@ -269,7 +269,7 @@ static void gen_callback_fn(void * callback_arg, int state)
 		fprintf(stderr, "[DEBUG] prev element type = '%c', prev duration = %12.2f, prev duration expected = %7d\n",
 		        cw_element_type_get_representation(prev_element->type), prev_element->duration, prev_duration_expected);
 #endif
-		fprintf(stderr, "[INFO ] Element %3zd, state %d, type = '%c'; previous element: duration = %12.2f us, divergence = %8.3f%%\n",
+		fprintf(stderr, "[INFO ] Element %3zu, state %d, type = '%c'; previous element: duration = %12.2f us, divergence = %8.3f%%\n",
 		        this_idx, state, cw_element_type_get_representation(this_element->type), prev_element->timespan, divergence);
 	}
 }

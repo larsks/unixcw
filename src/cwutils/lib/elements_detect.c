@@ -205,7 +205,7 @@ int cw_elements_detect_from_string(const char * string, cw_elements_t * elements
 	}
 
 	if (e > elements->max_count) {
-		fprintf(stderr, "[ERROR] Count of elements (%zd) exceeds available space (%zd)\n", e, elements->max_count);
+		fprintf(stderr, "[ERROR] Count of elements (%zu) exceeds available space (%zu)\n", e, elements->max_count);
 		return -1;
 	}
 	elements->curr_count = e;

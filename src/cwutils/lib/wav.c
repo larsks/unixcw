@@ -52,16 +52,16 @@
 
 int wav_read_header(int fd, wav_header_t * header)
 {
-	fprintf(stderr, "[INFO ] Reading %zd bytes of header\n", sizeof (wav_header_t));
+	fprintf(stderr, "[INFO ] Reading %zu bytes of header\n", sizeof (wav_header_t));
 	ssize_t n = read(fd, header, sizeof (wav_header_t));
 
 	if (FILE_HEADER_SIZE != sizeof (wav_header_t)) {
-		fprintf(stderr, "[ERROR] Header struct has wrong size %zd\n", sizeof (wav_header_t));
+		fprintf(stderr, "[ERROR] Header struct has wrong size %zu\n", sizeof (wav_header_t));
 		return -1;
 	}
 
 	if (n != (ssize_t) sizeof (wav_header_t)) {
-		fprintf(stderr, "[ERROR] Wrong read size for header: %zd != %zd\n", n, sizeof (wav_header_t));
+		fprintf(stderr, "[ERROR] Wrong read size for header: %zd != %zu\n", n, sizeof (wav_header_t));
 		return -1;
 	}
 

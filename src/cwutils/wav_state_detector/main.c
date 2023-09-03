@@ -168,7 +168,7 @@ int main(int argc, char * argv[])
 	}
 
 	const cw_element_time_t sample_spacing = (1000.0 * 1000.0) / header.sample_rate; // [us]
-	fprintf(stderr, "[INFO ] Sample rate    = %d Hz\n", header.sample_rate);
+	fprintf(stderr, "[INFO ] Sample rate    = %u Hz\n", header.sample_rate);
 	fprintf(stderr, "[INFO ] Sample spacing = %.4f us\n", sample_spacing);
 
 	cw_elements_t * wav_elements = cw_elements_new(1000);
@@ -179,7 +179,7 @@ int main(int argc, char * argv[])
 		cw_elements_delete(&wav_elements);
 		exit(EXIT_FAILURE);
 	}
-	fprintf(stderr, "[INFO ] Detected %zd elements in wav file\n", wav_elements->curr_count);
+	fprintf(stderr, "[INFO ] Detected %zu elements in wav file\n", wav_elements->curr_count);
 	/* Debug. */
 	cw_elements_print_to_file(stderr, wav_elements);
 

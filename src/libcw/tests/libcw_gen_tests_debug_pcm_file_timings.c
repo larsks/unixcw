@@ -185,7 +185,7 @@ static int elements_set_ideal_durations(cw_elements_t * elements, const cw_gen_d
 	for (size_t i = 0; i < elements->curr_count; i++) {
 		int duration = 0;
 		if (0 != cw_element_type_to_duration(elements->array[i].type, durations, &duration)) {
-			fprintf(stderr, "[ERROR] Can't assign duration to element #%zd with type '%c'\n",
+			fprintf(stderr, "[ERROR] Can't assign duration to element #%zu with type '%c'\n",
 			        i, elements->array[i].type);
 			return -1;
 		}
@@ -317,7 +317,7 @@ static int get_elements_from_wav_file(const char * path, cw_elements_t * element
 	}
 
 	const cw_element_time_t sample_spacing = (1000.0 * 1000.0) / header.sample_rate; // [us]
-	fprintf(stderr, "[INFO ] wav file sample rate    = %d Hz\n", header.sample_rate);
+	fprintf(stderr, "[INFO ] wav file sample rate    = %u Hz\n", header.sample_rate);
 	fprintf(stderr, "[INFO ] wav file sample spacing = %.4f us\n", sample_spacing);
 
 	const int retval = cw_elements_detect_from_wav(input_fd, elements, sample_spacing);
@@ -344,7 +344,7 @@ static void print_test_results(FILE * file, const cw_elements_t * string_element
 	fprintf(file, "[DEBUG]  Num. | str state  type     duration | wav state     duration |\n");
 	fprintf(file, "[DEBUG] ------+------------------------------+------------------------|\n");
 	for (size_t i = 0; i < count; i++) {
-		fprintf(file, "[DEBUG] %5zd | %5s     '%c' %12.2fus | %5s   %12.2fus |\n",
+		fprintf(file, "[DEBUG] %5zu | %5s     '%c' %12.2fus | %5s   %12.2fus |\n",
 		        i,
 		        string_elements->array[i].state == cw_state_mark ? "mark" : "space",
 		        cw_element_type_get_representation(string_elements->array[i].type),

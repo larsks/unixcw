@@ -205,19 +205,19 @@ static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 		const float error_rate_percent = 100.0F * mismatch_count / comparison_len;
 		if (error_rate_percent > tester->acceptable_error_rate_percent) {
 			/* High error rate is never acceptable. */
-			fprintf(stderr, "[EE] Input len %zd, mismatch cnt %zd, err rate "PERC_FMT" (too high, thresh "PERC_FMT")\n",
+			fprintf(stderr, "[EE] Input len %zu, mismatch cnt %zu, err rate "PERC_FMT" (too high, thresh "PERC_FMT")\n",
 			        comparison_len, mismatch_count,
 			        (double) error_rate_percent,
 			        (double) tester->acceptable_error_rate_percent);
 			return false;
 		} else {
-			fprintf(stderr, "[NN] Input len %zd, mismatch cnt %zd, err rate "PERC_FMT" (acceptable, thresh "PERC_FMT")\n",
+			fprintf(stderr, "[NN] Input len %zu, mismatch cnt %zu, err rate "PERC_FMT" (acceptable, thresh "PERC_FMT")\n",
 			        comparison_len, mismatch_count,
 			        (double) error_rate_percent,
 			        (double) tester->acceptable_error_rate_percent);
 		}
 	} else {
-		fprintf(stderr, "[II] Compared %zd chars, found %zd mismatches\n", comparison_len, mismatch_count);
+		fprintf(stderr, "[II] Compared %zu chars, found %zu mismatches\n", comparison_len, mismatch_count);
 	}
 #undef PERC_FMT
 
@@ -226,15 +226,15 @@ static bool cw_rec_tester_input_and_received_match(cw_rec_tester_t * tester)
 			/* Errors are acceptable only at the beginning, where
 			   receiver didn't tune yet into stream of incoming
 			   data. */
-			fprintf(stderr, "[EE] Compared %zd chars, last mismatch idx %zd (too far from beginning, thresh %zd)\n",
+			fprintf(stderr, "[EE] Compared %zu chars, last mismatch idx %zu (too far from beginning, thresh %zu)\n",
 			        comparison_len, last_mismatch_index, tester->acceptable_last_mismatch_index);
 			return false;
 		} else {
-			fprintf(stderr, "[NN] Compared %zd chars, last mismatch idx %zd (acceptable, thresh %zd)\n",
+			fprintf(stderr, "[NN] Compared %zu chars, last mismatch idx %zu (acceptable, thresh %zu)\n",
 			        comparison_len, last_mismatch_index, tester->acceptable_last_mismatch_index);
 		}
 	} else {
-		fprintf(stderr, "[II] Compared %zd chars, last mismatch idx none\n", comparison_len);
+		fprintf(stderr, "[II] Compared %zu chars, last mismatch idx none\n", comparison_len);
 	}
 
 
@@ -328,7 +328,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 	const size_t diffs_to_report_max = 10;
 	size_t diffs_reported = 0;
 	fprintf(stderr,
-		"[II] Displaying at most last %zd different characters\n",
+		"[II] Displaying at most last %zu different characters\n",
 		diffs_to_report_max);
 
 	const size_t input_len = strlen(tester->input_string);
@@ -341,7 +341,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 		const size_t received_index = received_len - 1 - i;
 
 		if (tester->input_string[input_index] != tester->received_string[received_index]) {
-			fprintf(stderr, "[WW] char input[%6zd] = %4d/0x%02x/'%c' vs. received[%6zd] = %4d/0x%02x/'%c'\n",
+			fprintf(stderr, "[WW] char input[%6zu] = %4d/0x%02x/'%c' vs. received[%6zu] = %4d/0x%02x/'%c'\n",
 
 				input_index,
 				(int) tester->input_string[input_index],
@@ -552,7 +552,7 @@ int cw_rec_tester_on_character(cw_rec_tester_t * tester, cw_rec_data_t * erd, st
 	fprintf(stderr, "[II] Character: '%c'\n", erd->character);
 
 	if (tester->received_string_i >= (REC_TEST_RECEIVED_BUFFER_SIZE - 1)) {
-		fprintf(stderr, "[EE] Tester's buffer overrun on character: iterator = %zd, size = %d\n",
+		fprintf(stderr, "[EE] Tester's buffer overrun on character: iterator = %zu, size = %d\n",
 		        tester->received_string_i, REC_TEST_RECEIVED_BUFFER_SIZE);
 		return CW_FAILURE;
 	}
@@ -620,7 +620,7 @@ int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct
 	}
 
 	if (tester->received_string_i >= (REC_TEST_RECEIVED_BUFFER_SIZE - 1)) {
-		fprintf(stderr, "[EE] Tester's buffer overrun on space: iterator = %zd, size = %d\n",
+		fprintf(stderr, "[EE] Tester's buffer overrun on space: iterator = %zu, size = %d\n",
 		        tester->received_string_i, REC_TEST_RECEIVED_BUFFER_SIZE);
 		return CW_FAILURE;
 	}
