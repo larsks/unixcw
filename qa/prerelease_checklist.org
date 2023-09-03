@@ -104,7 +104,7 @@ root dir.
 
 ** DONE cppcheck
 
-Use ./qa/run_cppcheck.sh script to run cppcheck. The script passes some
+Use ./qa/lint_cppcheck.sh script to run cppcheck. The script passes some
 options to cppcheck.
 
 "bear" program should be installed from a Linux package.
@@ -117,7 +117,7 @@ options to cppcheck.
 
 2. Run cppcheck:
 
-    ./qa/run_cppcheck.sh
+    ./qa/lint_cppcheck.sh
 
 3. Fix reported issues.
 
