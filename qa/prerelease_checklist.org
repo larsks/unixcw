@@ -71,7 +71,7 @@ may affect end user.
 Note down (as "tickets" in README.dev.org or as TODO/FIXME notes in code) any
 problems that won't be fixed in this release.
 
-* STARTED Static code analysis
+* DONE Static code analysis
 
 TODO: some functionalities in the package are disabled by default (mostly the
 debug functionalities). You may want to enable them through ./configure
@@ -102,7 +102,7 @@ root dir.
 
 3. Fix reported issues.
 
-** STARTED cppcheck
+** DONE cppcheck
 
 Use ./qa/run_cppcheck.sh script to run cppcheck. The script passes some
 options to cppcheck.
