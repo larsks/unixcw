@@ -201,6 +201,16 @@ the package:
    - package documentation (NEWS/README/README.dev.org/man pages/installation
      instructions, other)
 
+* TODO Review the opened tickets, find fixed ones
+
+Review the list of opened tickets from README.dev.org -> "Buts, feature
+requests". It may happen that some of them have been fixed during your work
+in this development cycle, but you didn't notice it.
+
+Read the list of opened tickets, find the tickets that describe already fixed
+bug or already implemented feature, and close them.
+
+
 
 
 * TODO Localization
