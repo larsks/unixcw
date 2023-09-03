@@ -374,7 +374,9 @@ libtoolize
    6. 10GB of disc space for FreeBSD 12.1 is not enough to have comfortable
       working env, as I'm constantly running into "no free space left"
       message. 15GB or even 20GB would be more adequate.
-
+   7. When writing commit messages, try to formulate them in a way that will
+      be easy to copy to release notes. When possible, add a summary that
+      will be meaningful from user's or integrator's point of view.
 
 
 
