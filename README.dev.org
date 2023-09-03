@@ -381,7 +381,7 @@ libtoolize
 
 
 * Bugs, feature requests
-** TODO Bug: -lintl on Alpine is not added to linker flags
+** TODO R0001 Bug: -lintl on Alpine is not added to linker flags
 
 Compilation of cw on Alpine 1.17.3 is failing because linker can't find intl function:
    /usr/lib/gcc/x86_64-alpine-linux-musl/12.2.1/../../../../x86_64-alpine-linux-musl/bin/ld: /home/acerion/unixcw/unixcw/src/cwutils/i18n.c:63: undefined reference to `libintl_gettext'
@@ -392,28 +392,25 @@ it's a matter of getting linker flags on Alpine right.
 See 'AC_CHECK_LIB(intl, textdomain)' in configure.ac - we probably already do
 something to address this on for FreeBSD.
 
-** TODO Feature: allow disabling cw and cwgen through ./configure
+** TODO R0002 Feature: allow disabling cw and cwgen through ./configure
 A problem with -lintl on Alpine shows that even such simple
 application as cw can fail to build. To allow a quick workaround for
 users, add "--disable-cw" to configure script.
 
 While you are at it, add similar flag for cwgen.
 
-* TODO
+** TODO R0003 Use suseconds_t for duration variables?
 
-** code
-*** Use suseconds_t for duration variables?
-
-*** Detect unusually long times when joining generator's thread
+** TODO R0004 Detect unusually long times when joining generator's thread
 
 Usually it's 2-5 microseconds, anything longer may be a sign of problems.
 
-*** Module prefixes of equal length
+** TODO R0005 Module prefixes of equal length
 
 To improve readability of debug messages, all values of MSG_PREFIX (like
 "libcw/gen" or "libcw/alsa") should have the same length.
 
-*** Detect missing function definitions
+** TODO R0006 Detect missing function definitions
 In order to detect libcw function declarations without definitions, write a
 code that tries to generate code that calls all libcw public functions. If
 definition of any function declared in public header is missing, linking
@@ -423,32 +420,32 @@ Rationale: today I have detected (by sheer luck) that cw_set_debug_flags()
 declaration existed in libcw_debug.h, but the function was not defined
 anywhere.
 
-*** Don't display unsupported sound systems
+** TODO R0007 Don't display unsupported sound systems
 Don't show in help texts ("-h") information about sound systems
 disabled during compilation. Don't show ALSA/PulseAudio information on
 FreeBSD.
 
-*** 'Enter' in cw
+** TODO R0008 'Enter' in cw
 Just pressing 'Enter' in cw leads to calls of
 gen->write_buffer_to_sound_device(). It should not.
 
-*** CPU usage of pulseaudio
+** TODO R0009 CPU usage of pulseaudio
 Verify cpu usage of "pulseadio" process when "cw" is started and is doing
 nothing at all.
 
-*** math library in dependencies
+** TODO R0010 math library in dependencies
 
 Look at this warning displayed when Debian packages are being built:
 
 dpkg-shlibdeps: warning: package could avoid a useless dependency if debian/cw/usr/bin/cwgen debian/cw/usr/bin/cw were not linked against libm.so.6 (they use none of the library's symbols)
 dpkg-shlibdeps: warning: package could avoid a useless dependency if debian/cwcp/usr/bin/cwcp was not linked against libm.so.6 (it uses none of the library's symbols)
 
-*** Space in xcwcp
+** TODO R0011 Space in xcwcp
 Double-check if the first character added to text area in xcwcp is a space. If it is, then fix it.
-*** Slope duration for tones at highest speeds
+** TODO R0012 Slope duration for tones at highest speeds
 For tones at highest speeds the current tone slope duration may be too long,
 and the tones may be malformed. The duration may have to be shortened.
-*** Correct source of frequency in console code
+** TODO R0013 Correct source of frequency in console code
 libcw tests that should generate varying frequency (like
 legacy_api_test_cw_queue_tone()) don't generate the varying
 frequencies for console sound system. This is probably related to
@@ -458,10 +455,10 @@ argument from.
 This doesn't have impact on cw/cwcp/xcwcp, but should be fixed
 nevertheless.
 
-*** Integrate contents of recent debian/ directory
+** TODO R0014 Integrate contents of recent debian/ directory
 Use contents of the latest files from debian.org.
 
-*** freedesktop.org menu file
+** TODO R0015 freedesktop.org menu file
 
 From Debian people:
 
@@ -472,34 +469,32 @@ at the link below. [...]
 https://salsa.debian.org/debian-hamradio-team/unixcw/-/commit/91a480d31452ba356e1b30ef172fc9cc830053fc
 "
 
-** build system
-*** Add to configure.ac a check for GNU make on build machine
+** TODO R0016 Add to configure.ac a check for GNU make on build machine
 
 unixcw's Makefiles may not work with non-GNU make on non Linux machines.
 
-*** Add to configure.ac a check for pkg-config
+** TODO R0017 Add to configure.ac a check for pkg-config
 
  It is necessary for configuring QT4 application (xcwcp).
 
-*** Make qa_test_configure_flags.sh portable
+** TODO R0018 Make qa_test_configure_flags.sh portable
 
 Some shells (on FreeBSD) don't like the options[] table.
 
-*** Flags for disabling modules
+** TODO R0019 Flags for disabling modules
 
 After finalizing split of libcw into modules, add configure flags for
 disabling modules (e.g. --disable-libcw-receiver, --disable-libcw-key).
 
-*** pkg-config + ncurses
+** TODO R0020 pkg-config + ncurses
 
 Check if it's possible to use pkg-config to get ncurses compilation flags.
 
-*** Debian patch for reproducible builds
+** TODO R0021 Debian patch for reproducible builds
 Integrate this patch:
 https://salsa.debian.org/debian-hamradio-team/unixcw/-/blob/master/debian/patches/0004-reprotest_collate_make_fix.patch
 
-** libcw tests
-*** "level 1" in test_cw_tq_gen_operations_B
+** TODO R0022 "level 1" in test_cw_tq_gen_operations_B
 Investigate value "1" in this test. Is it valid/acceptable for tests?
 
 [II] Beginning of test
@@ -516,7 +511,7 @@ Investigate value "1" in this test. Is it valid/acceptable for tests?
 [II] libcw/tests: waiting for level 0 (final)                             [ OK ]
 [II] End of test: test_cw_tq_gen_operations_B
 
-*** Receiver errors
+** TODO R0023 Receiver errors
 [II] libcw/tests: Poll representation                                     [ OK ]
 [EE] cw_rec_poll_representation: 1597: libcw/rec: 'global rec': poll: space duration == INT_MAX
 
@@ -527,7 +522,7 @@ cw_start_receive_tone: Numerical result out of range
 [EE] cw_rec_mark_end: 1070: libcw/rec: 'global rec': mark_end: receiver state not RS_MARK: RS_IDLE
 [II] Polled character 'U'
 
-*** Each failed test should be logged to file
+** TODO R0024 Each failed test should be logged to file
 Having the failed tests logged to a file will make it easier to track
 problems and come back to them later. Right now all we have is a long,
 long log of tests (where both successful and failed tests are printed)
@@ -539,22 +534,22 @@ tests) would be a useful middle ground.
 
 This would require buffering of a test in memory and dumping it to
 file on errors.
-*** Count ALSA errors in tests framework:
+** TODO R0025 Count ALSA errors in tests framework:
  + write: writei: Input/output error / -5
  + underruns
  + other
 This will require propagating them from libcw's ALSA module up to test
 framework, but it would help a lot in registering and tracking problems.
 
-*** Print summary table also to disc file
+** TODO R0026 Print summary table also to disc file
 It will be easier to copy/paste test results on non-X systems from a
 disc file to qa/tests.org.
-*** Track failing tests
+** TODO R0027 Track failing tests
 Learn how to recognize which functions fail, learn how to count their
 failures and track them over time and over OSes. Perhaps each test should
 have its unique id that would be preserved even if a test function was
 renamed or split.
-*** Short first element in test_cw_gen_state_callback
+** TODO R0028 Short first element in test_cw_gen_state_callback
 
 On Alpine/N150 the first recorded element in test_cw_gen_state_callback has
 shorter duration. This may be occurring on other machines too.
@@ -586,22 +581,21 @@ shorter duration. This may be occurring on other machines too.
 [II] Call  10, state 1, representation = '-', duration of previous element = 298646 us
 [II] Call  11, state 0, representation = '^', duration of previous element = 896103 us
 
-*** Add code checkers tests
+** TODO R0029 Add code checkers tests
 Add "run clang-tidy and cppcheck" for each platform and each package to
 qa/tests.org.
 
-** other tests
-*** Fix long duration of valgrind tests
+** TODO R0030 Fix long duration of valgrind tests
 When libcw tests binary is executed under valgrind, its execution
 takes a lot of time because the tests call vsnprintf() a lot
 (indirectly through snprintf() and vsnprintf()). We can really shorten
 the duration of tests if only we will find a way to decrease usage of
 these functions.
-*** Implement a fully automatic testing of cwgen's output
+** TODO R0031 Implement a fully automatic testing of cwgen's output
 Pass to cwgen all combinations of command line args, and examine if
 cwgen's output is generating what is requested. Also check randomness
 of output.
-*** Test of installation and usage of library
+** TODO R0032 Test of installation and usage of library
 Add following test to tests of unixcw:
 1. Compile the install unixcw:
 ./configure --prefix=$HOME && make && make install
@@ -611,14 +605,14 @@ PKG_CONFIG_PATH=$HOME/lib/pkgconfig/ ./configure && make
 3. Run cwdaemon using libcw library installed in $HOME.
 LD_LIBRARY_PATH+=$LD_LIBRARY_PATH:$HOME/lib ./src/cwdaemon -x p -n
 ./examples/example.sh
-*** Add 'build Debian package' test
+** TODO R0033 Add 'build Debian package' test
 Add "run 'build Debian package' test" to list of tests in qa/tests.org.
-*** Add qa/ script for reproducible Debian builds
+** TODO R0034 Add qa/ script for reproducible Debian builds
 https://manpages.debian.org/buster/reprotest/reprotest.1.en.html
-** TODO R00XY Feature: remove cw_assert() from libcw
+** TODO R0035 Feature: remove cw_assert() from libcw
 
 Replace it with dev debug message that is compiled only in dev builds.
-** TODO R00XZ Feature: run tests with dev features enabled
+** TODO R0036 Feature: run tests with dev features enabled
 There are sections of code that are enabled only in dev builds: e.g. some
 additional checks and safeguards. The unit/integration code must have a
 chance at triggering these checks and safeguards.
