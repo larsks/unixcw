@@ -9,6 +9,9 @@ Describe them here, and stick to them during the development phase. Don't
 extend the scope unless really necessary (e.g. unless you find a serious
 bug).
 
+If you plan to fix one of tickets from README.dev.org -> 'Bugs, feature
+requests' list, put the ticket numbers on the list below.
+
 The goals of this development cycle are:
 1.
 
@@ -16,6 +19,24 @@ The goals of this development cycle are:
 During development phase you don't want to introduce any issues that can be
 caught by compiler. -Werror will make sure that you will fix them before they
 slip into repo.
+
+* TODO Review 'terminology'
+
+Refresh your knowledge of terminology and conventions for code and
+documentation by reading the related section in README.dev.org.
+
+Do this in order to avoid introducing non-compliant changes in code or
+documentation.
+
+* TODO Review 'lessons learned'
+
+The previous development cycle may have happened a long time ago, and you may
+have forgotten the lessons learned during the previous development cycle.
+
+Refresh the lessons now to avoid making the same mistakes that you made in
+the past.
+
+Try to read the lessons learned few times during current development cycle.
 
 * DONE Do the actual coding
 
