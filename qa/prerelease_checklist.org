@@ -102,7 +102,24 @@ root dir.
 
 3. Fix reported issues.
 
-** TODO cppcheck
+** STARTED cppcheck
+
+Use ./qa/run_cppcheck.sh script to run cppcheck. The script passes some
+options to cppcheck.
+
+"bear" program should be installed from a Linux package.
+
+1. Prepare the project's source code package for validation: configure it and
+   build compilation database:
+
+    ./configure --enable-dev-receiver-test --enable-dev-libcw-debugging --enable-dev-pcm-samples-file
+    bear -- make && bear --append -- make check
+
+2. Run cppcheck:
+
+    ./qa/run_cppcheck.sh
+
+3. Fix reported issues.
 
 * TODO Come up with new version numbers
 
