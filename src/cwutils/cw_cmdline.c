@@ -452,8 +452,7 @@ void cw_print_help(cw_config_t *config)
 	if (config->has_feature_cw_specific
 	    || config->has_feature_practice_time
 	    || config->has_feature_infile
-	    || config->has_feature_outfile
-	    || config->has_feature_cw_specific) {
+	    || config->has_feature_outfile) {
 
 		fprintf(stderr, "%s", _("Other options:\n"));
 
