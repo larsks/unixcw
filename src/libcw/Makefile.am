@@ -32,7 +32,7 @@ EXTRA_DIST=include.awk libdoc.awk libfuncs.awk libpc.awk libsigs.awk \
 	libcw.3.m4 \
 	libcw.pc.in \
 	cw.7 \
-	Doxyfile clang_tidy.sh
+	Doxyfile
 
 # These files are used to build two different targets - list them only
 # once. I can't compile these files into an utility library because
