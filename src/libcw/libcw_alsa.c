@@ -962,10 +962,10 @@ static cw_ret_t cw_alsa_set_hw_params_buffer_size_internal(cw_gen_t * gen, snd_p
 	   parameter to be zero in final configuration space. Better set it
 	   explicitly. */
 	int dir = 0;
-	cw_alsa.snd_pcm_hw_params_set_periods(gen->alsa_data.pcm_handle, hw_params, n_periods, dir);
+	snd_rv = cw_alsa.snd_pcm_hw_params_set_periods(gen->alsa_data.pcm_handle, hw_params, n_periods, dir);
 	if (0 != snd_rv) {
 		cw_debug_msg (&cw_debug_object, CW_DEBUG_SOUND_SYSTEM, CW_DEBUG_ERROR,
-			      MSG_PREFIX "set hw params: can't set periods: %s / %d", cw_alsa.snd_strerror(snd_rv), n_periods);
+		              MSG_PREFIX "set hw params: can't set %d periods: [%s]", n_periods, cw_alsa.snd_strerror(snd_rv));
 		return CW_FAILURE;
 	}
 
