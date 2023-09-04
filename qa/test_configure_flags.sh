@@ -1,107 +1,158 @@
 #!/bin/bash
 
+# Copyright (C) 2023  Kamil Ignacak (acerion@wp.pl)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
+# This file is a part of unixcw package.
+
+
+
 # TODO: the path to bash on FreeBSD is /usr/local/bin/bash
 
-# Test configuration and compilation of software for all
-# combinations of './configure' flags.
+# Test configuration and compilation of software for all combinations of
+# './configure' options that configure features of unixcw package.
 #
 # The tests are performed in order to find compilation errors caused
 # by conditional #includes and #defs in source code.
 #
-# Test are numbered and executed from 2^N to 1 (where N is the number of
-# tested './configure' flags). You can pass a starting test number (in
-# range from 2^N to 1) to the script.
+# Combinations of options are numbered and executed from
+# 2^total_options_count to 1 (where total_options_count is the number of
+# tested './configure' options). You can pass a starting combination number
+# (in range from 2^total_options_count to 1) to the script as a script's
+# argument.
 
 
-let N=9
 
 
-# cd "../"
-make clean &> /dev/null
+let make_jobs=2
 
+# All interesting options that can be passed to ./configure.
+let total_options_count=11
+all_options[0]="--disable-console"
+all_options[1]="--disable-oss"
+all_options[2]="--disable-alsa"
+all_options[3]="--disable-pulseaudio"
+all_options[4]="--disable-cwgen"
+all_options[5]="--disable-cw"
+all_options[6]="--disable-cwcp"
+all_options[7]="--disable-xcwcp"
+all_options[8]="--enable-dev-receiver-test"
+all_options[9]="--enable-dev-libcw-debugging"
+all_options[10]="--enable-dev-pcm-samples-file"
 
-options[0]="--disable-console"
-options[1]="--disable-oss"
-options[2]="--disable-alsa"
-options[3]="--disable-pulseaudio"
-options[4]="--disable-cwgen"
-options[5]="--disable-cw"
-options[6]="--disable-cwcp"
-options[7]="--disable-xcwcp"
-options[8]="--enable-dev"
-
-#options[0]="1"
-#options[1]="2"
-#options[2]="3"
-#options[3]="4"
-#options[4]="5"
-#options[5]="6"
-#options[6]="7"
 
 
 
 # Set up a starting point for tests - sometimes it's useful not to run the
 # tests from the beginning but from specific test (specific combination of
-# flags). E.g. when compilation with combination #X fails, you fix the
+# options). E.g. when compilation with combination #X fails, you fix the
 # compilation error and re-start the test script from combination #X.
 if [ $1 ]; then
-    let i=$1
+	let i=$1
 else
-    let i=$((2**N))
+	let i=$((2**total_options_count))
 fi
 
 
 
+
+# Get a string with a list/combination of options passed to ./configure. The
+# combination corresponds to value of first argument: a value in range of
+# (<total count of possibilities> to <1>).
+#
+# An example result string looks like this:
+# "--disable-cwcp --enable-dev-pcm-samples-file"
+# You can pass this string to ./configure.
+function get_options()
+{
+	local n_options=$1
+	local combination=$2
+	local result=""
+
+	# echo "[DEBUG] n_options = $n_options, combination = $combination"
+
+	# This loop is a method of determining what digit stands at a leftmost
+	# position of binary representation of $combination.
+	#
+	# If in given iteration of outer loop the combination is greater than
+	# power_of_two, then we have an '1' at the beginning of the
+	# representation. Otherwise it's a '0'.
+	for ((idx = $n_options - 1; idx >= 0; idx--))
+	do
+		# In first iteration of loop: power_of_two = 2 ^ (11 - 1) = 1024
+		let power_of_two=$((2**$idx))
+
+		# In first iteration of loop: if (2048 - 1024 > 0) -> leftmost bit of
+		# combination is '1'.
+		if (( $(($combination - $power_of_two)) > 0 )); then
+
+			# We have a '1' on leftmost position of binary representation of
+			# $combination. Append specific option to result.
+
+			# This line is a method of truncating combination, removing the
+			# leftmost digit. In next iteration of loop the next leftmost
+			# digit will be compared with next (decreased) power_of_two.
+			let combination=$(($combination - $power_of_two))
+
+			result="$result ${all_options[$idx]}"
+		fi
+	done
+
+	# Return a string
+	echo "$result"
+}
+
+
+
+
+make clean &> /dev/null
+
 for ((; i>0; i--))
 do
-    let tmp=$(($i))
+	options=$(get_options $total_options_count $i)
 
-    switches=""
+	# Test code.
+	# echo "[INFO ] Options = $options"
+	# continue
 
-    for ((j = $N - 1; j >= 0; j--))
-    do
-	let power=$((2**$j))
-
-	if (( $(($tmp - $power)) > 0 )); then
-	    let tmp=$(($tmp - $power))
-
-	    switches="$switches ${options[$j]}"
-	else
-
-	    # test
-	    #switches="$switches 0"
-
-	    # real code
-	    switches="$switches"
-	fi
-
-    done
-
-    # test
-    #echo $switches
-
-    #echo $(eval pwd)
-
-    # The main part - the compilation with given configuration flags.
+	# The main part - the compilation with given configuration options.
 	#
 	# TODO acerion 2023.08.24: the command should run "make distcheck"
 	# instead of just "make check" to ensure that:
-
 	# 1. a code is being built in clear dir (unpacked from dist package)
-	# 2. 'make dist' always works, regardless of './configure' flags (a
+	# 2. 'make dist' always works, regardless of './configure' options (a
 	#    heavy-duty test of 'make dist')
-    command="./configure $switches &>/dev/null   &&   make &>/dev/null   &&   make check &>/dev/null   &&   make clean &>/dev/null"
-    echo $i": "$command
-    result=$(eval $command)
+	# Unfortunately "make distcheck" takes more time than just "make check".
+	command="./configure $options &>/dev/null && make -j $make_jobs &>/dev/null && make check -j $make_jobs &>/dev/null && make clean -j $make_jobs &>/dev/null"
+	# echo "[DEBUG] Command: $command"
+	echo "[INFO ] Iteration $i: $options"
+	result=$(eval $command)
 
-    # $? is the result code of last command.
-    if [ $? != 0 ]; then
-	echo "Test of configuration flags FAILED"
-	exit -1
-    fi
+	# $? is the result code of last command.
+	if [ $? != 0 ]; then
+		echo "[ERROR] Test of configuration options FAILED in iteration $i for these options: $options"
+		exit -1
+	fi
 done
 
 
-echo "Test of configuration flags SUCCEEDED"
+
+
+echo "[INFO ] Test of entire space of configuration options has SUCCEEDED"
 exit 0
 
