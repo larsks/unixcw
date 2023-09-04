@@ -36,8 +36,12 @@
 
 
 
+#include <fcntl.h>
 #include <math.h> /* fabs() */
 #include <stdlib.h> /* exit() */
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <cwutils/lib/elements.h>
 #include <cwutils/lib/elements_detect.h>

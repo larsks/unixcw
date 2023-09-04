@@ -31,6 +31,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <cwutils/cw_easy_rec.h>

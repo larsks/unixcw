@@ -18,6 +18,8 @@
 
 
 
+#include <limits.h> /* INT_MIN/MAX */
+
 #include "element_stats.h"
 
 
