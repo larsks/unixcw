@@ -85,7 +85,15 @@ def section_info_highlevel(stream):
 
 
 
-def find_tested_functions_in_file(file_handle, fut_tag):
+# Find functions put in 'fut_tag' in given file with test code. This may look
+# like this in source code:
+#
+# cw_ret_t cwret = LIBCW_TEST_FUT(cw_gen_remove_last_character)(gen);
+#
+# Here LIBCW_TEST_FUT is the tag, and cw_gen_remove_las6t_character is the
+# searched function name. Notice that function's parens around list of
+# arguments are outside of fut tag.
+def find_fut_tagged_functions_in_test_file(file_handle, fut_tag):
     result = set()
     while True:
         line = file_handle.readline()
@@ -115,13 +123,24 @@ def find_tested_functions_in_file(file_handle, fut_tag):
 
 
 
-def find_tested_functions_in_dir(directory, fut_tag):
+def find_fut_tagged_functions_in_dir(directory, fut_tag):
     result = set()
-    for name in os.listdir(directory):
-        if not name.endswith(".c"):
-            continue
-        with open(directory + "/" + name) as file:
-            result |= find_tested_functions_in_file(file, fut_tag) # merge two sets
+    return find_fut_tagged_functions_in_dir2(result, directory, fut_tag)
+
+
+
+
+def find_fut_tagged_functions_in_dir2(result, directory, fut_tag):
+    with os.scandir(directory) as it:
+        for entry in it:
+            if entry.is_file():
+                if not entry.name.endswith(".c"):
+                    continue
+                with open(directory + "/" + entry.name) as file:
+                    result |= find_fut_tagged_functions_in_test_file(file, fut_tag) # merge two sets
+            elif entry.is_dir():
+                # Recurse into dir.
+                result |= find_fut_tagged_functions_in_dir2(result, entry.name, fut_tag)
 
     return result
 
@@ -149,7 +168,7 @@ def print_functions_set(header, functions):
 
 
 def print_function_row(function_counter, function_name, is_in_so, is_in_fut):
-    print('{:>3}   {:<50}'.format(function_counter, function_name), end='')
+    print('{:>3}   {:<55}'.format(function_counter, function_name), end='')
 
     if is_in_so:
         print("       ", end='')
@@ -182,7 +201,7 @@ def print_help(script_name):
 
 if __name__ == '__main__':
     so_symbols = set()
-    tested_functions = set()
+    fut_tagged_functions = set()
     so_location = ""
     test_code_location = ""
 
@@ -201,24 +220,25 @@ if __name__ == '__main__':
         sys.exit(1)
 
     so_symbols = find_libcw_functions_in_so(so_location)
-    tested_functions = find_tested_functions_in_dir(test_code_location, "LIBCW_TEST_FUT")
+    fut_tagged_functions = find_fut_tagged_functions_in_dir(test_code_location, "LIBCW_TEST_FUT")
 
     #print_functions_set("All libcw.so function symbols:", so_symbols)
-    #print_functions_set("\nlibcw FUT functions (functions under test):", tested_functions)
-    #print_functions_set("libcw functions not tested yet:", so_symbols - tested_functions)
+    #print_functions_set("\nlibcw FUT-tagged functions (functions under test):", fut_tagged_functions)
+    #print_functions_set("libcw functions not tagged with FUT yet:", so_symbols - fut_tagged_functions)
     #print("\n")
 
 
-    all_functions = so_symbols | tested_functions
-    n_tested = len(tested_functions)
+    all_functions = so_symbols | fut_tagged_functions
+    n_tested = len(fut_tagged_functions)
     n_all = len(all_functions)
+
 
     # Check if all tested symbols were found of list of symbols in
     # library:
-    #if not tested_functions.issubset(so_symbols):
+    #if not fut_tagged_functions.issubset(so_symbols):
     #    print("Error: set of FUT functions is not a subset of all so symbols")
     #    # First build set of functions that are not common, and then preserve only tested functions.
-    #    not_in_so = (so_symbols ^ tested_functions) & tested_functions
+    #    not_in_so = (so_symbols ^ fut_tagged_functions) & fut_tagged_functions
     #    print_functions_set("FUT functions not in .so:", not_in_so)
 
     print_stats(n_tested, n_all)
@@ -228,22 +248,43 @@ if __name__ == '__main__':
     print("'so-'  - function not found in .so library");
     print("")
 
+    unexpected_functions = 0;
+
+    print("Public functions:\n")
     fun_counter = 1
     for fun in sorted(all_functions):
+        if fun.count(".") > 0:
+            unexpected_functions += 1
+            continue
         if not fun.endswith("_internal"):
             is_in_so = fun in so_symbols
-            is_in_fut = fun in tested_functions
+            is_in_fut = fun in fut_tagged_functions
             print_function_row(fun_counter, fun, is_in_so, is_in_fut)
             fun_counter += 1
 
-    print("")
-
+    print("\nPrivate functions:\n")
     for fun in sorted(all_functions):
+        if fun.count(".") > 0:
+            unexpected_functions += 1
+            continue
         if fun.endswith("_internal"):
             is_in_so = fun in so_symbols
-            is_in_fut = fun in tested_functions
+            is_in_fut = fun in fut_tagged_functions
             print_function_row(fun_counter, fun, is_in_so, is_in_fut)
             fun_counter += 1
+
+    if unexpected_functions > 0:
+        # Functions that should not have been found by this tool. Examples:
+        # cw_gen_value_tracking_set_value_internal.constprop.0
+        # cw_key_ik_set_value_internal.isra.0
+        # cw_timer_run_internal.part.0
+        print("\nUnexpected functions:\n")
+        for fun in sorted(all_functions):
+            if fun.count(".") > 0:
+                is_in_so = fun in so_symbols
+                is_in_fut = fun in fut_tagged_functions
+                print_function_row(fun_counter, fun, is_in_so, is_in_fut)
+                fun_counter += 1
 
 
     # Print the stats again after a long long list of functions has been
