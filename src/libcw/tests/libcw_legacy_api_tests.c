@@ -1602,7 +1602,7 @@ cwt_retv legacy_api_test_gen_remove_last_character(cw_test_executor_t * cte)
 
 		/* Remove N characters from end. */
 		for (int i = 0; i < to_remove; i++) {
-			cw_ret_t cwret = LIBCW_TEST_FUT(cw_generator_remove_last_character());
+			cw_ret_t cwret = LIBCW_TEST_FUT(cw_generator_remove_last_character)();
 			if (!cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret,
 							    "remove last %d characters, removing %d-th character",
 							    to_remove, i)) {
