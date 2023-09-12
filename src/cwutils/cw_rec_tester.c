@@ -39,8 +39,6 @@ static void low_tone_queue_callback(void * arg);
 
 static void * cw_rec_tester_play_string(void * arg_tester);
 
-static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short);
-
 static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester);
 
 
@@ -91,19 +89,7 @@ void cw_rec_tester_evaluate_receive_correctness(cw_rec_tester_t * tester, bool *
 
 
 
-/**
-   @brief Initialize main text buffers of tester
-
-   The output buffer is just cleared (that's where the received text will go).
-
-   The input buffer is filled with a text that will be played by helper generator and then received by tested receiver.
-
-   @reviewedon 2023.08.15
-
-   @param[in/out] tester Tester in which to initialize the text buffers
-   @param[in] make_short Whether the text put into input buffer should be short (for quick tests) or long
-*/
-static void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short)
+void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short)
 {
 	memset(tester->input_string, 0, sizeof (tester->input_string));
 	tester->input_string_i = 0;

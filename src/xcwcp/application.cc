@@ -57,7 +57,7 @@
 #include <cwutils/cw_common.h>
 #include <cwutils/i18n.h>
 #include <cwutils/cw_copyright.h>
-#include <cwutils/cw_easy_legacy_receiver.h>
+
 
 
 
@@ -172,7 +172,7 @@ Application::Application() :
    (if any), then calls that instance's receiver handler function.
 
    This function is called in signal handler context. */
-void Application::libcw_keying_event_static(void * easy_receiver, int key_state)
+void Application::libcw_keying_event_static(void *arg, int key_state)
 {
 	const Application *app = libcw_user_application_instance;
 
@@ -186,7 +186,8 @@ void Application::libcw_keying_event_static(void * easy_receiver, int key_state)
 
 		//fprintf(stderr, "calling callback, stage 1 (key = %d)\n", key_state);
 
-		cw_easy_legacy_receiver_handle_libcw_keying_event(easy_receiver, key_state);
+		struct timeval *t = (struct timeval *) arg;
+		app->receiver->handle_libcw_keying_event(t, key_state);
 	}
 
 	return;
@@ -1109,9 +1110,17 @@ void Application::make_auxiliaries_end(void)
 	   paddles are pressed, but (since it doesn't receive timing
 	   parameters) it won't be able to identify entered Morse
 	   code. */
-	cw_register_keying_callback(libcw_keying_event_static, receiver->easy_rec);
+	cw_register_keying_callback(libcw_keying_event_static, &receiver->main_timer);
 
-	cw_easy_legacy_receiver_start(receiver->easy_rec);
+	/* The call above registered receiver->main_timer as a generic
+	   argument to a callback. However, libcw needs to know when
+	   the argument happens to be of type 'struct timeval'. This
+	   is why we have this second call, explicitly passing
+	   receiver's timer to libcw. */
+	cw_iambic_keyer_register_timer(&receiver->main_timer);
+
+	gettimeofday(&(receiver->main_timer), NULL);
+	//fprintf(stderr, "time on aux config: %10ld : %10ld\n", receiver->main_timer.tv_sec, receiver->main_timer.tv_usec);
 
 	QString label("Output: ");
 	label += cw_generator_get_audio_system_label();

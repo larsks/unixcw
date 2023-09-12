@@ -215,6 +215,23 @@ int cw_rec_tester_on_space(cw_rec_tester_t * tester, cw_rec_data_t * erd, struct
 
 
 
+/**
+   @brief Initialize main text buffers of tester
+
+   The output buffer is just cleared (that's where the received text will go).
+
+   The input buffer is filled with a text that will be played by helper generator and then received by tested receiver.
+
+   @reviewedon 2023.08.15
+
+   @param[in/out] tester Tester in which to initialize the text buffers
+   @param[in] make_short Whether the text put into input buffer should be short (for quick tests) or long
+*/
+void cw_rec_tester_init_text_buffers(cw_rec_tester_t * tester, bool make_short);
+
+
+
+
 #if defined(__cplusplus)
 }
 #endif
