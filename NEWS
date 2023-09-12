@@ -5,6 +5,88 @@ version 3.6.1 / 2023-xx-yy
   - Fixing 'cw timing' problem
     Commit faa8c85052b30a788672568cab083791f0043b78
 
+    Problem:
+
+    Duration of inter-word-space was equal to 10 units, while it should have been
+    7 units.
+
+    As far as I know, the inter-word-space was not equal to 7 for many years.
+
+    Solution:
+
+    Add code that tracks enqueued spaces (primarily inter-mark-spaces and
+    inter-character-spaces, but also inter-word-spaces), and use that tracker to
+    decide how long an enqueued inter-word-space should really be.
+
+    Additional change that fixes the problem is with not enqueueing
+    inter-character-space when inter-word-space was enqueued.
+
+    Tests:
+
+    Large part of commits done to the repo since last release was dedicated to
+    expanding of testing capabilities of the libcw tests in area of generator,
+    receiver and timings.
+
+    Some libcw tests have been improved and other tests have been added to
+    automatically test some of libcw APIs that may be affected.
+
+    'simple receiver' type has been improved to make it more helpful in
+    discovering problems with timings.
+
+    Automatic test in which generated samples are stored to disc file and then
+    are analysed has been improved.
+
+    "Manual" tests have been executed where generated audio is captured by
+    external program (Audacity) and the different timings of different marks and
+    spaces are measured in the program to confirm that proper relations (1/3/7
+    units) are kept.
+
+  - libcw's version has been changed from 7:0:0 to 8:0:0. The change in
+    "current" number is caused by scope of changes to cw_gen_t type needed to
+    fix "cw timing" issue. See
+    https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+    for more information on libcw's versioning scheme.
+
+  - If PulseAudio sound system is not available at runtime, libcw checks
+    value of XDG_RUNTIME_DIR env variable and prints an information if the
+    variable is empty. Empty variable may indicate incorrect configuration of
+    PulseAudio in user's system.
+
+  - Fixing minor issue with omitted checking of return value from ALSA's
+    snd_pcm_hw_params_set_periods().
+
+  - Added automatic tests of following libcw functions:
+    - cw_get_receive_parameters()
+	- cw_gen_enqueue_character_no_ics()
+
+  - Improved automatic tests of some of libcw functions
+
+
+  All packages:
+
+  - Fixing minor issues found during static code analysis.
+
+  - Clearing up custom flags passed to ./configure script: all flags that
+    enable features aiding a development of unixcw now start with
+    "--enable-dev-".
+
+  - Compilation of cw and cwgen programs can be now disabled through
+    ./configure's "--disable-cw" and "--disable-cwgen" flags. Similar flags
+    for other unixcw programs were already present.
+
+
+  Quality Assurance:
+
+  - Refactoring a script that tests all custom flags passed to ./configure
+    script.
+
+  - Improving helper files used for static code analysis. clang-tidy now has
+    its global configuration file uses during analysis of code in entire
+    package.
+
+
+----------------------------------------------------------------------------
+
 
 version 3.6.0 / 2021-01-17
 
