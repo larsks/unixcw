@@ -121,7 +121,7 @@ options to cppcheck.
 
 3. Fix reported issues.
 
-* TODO Come up with new version numbers
+* STARTED Come up with new version numbers
 
 Based on scope of changes that you did, come up with new version of unixcw
 package (configure.ac/AC_INIT) and of libcw library

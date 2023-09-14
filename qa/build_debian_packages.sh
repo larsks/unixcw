@@ -47,7 +47,7 @@
 
 # Customize these variables as needed.
 PACKAGE="unixcw"
-VERSION="3.6.0"
+VERSION="3.6.1"
 
 
 
@@ -236,8 +236,8 @@ tar cvfz $deb_build_dir/$archive_debian -C $repo_dir debian
 
 
 # At this point there should be two archives in $deb_build_dir:
-# $archive_orig     = unixcw_3.6.0.orig.tar.gz
-# $archive_debian   = unixcw_3.6.0.debian.tar.gz
+# $archive_orig     = unixcw_x.y.z.orig.tar.gz
+# $archive_debian   = unixcw_x.y.z.debian.tar.gz
 #
 # Their structure should match the structure of source code archives
 # available at packages.debian.org.
