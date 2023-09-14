@@ -616,5 +616,9 @@ Replace it with dev debug message that is compiled only in dev builds.
 There are sections of code that are enabled only in dev builds: e.g. some
 additional checks and safeguards. The unit/integration code must have a
 chance at triggering these checks and safeguards.
+** TODO R0037 Feature: non-hardcoded package version number
 
+Right now the package number (e.g. 3.6.0) is explicitly given in many places
+in the package. Come up with a way to at least decrease the count of places
+where the number is hardcoded - use some #define or something like this.
 
