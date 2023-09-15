@@ -85,6 +85,15 @@ version 3.6.1 / 2023-xx-yy
     package.
 
 
+  Debian:
+
+  - Integrated changes from Debian patch 0001-FTCBFS.patch: hardcoded
+    "pkg-config" name is now replaced with "$PKG_CONFIG" in configure.ac
+
+  - Integrated changes from Debian patch
+    0004-reprotest_collate_make_fix.patch: language-independent sorting that
+    allows reproducible builds.
+
 ----------------------------------------------------------------------------
 
 

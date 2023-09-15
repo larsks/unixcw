@@ -165,12 +165,12 @@ of libcw are correct.
 Make a properly named copy of qa/test_scenarios/template.org. The name of the
 copy should reflect new version number of the package.
 
-* TODO Synchronize with Debian
-** TODO Get *debian.tar.xz archive
+* STARTED Synchronize with Debian
+** STARTED Get *debian.tar.xz archive
 
 Go to https://packages.debian.org/sid/cw, Download *debian.tar.xz archive.
 
-** TODO Evaluate patches from the archive
+** DONE Evaluate patches from the archive
 
 You may want to apply them to the package. Update NEWS file with information
 that the patches were applied. This will let Debian team know about it

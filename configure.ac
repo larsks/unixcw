@@ -459,7 +459,7 @@ else
 			   AC_PATH_PROGS(MOC, [moc-qt5 moc], moc,`eval $PKG_CONFIG --variable=host_bins Qt5Core`)
 
 			   # https://stackoverflow.com/questions/11663702/how-to-suppress-warnings-for-file-included-from-header
-			   QT_INCLUDE_DIR=`pkg-config --variable=includedir Qt5Core`
+			   QT_INCLUDE_DIR=`$PKG_CONFIG --variable=includedir Qt5Core`
 			   QT5_CFLAGS="-isystem $QT_INCLUDE_DIR"
 			   QT5_CFLAGS+=" -isystem $QT_INCLUDE_DIR/QtWidgets"
 			   QT5_CFLAGS+=" -isystem $QT_INCLUDE_DIR/QtGui"

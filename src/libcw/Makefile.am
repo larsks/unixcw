@@ -122,8 +122,8 @@ libcw_test_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBCW_NDEBUG) -DLIBCW_UNIT_TESTS
 
 # target: libcw man page
 libcw.3: libcw.3.m4
-	cat $(top_srcdir)/src/libcw/*.c | $(AC_AWK) -f $(top_srcdir)/src/libcw/libdoc.awk | $(AC_AWK) -f $(top_srcdir)/src/libcw/libsigs.awk  > signatures
-	cat $(top_srcdir)/src/libcw/*.c | $(AC_AWK) -f $(top_srcdir)/src/libcw/libdoc.awk | $(AC_AWK) -f $(top_srcdir)/src/libcw/libfuncs.awk > functions
+	cat `LC_ALL=C ls $(top_srcdir)/src/libcw/*.c` | $(AC_AWK) -f $(top_srcdir)/src/libcw/libdoc.awk | $(AC_AWK) -f $(top_srcdir)/src/libcw/libsigs.awk  > signatures
+	cat `LC_ALL=C ls $(top_srcdir)/src/libcw/*.c` | $(AC_AWK) -f $(top_srcdir)/src/libcw/libdoc.awk | $(AC_AWK) -f $(top_srcdir)/src/libcw/libfuncs.awk > functions
 	$(AC_AWK) -f $(top_srcdir)/src/libcw/include.awk < $(top_srcdir)/src/libcw/libcw.3.m4 >libcw.3
 	rm -f signatures functions
 
