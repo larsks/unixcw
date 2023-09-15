@@ -47,7 +47,7 @@
   1. Compile unixcw package with enabled feature of saving samples to debug
      file:
 
-         ./configure --enable-dev
+         ./configure --enable-dev-pcm-samples-file
          make
 
   2. Generate debug file in one of unixcw programs: just play some string in

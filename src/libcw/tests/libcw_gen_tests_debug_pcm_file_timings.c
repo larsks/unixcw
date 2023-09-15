@@ -24,9 +24,9 @@
    This test is verifying if marks and spaces in wav (sound) file produced by
    generator have proper durations.
 
-   The sound file is produced by libcw if libcw is compiled in development
-   mode ("./configure --enable-dev"). In such case the generator copies all
-   sound samples to dedicated file in /tmp.
+   The sound file is produced by libcw if libcw is compiled with appropriate
+   feature enabled ("./configure --enable-dev-pcm-samples-file"). In such
+   case the generator copies all sound samples to dedicated file in /tmp.
 
    This test is checking if durations of the marks and spaces are as expected.
 
