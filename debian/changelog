@@ -1,3 +1,94 @@
+unixcw (3.6.0-5) unstable; urgency=medium
+
+  * Update d control libcw-dev marked Multi-Arch: same
+  * Improved xcwcp desktop icon handling, matching AppStream best practices
+
+ -- Federico Grau <donfede@casagrau.org>  Wed, 27 Oct 2021 18:48:45 -0400
+
+unixcw (3.6.0-4) unstable; urgency=medium
+
+  * Team upload.
+  * Add patch to enable cross-build from source (Closes: #996641)
+
+ -- tony mancill <tmancill@debian.org>  Sat, 23 Oct 2021 09:38:37 -0700
+
+unixcw (3.6.0-3) unstable; urgency=medium
+
+  [ Christoph Berg ]
+  * libcw-dev: Add Provides libcw6-dev. (Cf. #996628)
+
+  [ Federico Grau ]
+  * Earlier commit Mon Feb 15 2021 Closes: #990589
+  * Update d/control Breaks, to match Replaces Closes: #987257
+  * Bump standards version to 4.6.0.
+
+ -- Christoph Berg <myon@debian.org>  Thu, 21 Oct 2021 08:51:47 +0200
+
+unixcw (3.6.0-2) unstable; urgency=medium
+
+  * Transition from experimental to unstable.
+
+ -- Federico Grau <donfede@casagrau.org>  Thu, 14 Oct 2021 17:22:57 -0400
+
+unixcw (3.6.0-1) experimental; urgency=medium
+
+  [ Federico Grau ]
+  * Update debian/watch to file version 4, with current upstream URL.
+  * New upstream release (3.6.0; new libcw7).
+  * Update d/copyright to DEP-5 machine-readable format.
+  * Update debian/ with upstream Bug-Database and Requires-Root.
+  * Add initial d libcw7.symbols file.
+  * Update d rules, hardening tweaks.
+  * Update desktop menu entries; rm d *.menu and add d *.desktop files.
+  * Rename libcwX-dev to libcw-dev.
+
+ -- Federico Grau <donfede@casagrau.org>  Mon, 15 Feb 2021 14:57:58 -0500
+
+unixcw (3.5.1-4) unstable; urgency=low
+
+  * Team upload.
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Bump debhelper from deprecated 9 to 10.
+  * Set upstream metadata fields: Name (from ./configure), Repository.
+
+  [ Christoph Berg ]
+  * Remove obsolete boilerplate code from rules.
+  * Add debian/gitlab-ci.yml.
+  * Mark packages as Multi-Arch: same/foreign.
+  * Use dh and DH 13.
+  * Disable tests/libcw_test_tq_short_space.sh as it needs alsa at build-time.
+
+  [ Federico Grau ]
+  * Add patch libpulse-simple_so_version. (Closes: #979113)
+  * Add patch reprotest_collate_make_fix to correct CI errors.
+
+  [ Helmut Grohne ]
+  * Use a multiarch --libdir. (Closes: #962432)
+
+ -- Christoph Berg <myon@debian.org>  Tue, 19 Jan 2021 23:10:51 +0100
+
+unixcw (3.5.1-3) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Select a qt version. (Closes: #922664)
+
+  [ Christoph Berg ]
+  * Create packaging repository on salsa.
+  * Exclude from building on kfreebsd, undefined reference to `dlopen'.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 19 Feb 2019 09:46:06 +0100
+
+unixcw (3.5.1-2) unstable; urgency=medium
+
+  * Fix watch file
+  * Bump standards version to 4.0.0
+
+ -- Colin Tuckley <colint@debian.org>  Mon, 24 Jul 2017 13:15:48 +0100
+
 unixcw (3.5.1-1) unstable; urgency=medium
 
   * New upstream release (small fix in library and in compilation of xcwcp).
@@ -8,7 +99,7 @@ unixcw (3.5.1-1) unstable; urgency=medium
 unixcw (3.5.0-1) unstable; urgency=medium
 
   * New upstream release (small fix in library; xcwcp ported to Qt5).
-  * Bump standards version to 3.9.7. 
+  * Bump standards version to 3.9.7.
   * Add Brazilian Portuguese debconf templates translation
     from Adriano Rafael Gomes <adrianorg@arg.eti.br> Closes: #816939
 
@@ -41,7 +132,7 @@ unixcw (3.3.1-1) unstable; urgency=medium
 
   [ Kamil Ignacak ]
   * New upstream release (See Changelog).
-    Closes: #237891, #567394, #567392 
+    Closes: #237891, #567394, #567392
   * Bump standards version to 3.9.5
 
   [ Colin Tuckley ]

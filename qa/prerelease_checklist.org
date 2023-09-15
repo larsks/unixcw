@@ -176,7 +176,7 @@ You may want to apply them to the package. Update NEWS file with information
 that the patches were applied. This will let Debian team know about it
 because it may affect their workflow.
 
-** TODO Merge debian/
+** STARTED Merge debian/
 
 Merge current version of files from debian/ dir in the archive into project's
 repo. Let the configuration of the package in the repo be in sync with
