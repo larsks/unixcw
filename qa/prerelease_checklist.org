@@ -165,8 +165,8 @@ of libcw are correct.
 Make a properly named copy of qa/test_scenarios/template.org. The name of the
 copy should reflect new version number of the package.
 
-* STARTED Synchronize with Debian
-** STARTED Get *debian.tar.xz archive
+* DONE Synchronize with Debian
+** DONE Get *debian.tar.xz archive
 
 Go to https://packages.debian.org/sid/cw, Download *debian.tar.xz archive.
 
@@ -176,18 +176,18 @@ You may want to apply them to the package. Update NEWS file with information
 that the patches were applied. This will let Debian team know about it
 because it may affect their workflow.
 
-** STARTED Merge debian/
+** DONE Merge debian/
 
 Merge current version of files from debian/ dir in the archive into project's
 repo. Let the configuration of the package in the repo be in sync with
 Debian.
 
-** TODO Run qa/build_debian_packages.sh
+** DONE Run qa/build_debian_packages.sh
 
 Run qa/build_debian_packages.sh to confirm that Debian packages can be built
 more or less correctly. Fix any issues you will find.
 
-** TODO Fix compiler warnings
+** DONE Fix compiler warnings
 
 While running qa/build_debian_packages.sh, pay attention to compiler
 warnings. Debian's build scripts may use different complier flags.

@@ -121,12 +121,18 @@ static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_
 	for (size_t e = 0; e < elements->curr_count; e++) {
 		cw_element_time_t this_element_span = 0.0;
 		while (this_element_span < elements->array[e].timespan) {
+			ssize_t n = 0;
 			if (elements->array[e].state == cw_state_mark) {
-				write(fd, &high, sizeof (high));
+				n = write(fd, &high, sizeof (high));
 			} else {
-				write(fd, &low, sizeof (low));
+				n = write(fd, &low, sizeof (low));
 			}
 			this_element_span += sample_spacing;
+			if (n != sizeof (cw_sample_t)) {
+				/* TODO acerion 2023.09.15: better error handling. */
+				fprintf(stderr, "[ERROR]: write() failed: %zd != %zd: %s\n", n, sizeof (cw_sample_t), strerror(errno));
+				return;
+			}
 		}
 	}
 }
