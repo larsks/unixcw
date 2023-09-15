@@ -1,4 +1,4 @@
+debian/xcwcp.desktop        usr/share/applications/
 usr/bin/xcwcp
 usr/share/man/man1/xcwcp*
-usr/share/doc/xcwcp
-usr/share/pixmaps
+usr/share/icons/hicolor/scalable/apps/

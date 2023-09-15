@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cp -f ../../debian/cw.config DEBIAN/config
-cp -f ../../debian/cw.templates DEBIAN/templates

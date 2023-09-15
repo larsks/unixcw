@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cp -f ../../debian/xcwcp.config DEBIAN/config
-cp -f ../../debian/xcwcp.templates DEBIAN/templates

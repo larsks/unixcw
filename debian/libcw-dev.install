@@ -1,0 +1,7 @@
+usr/include/libcw.h
+usr/include/libcw2.h
+usr/include/libcw_debug.h
+usr/lib/*/libcw.a
+usr/lib/*/libcw.so
+usr/lib/*/pkgconfig/libcw.pc
+usr/share/man/man3

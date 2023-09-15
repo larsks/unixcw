@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Xcwcp
+GenericName=Amateur Radio Morse Code Tutor
+Comment=Interactive Morse code tutor with a Qt user interface
+Exec=xcwcp
+Icon=xcwcp
+Terminal=false
+Type=Application
+Categories=Application;Education;HamRadio;Utility;
+Keywords=Hamradio;Morse;Ham;Amateur;CW;
+StartupNotify=true

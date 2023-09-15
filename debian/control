@@ -2,18 +2,49 @@ Source: unixcw
 Section: hamradio
 Priority: optional
 Maintainer: Debian Hamradio Maintainers <debian-hams@lists.debian.org>
-Uploaders: Kamil Ignacak <acerion@wp.pl>, Kamal Mostafa <kamal@whence.com>, Colin Tuckley <colint@debian.org>
-Standards-Version: 3.9.8
-Build-Depends: debhelper (>=9), libasound2-dev, libpulse-dev, qtbase5-dev, libncurses5-dev, po-debconf, autotools-dev, mawk|gawk, dpkg-dev (>= 1.16.1~)
+Uploaders:
+ Kamil Ignacak <acerion@wp.pl>,
+ Federico Grau <donfede@casagrau.org>,
+Standards-Version: 4.6.0
+Build-Depends:
+ debhelper-compat (= 13),
+ dpkg-dev (>= 1.16.1~),
+ libasound2-dev,
+ libncurses5-dev,
+ libpulse-dev,
+ mawk | gawk,
+ po-debconf,
+ qtbase5-dev,
 Homepage: http://unixcw.sourceforge.net/
+Rules-Requires-Root: no
+Vcs-Browser: https://salsa.debian.org/debian-hamradio-team/unixcw
+Vcs-Git: https://salsa.debian.org/debian-hamradio-team/unixcw.git
 
 Package: libcw8
 Section: libs
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Replaces: unixcw, libcw3, libcw4, libcw5, libcw6, libcw7
-Breaks: unixcw, libcw3
-Suggests: cw, cwcp, xcwcp
+Architecture: hurd-any linux-any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Replaces:
+ libcw3,
+ libcw4,
+ libcw5,
+ libcw6,
+ libcw7,
+ unixcw,
+Breaks:
+ libcw3,
+ libcw4,
+ libcw5,
+ libcw6,
+ libcw7,
+ unixcw,
+Suggests:
+ cw,
+ cwcp,
+ xcwcp,
 Description: Morse code tutor - shared library
  The unixcw project provides support for learning to use Morse code.
  .
@@ -21,12 +52,27 @@ Description: Morse code tutor - shared library
  signals and to generate sound on the console buzzer or a sound card
  through OSS, ALSA or PulseAudio.
 
-Package: libcw8-dev
+Package: libcw-dev
 Section: libdevel
-Architecture: any
-Depends: libcw8 (= ${binary:Version}), ${misc:Depends}
-Replaces: unixcw-dev, libcw3-dev, libcw4-dev, libcw5-dev, libcw6-dev, libcw7-dev
-Breaks: unixcw-dev, libcw3-dev
+Architecture: hurd-any linux-any
+Multi-Arch: same
+Depends:
+ libcw8 (= ${binary:Version}),
+ ${misc:Depends},
+Provides:
+ libcw6-dev,
+Replaces:
+ libcw3-dev,
+ libcw4-dev,
+ libcw5-dev,
+ libcw6-dev,
+ unixcw-dev,
+Breaks:
+ libcw3-dev,
+ libcw4-dev,
+ libcw5-dev,
+ libcw6-dev,
+ unixcw-dev,
 Description: Morse code tutor - development files
  The unixcw project provides support for learning to use Morse code.
  .
@@ -34,8 +80,13 @@ Description: Morse code tutor - development files
  development of programs that handle (i.e. send and receive) Morse code.
 
 Package: cw
-Architecture: any
-Depends: libcw8, ${shlibs:Depends}, ${misc:Depends}, debconf|debconf-2.0
+Architecture: hurd-any linux-any
+Multi-Arch: foreign
+Depends:
+ debconf | debconf-2.0,
+ libcw8,
+ ${misc:Depends},
+ ${shlibs:Depends},
 Description: Morse code tutor - command line user interface
  The unixcw project provides support for learning to use Morse.
  .
@@ -51,8 +102,13 @@ Description: Morse code tutor - command line user interface
  tone, and spacing of characters.
 
 Package: cwcp
-Architecture: any
-Depends: libcw8, ${shlibs:Depends}, ${misc:Depends}, debconf|debconf-2.0
+Architecture: hurd-any linux-any
+Multi-Arch: foreign
+Depends:
+ debconf | debconf-2.0,
+ libcw8,
+ ${misc:Depends},
+ ${shlibs:Depends},
 Description: Morse code tutor - text user interface
  The unixcw project provides support for learning to use Morse code.
  .
@@ -62,8 +118,13 @@ Description: Morse code tutor - text user interface
  sounding options such as the sending speed and pitch.
 
 Package: xcwcp
-Architecture: any
-Depends: libcw8, ${shlibs:Depends}, ${misc:Depends}, debconf|debconf-2.0
+Architecture: hurd-any linux-any
+Multi-Arch: foreign
+Depends:
+ debconf | debconf-2.0,
+ libcw8,
+ ${misc:Depends},
+ ${shlibs:Depends},
 Description: Morse code tutor - graphical user interface
  The unixcw project provides support for learning to use Morse code.
  .

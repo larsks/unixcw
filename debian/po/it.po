@@ -29,8 +29,9 @@ msgstr "Eseguire cwcp con i privilegi di root?"
 msgid ""
 "If it is run with elevated privileges (which is not recommended), cwcp can "
 "produce sounds using the console buzzer."
-msgstr "Se eseguito con privilegi elevati (che non è raccomandato), "
-"cwcp può produrre suoni utilizzando il buzzer della console."
+msgstr ""
+"Se eseguito con privilegi elevati (che non è raccomandato), cwcp può "
+"produrre suoni utilizzando il buzzer della console."
 
 #. Type: boolean
 #. Description
@@ -38,8 +39,9 @@ msgstr "Se eseguito con privilegi elevati (che non è raccomandato), "
 msgid ""
 "Please choose whether this should be achieved by giving the executable the "
 "\"setuid\" attribute."
-msgstr "Scegliere se questo dovrebbe essere fatto impostando "
-"l'attributo \"setuid\" dell'eseguibile."
+msgstr ""
+"Scegliere se questo dovrebbe essere fatto impostando l'attributo \"setuid\" "
+"dell'eseguibile."
 
 #. Type: boolean
 #. Description
@@ -47,9 +49,10 @@ msgstr "Scegliere se questo dovrebbe essere fatto impostando "
 msgid ""
 "Alternatives include running the program with sudo or eliminating this issue "
 "completely by using output via a sound card instead of the buzzer."
-msgstr "Le alternative includono l'esecuzione del programma con il "
-"comando sudo oppure l'eliminazione completa di questo problema "
-"tramite l'utilizzo di una scheda audio anziché del buzzer."
+msgstr ""
+"Le alternative includono l'esecuzione del programma con il comando sudo "
+"oppure l'eliminazione completa di questo problema tramite l'utilizzo di una "
+"scheda audio anziché del buzzer."
 
 #. Type: boolean
 #. Description
@@ -63,9 +66,9 @@ msgstr "Eseguire cw con i privilegi di root?"
 msgid ""
 "If it is run with elevated privileges (which is not recommended), cw can "
 "produce sounds using the console buzzer."
-msgstr "Se eseguito con privilegi elevati (che non è raccomandato), "
-"cw può produrre suoni utilizzando il buzzer della console."
-
+msgstr ""
+"Se eseguito con privilegi elevati (che non è raccomandato), cw può produrre "
+"suoni utilizzando il buzzer della console."
 
 #~| msgid "Make cwcp setuid root"
 #~ msgid "Make cwcp setuid root?"

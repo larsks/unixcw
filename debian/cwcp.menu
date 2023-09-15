@@ -1,2 +1,0 @@
-?package(cwcp):needs="text" section="Applications/Amateur Radio"\
-  title="cwcp" command="/usr/bin/cwcp"
