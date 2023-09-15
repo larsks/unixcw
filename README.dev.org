@@ -621,4 +621,15 @@ chance at triggering these checks and safeguards.
 Right now the package number (e.g. 3.6.0) is explicitly given in many places
 in the package. Come up with a way to at least decrease the count of places
 where the number is hardcoded - use some #define or something like this.
+** TODO R0038 Feature: changelogs in Debian packages
+Debian packages contain changelog files that describe user-facing changes.
+The files are somehow taken from unixcw package, but are now outdated. Do
+something to make them up-to-date.
 
+Example file: cwcp_3.6.1-1_amd64.deb/CONTENTS/usr/share/doc/cwcp/changelog.gz
+** TODO R0039 'warn unused return value'
+
+During building of Debian packages I noticed a compiler warning saying that
+return value of write() was not checked ('Wunused-return' or something like
+this). Why this issue was not found earlier? Am I missing some compiler
+warning in my flags?
