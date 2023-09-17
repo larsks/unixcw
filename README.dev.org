@@ -477,7 +477,7 @@ unixcw's Makefiles may not work with non-GNU make on non Linux machines.
 
  It is necessary for configuring QT4 application (xcwcp).
 
-** TODO R0018 Make qa_test_configure_flags.sh portable
+** TODO R0018 Make qa_test_configure_options.sh portable
 
 Some shells (on FreeBSD) don't like the options[] table.
 

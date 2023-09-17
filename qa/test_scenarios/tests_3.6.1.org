@@ -13,12 +13,12 @@ Run "make distcheck" in main directory of unixcw.
 *Expected result*
 Distribution package is built correctly
 
-**** TODO ./configure flags
+**** TODO ./configure options
 
-Test that all flags supported by ./configure script produce "buildable" code.
+Test that all options supported by ./configure script produce "buildable" code.
 
 *Steps*
-Run ./qa/test_configure_flags.sh
+Run ./qa/test_configure_options.sh
 
 *Expected result*
 
@@ -26,7 +26,7 @@ The script should not report any failure.
 
 Example of failed test:
 
-$ qa/test_configure_flags.sh
+$ qa/test_configure_options.sh
 128: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
 Test of configuration flags FAILED
 $ echo $?
@@ -34,7 +34,7 @@ $ echo $?
 
 Example of successful test:
 
-$ qa/test_configure_flags.sh
+$ qa/test_configure_options.sh
 128: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
 127: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
 126: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null

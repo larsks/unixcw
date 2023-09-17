@@ -104,7 +104,7 @@ start_ts=$(get_date)
 # executed iterations in the log file. The repo may be placed in tmpfs and
 # this test script may be executed in there, so put the log in ~/ dir which
 # has a high chance of being a permanent localization.
-log_file=~/test_configure_flags_log_$start_ts.txt
+log_file=~/test_configure_options_log_$start_ts.txt
 
 
 
