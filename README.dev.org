@@ -377,8 +377,14 @@ libtoolize
    7. When writing commit messages, try to formulate them in a way that will
       be easy to copy to release notes. When possible, add a summary that
       will be meaningful from user's or integrator's point of view.
+   8. Maintain a section called "Quality Assurance" in changelog/NEWS file.
+      Put there changes related to:
+      a. increasing quality of code in the package,
+      b. increasing security of program(s) compiled from the package.
 
-
+      Let users know that there are specific actions taken and changes made
+      to increase quality of the software that they will be using. Make the
+      actions and changes more visible in the changelog/NEWS file.
 
 * Bugs, feature requests
 ** TODO R0001 Bug: -lintl on Alpine is not added to linker flags
