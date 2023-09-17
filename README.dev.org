@@ -635,7 +635,53 @@ something to make them up-to-date.
 Example file: cwcp_3.6.1-1_amd64.deb/CONTENTS/usr/share/doc/cwcp/changelog.gz
 ** TODO R0039 'warn unused return value'
 
-During building of Debian packages I noticed a compiler warning saying that
-return value of write() was not checked ('Wunused-return' or something like
-this). Why this issue was not found earlier? Am I missing some compiler
-warning in my flags?
+During building of Debian packages I noticed a compiler warning:
+
+    warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+
+Why this issue was not found earlier? Am I missing some compiler warning in
+my flags?
+
+It may be required to set -D_FORTIFY_SOURCE=1 (or =2) to see this warning
+during compilation time.
+
+** TODO R0040 Add more compilation flags
+
+Generic: -Wunused -Wsign-conversion -Wmisleading-indentation -Wduplicated-branches -Walloc-zero -Wconversion -Wformat-signedness -Wuninitialized -Winit-self -Wundef -Wunused-macros -Wstrict-aliasing -Wattributes -Wmain -Wpointer-arith -Wunused-result
+
+C: -Wimplicit-int -Wimplicit-function-declaration -Wint-conversion -Wpointer-sign -Wincompatible-pointer-types
+
+C++: -Woverloaded-virtual -Wuseless-cast -Wnarrowing -Wwrite-strings
+
+For Debian: -Wdate-time
+
+Inspired by:
+https://medium.com/@costaparas/the-gcc-warning-flags-every-c-programmer-should-know-about-8846c4a9bc94
+https://cpp-polska.pl/post/flagi-wall-i-wextra-to-nie-wszystko-czyli-zbior-przydatnych-flag-do-gcc
+
+** TODO R0041 Bump value of -D_FORTIFY_SOURCE from 1 to 2
+
+configure.ac specifies this macro for C and for C++, but with value of '1'.
+Increase the value to '2' and do lots of tests to ensure that no run-time
+errors occur.
+
+** TODO R0042 Clean up compilation flags in configure.ac
+
+Right now the section of code in configure.ac that adds compilation flags
+(-Wxyz) is messy. Clean it up. Remove sections related to unsupported
+compilers - you can't test them anyway.
+
+** TODO R0043 QA in README and NEWS
+
+1. Add to README some information about QA mechanisms in the package:
+ - automatic tests of libcw and other components,
+ - static code analysis,
+ - compiler flags,
+ - other
+
+2. Add to prerelease checklist some steps that will require:
+ - reviewing of recent QA changes and adding them to NEWS file,
+ - reviewing of recent QA changes and updating QA section in README.
+
+Let users of unixcw know that there is some QA effort put into this software.
+
