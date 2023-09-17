@@ -127,12 +127,17 @@ static void write_elements_to_file(int fd, cw_elements_t * elements, cw_element_
 			} else {
 				n = write(fd, &low, sizeof (low));
 			}
-			this_element_span += sample_spacing;
-			if (n != sizeof (cw_sample_t)) {
-				/* TODO acerion 2023.09.15: better error handling. */
-				fprintf(stderr, "[ERROR]: write() failed: %zd != %zd: %s\n", n, sizeof (cw_sample_t), strerror(errno));
+			if (-1 == n) {
+				/* TODO acerion 2023.09.17: better error handling. */
+				fprintf(stderr, "[ERROR]: write() failed and returned -1: %s\n", strerror(errno));
 				return;
 			}
+			if ((size_t) n != sizeof (cw_sample_t)) {
+				/* TODO acerion 2023.09.15: better error handling. */
+				fprintf(stderr, "[ERROR]: write() failed: %zd != %zu: %s\n", n, sizeof (cw_sample_t), strerror(errno));
+				return;
+			}
+			this_element_span += sample_spacing;
 		}
 	}
 }
