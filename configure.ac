@@ -588,7 +588,7 @@ if test "`basename $CC`" = "gcc" ; then
   CFLAGS="$CFLAGS -std=c99"
   # SUSv3
   # CFLAGS="$CFLAGS -D_XOPEN_SOURCE=600"
-  CFLAGS="$CFLAGS -D_GNU_SOURCE"
+  CFLAGS="$CFLAGS -D_GNU_SOURCE -D_FORTIFY_SOURCE=1"
   CFLAGS="$CFLAGS $GCC_WARNINGS $GCC_C_WARNINGS -pedantic -Wfloat-equal -Wpointer-arith"
   CFLAGS="$CFLAGS -Wcast-qual -Wwrite-strings -Wmissing-prototypes"
   CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-declarations -Wredundant-decls"
@@ -600,7 +600,7 @@ fi
 if test "`basename $CXX`" = "g++" ; then
   # -Wno-variadic-macros is to silence g++'s warnings about C99
   # variadic macros from libcw_debug.h
-  CXXFLAGS="$CXXFLAGS $GCC_WARNINGS -pedantic -Wno-long-long -Wno-variadic-macros"
+  CXXFLAGS="$CXXFLAGS $GCC_WARNINGS -pedantic -Wno-long-long -Wno-variadic-macros -D_FORTIFY_SOURCE=1"
 else
   if test "`basename $CXX`" = "icpc" ; then
     CXXFLAGS="$CXXFLAGS -Wall -wd181,188,279,383,593,810,981,1469"

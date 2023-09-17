@@ -77,6 +77,9 @@ version 3.6.1 / 2023-xx-yy
 
   Quality Assurance:
 
+  - All code is now compiled with "-D_FORTIFY_SOURCE=1". In the future this
+    will be upgraded to "-D_FORTIFY_SOURCE=2".
+
   - Refactoring a script that tests all custom flags passed to ./configure
     script.
 
