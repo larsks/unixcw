@@ -45,16 +45,24 @@ PCM frames.
 
 In addition to the unit tests, the following Quality Assurance
 measures are implemented:
+
 1. TO BE DONE: test coverage reports (gcov),
-2. TO BE DONE: static code analysis with cppcheck (for both production
-   code and test code),
-3. TO BE DONE: static code analysis with clang-tidy (for both
-   production code and test code),
+
+2. IN PROGRESS: static code analysis with cppcheck, done with top-level
+   qa/lint_cppcheck.sh script
+
+3. IN PROGRESS: static code analysis with clang-tidy, done with top-level
+   qa/lint_clang_tidy.sh using a top-level .clang-tidy config file (the list
+   of enabled checks is for now rather small)
+
 4. TO BE DONE: compilation with c++ compilers (g++ and clang) (for
    both production code and test code),
+
 5. TO BE DONE: compilation with -Wall -Werror -pedantic -Wextra
    (other) by default (for both production code and test code),
+
 6. TO BE DESCRIBED: valgrind,
+
 7. PARTIALLY DONE, TO BE DESCRIBED: compilation and tests on different
    platforms.
 

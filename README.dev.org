@@ -685,3 +685,6 @@ compilers - you can't test them anyway.
 
 Let users of unixcw know that there is some QA effort put into this software.
 
+There is already some description of QA measures in src/libcw/tests/README.
+Move the description out of that file.
+
