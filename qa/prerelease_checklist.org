@@ -255,6 +255,10 @@ in this development cycle, but you didn't notice it.
 Read the list of opened tickets, find the tickets that describe already fixed
 bug or already implemented feature, and close them.
 
+* TODO Spellcheck
+
+Spell-check user-facing files: NEWS, README, change logs, man pages, other
+documents.
 
 
 
