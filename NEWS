@@ -68,6 +68,14 @@ version 3.6.1 / 2023-xx-yy
     ./configure's "--disable-cw" and "--disable-cwgen" flags. Similar flags
     for other unixcw programs were already present.
 
+  - Default optimization and debug flags in CFLAGS have been changed from
+    "-g -O2" to "-O2". This still can be overriden by setting CFLAGS env
+    variable.
+
+  - Default optimization and debug flags in CXXFLAGS have been changed from
+    "-g -O2" to "-O2". This still can be overriden by setting CXXFLAGS env
+    variable.
+
 
   Quality Assurance:
 

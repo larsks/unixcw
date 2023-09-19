@@ -192,7 +192,7 @@ more or less correctly. Fix any issues you will find.
 While running qa/build_debian_packages.sh, pay attention to compiler
 warnings. Debian's build scripts may use different complier flags.
 
-* TODO Remove -Werror from CFLAGS
+* DONE Remove -Werror from CFLAGS
 At this stage of this list there should be no more changes in code. Remove
 -Werror from CFLAGS because after this stage there should be no occasions on
 which you would introduce problems in code.
@@ -202,7 +202,7 @@ this code will be compiled by your users may have different version of
 compiler, and that compiler may discover some issues. You don't want to break
 compilation on users' computers due to -Werror.
 
-* TODO Make sure that debug and optimization compiler flags are correct
+* DONE Make sure that debug and optimization compiler flags are correct
 
 Make sure that CFLAGS of code that is almost ready for release doesn't
 contain "-g -O". Do this before testing phase so that the code that you test

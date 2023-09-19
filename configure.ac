@@ -20,6 +20,13 @@
 AC_PREREQ(2.57)
 
 AC_INIT([unixcw], [3.6.1])
+
+# https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/C-Compiler.html
+# If your package does not like this default, then it is acceptable to insert
+# the line ‘: ${CFLAGS=""}’ after AC_INIT and before AC_PROG_CC to ...
+: ${CFLAGS="-O2"}
+: ${CXXFLAGS="-O2"}
+
 AC_CONFIG_SRCDIR([src/libcw/libcw_gen.c])
 AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])

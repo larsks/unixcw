@@ -2471,6 +2471,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/C-Compiler.html
+# If your package does not like this default, then it is acceptable to insert
+# the line ‘: ${CFLAGS=""}’ after AC_INIT and before AC_PROG_CC to ...
+: ${CFLAGS="-O2"}
+: ${CXXFLAGS="-O2"}
+
+
 
 am__api_version='1.16'
 
