@@ -63,9 +63,6 @@ typedef struct cw_variation_params {
 	/* For functions generating varying send speeds. */
 	int speed_min;
 	int speed_max;
-
-	/* For... something. */
-	int fuzz_percent;
 } cw_variation_params;
 
 
@@ -270,7 +267,7 @@ int test_cw_rec_test_with_constant_speeds(cw_test_executor_t * cte)
 	while (test_data[i].name) {
 		for (int speed = CW_SPEED_MIN; speed <= CW_SPEED_MAX; speed++) {
 
-			const cw_variation_params variation_params = { .speed = speed, .speed_min = 0, .speed_max = 0, .fuzz_percent = 0 };
+			const cw_variation_params variation_params = { .speed = speed, .speed_min = 0, .speed_max = 0 };
 
 			/* Generate duration data for given list of
 			   characters, each character is sent with
@@ -355,7 +352,7 @@ int test_cw_rec_test_with_varying_speeds(cw_test_executor_t * cte)
 	int i = 0;
 	while (test_data[i].name) {
 
-		cw_variation_params variation_params = { .speed = 0, .speed_min = CW_SPEED_MIN, .speed_max = CW_SPEED_MAX, .fuzz_percent = 0 };
+		cw_variation_params variation_params = { .speed = 0, .speed_min = CW_SPEED_MIN, .speed_max = CW_SPEED_MAX };
 
 		/* Generate duration data for given set of characters, each
 		   character is sent with varying speed from range
