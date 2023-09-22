@@ -1,7 +1,7 @@
 #+TODO: TODO STARTED FAILED | DONE SKIPPED
 # The vertical bar indicates which states are final states.
 
-* TODO Template for tests plan for unixcw version 3.6.1
+* TODO Tests for unixcw version 3.6.1
 Version of template: 2023.06.10.
 ** TODO <Machine/OS identifier>
 <Description of machine/OS>
