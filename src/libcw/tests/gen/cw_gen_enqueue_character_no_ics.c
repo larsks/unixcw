@@ -42,7 +42,6 @@
 #include "libcw_debug.h"
 #include "libcw_gen.h"
 #include "libcw_gen_tests.h"
-#include "libcw_debug.h"
 #include "libcw_utils.h"
 #include "cw_gen_enqueue_character_no_ics.h"
 

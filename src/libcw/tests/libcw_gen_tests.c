@@ -38,7 +38,6 @@
 #include "libcw_debug.h"
 #include "libcw_gen.h"
 #include "libcw_gen_tests.h"
-#include "libcw_debug.h"
 #include "libcw_utils.h"
 #include "test_framework.h"
 #include <cw_easy_rec.h>
