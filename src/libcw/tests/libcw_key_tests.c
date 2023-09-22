@@ -258,8 +258,14 @@ cwt_retv test_helper_test_straight_key(cw_test_executor_t * cte, volatile cw_key
 		cw_key_value_t readback_value;
 		if (test_data->modern_get) {
 			cwret = test_data->modern_get(key, &readback_value);
+			if (!cte->expect_op_int_errors_only(cte,
+			                                    CW_SUCCESS, "==", cwret,
+			                                    "%s: modern_get()'s return value is CW_SUCCESS",
+			                                    test_data->test_name)) {
+				state_failure = true;
+				break;
+			}
 		} else {
-			cwret = CW_SUCCESS;
 			readback_value = test_data->legacy_get();
 		}
 		if (!cte->expect_op_int_errors_only(cte,
