@@ -1,12 +1,12 @@
 #+TODO: TODO STARTED FAILED | DONE SKIPPED
 # The vertical bar indicates which states are final states.
 
-* TODO Tests for unixcw version 3.6.1
+* STARTED Tests for unixcw version 3.6.1
 Version of template: 2023.06.10.
-** TODO <Machine/OS identifier>
-<Description of machine/OS>
-*** TODO Build system tests
-**** TODO make distcheck
+** STARTED Main laptop, Debian GNU/Linux 12
+gcc (Debian 12.2.0-14) 12.2.0
+*** STARTED Build system tests
+**** STARTED make distcheck
 *Steps*
 Run "make distcheck" in main directory of unixcw.
 
