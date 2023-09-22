@@ -146,8 +146,8 @@ static void cw_test_log_error(struct cw_test_executor_t * self, const char * fmt
 static void cw_test_print_sound_systems(cw_test_executor_t * self, cw_sound_system * sound_systems, int max);
 static void cw_test_print_topics(cw_test_executor_t * self, int * topics, int max);
 
-static bool cw_test_test_topic_is_member(cw_test_executor_t * cte, int topic, int * topics, int max);
-static bool cw_test_sound_system_is_member(cw_test_executor_t * cte, cw_sound_system sound_system, cw_sound_system * sound_systems, int max);
+static bool cw_test_test_topic_is_member(cw_test_executor_t * cte, int topic, const int * topics, int max);
+static bool cw_test_sound_system_is_member(cw_test_executor_t * cte, cw_sound_system sound_system, const cw_sound_system * sound_systems, int max);
 
 static cwt_retv cw_test_main_test_loop(cw_test_executor_t * cte, cw_test_set_t * test_sets);
 static unsigned int cw_test_get_total_errors_count(cw_test_executor_t * cte);
@@ -1424,7 +1424,7 @@ void cw_test_print_test_options(cw_test_executor_t * self)
 
    The size of @param topics is specified by @param max.
 */
-bool cw_test_test_topic_is_member(__attribute__((unused)) cw_test_executor_t * cte, int topic, int * topics, int max)
+bool cw_test_test_topic_is_member(__attribute__((unused)) cw_test_executor_t * cte, int topic, const int * topics, int max)
 {
 	for (int i = 0; i < max; i++) {
 		if (LIBCW_TEST_TOPIC_MAX == topics[i]) {
@@ -1446,7 +1446,7 @@ bool cw_test_test_topic_is_member(__attribute__((unused)) cw_test_executor_t * c
 
    The size of @param sound_system is specified by @param max.
 */
-bool cw_test_sound_system_is_member(__attribute__((unused)) cw_test_executor_t * cte, cw_sound_system sound_system, cw_sound_system * sound_systems, int max)
+bool cw_test_sound_system_is_member(__attribute__((unused)) cw_test_executor_t * cte, cw_sound_system sound_system, const cw_sound_system * sound_systems, int max)
 {
 	for (int i = 0; i < max; i++) {
 		if (CW_AUDIO_NONE == sound_systems[i]) {
