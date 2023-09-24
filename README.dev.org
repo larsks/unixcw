@@ -649,7 +649,7 @@ during compilation time.
 
 Generic: -Wunused -Wsign-conversion -Wmisleading-indentation -Wduplicated-branches -Walloc-zero -Wconversion -Wformat-signedness -Wuninitialized -Winit-self -Wundef -Wunused-macros -Wstrict-aliasing -Wattributes -Wmain -Wpointer-arith -Wunused-result
 
-C: -Wimplicit-int -Wimplicit-function-declaration -Wint-conversion -Wpointer-sign -Wincompatible-pointer-types
+C: -Wimplicit-int -Wimplicit-function-declaration -Wint-conversion -Wpointer-sign -Wincompatible-pointer-types -Wold-style-definition
 
 C++: -Woverloaded-virtual -Wuseless-cast -Wnarrowing -Wwrite-strings
 
