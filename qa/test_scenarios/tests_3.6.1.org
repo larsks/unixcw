@@ -44,7 +44,6 @@ $ qa/test_configure_options.sh
 1: ./configure &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
 Test of configuration flags SUCCEEDED
 
-
 *Notes*
 The shell script may not work on systems without bash.
 

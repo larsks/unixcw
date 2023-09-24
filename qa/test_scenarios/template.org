@@ -7,6 +7,7 @@ Version of template: 2023.06.10.
 <More details about the machine>
 *** TODO Build system tests
 **** TODO make distcheck
+
 *Steps*
 Run "make distcheck" in main directory of unixcw.
 
@@ -131,7 +132,6 @@ samples are being written.
    "cw_file_<parameters>_pcm.raw" from _current_ run of program done in
    step 3.
 
-
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
 
@@ -148,14 +148,8 @@ Tests of basic usage of unixcw/src/cwcp/cwcp program.
 **** TODO basics
 Tests of basic usage of unixcw/src/xcwcp/xcwcp program.
 
-
-
 *** TODO cwgen tests
 Tests of basic usage of unixcw/src/cwgen/cwgen program.
-
-
-
-
 
 *** TODO receiving functionality
 **** TODO xcwcp receiver tests
