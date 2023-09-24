@@ -5,15 +5,22 @@
 Version of template: 2023.06.10.
 ** STARTED Main laptop, Debian GNU/Linux 12
 gcc (Debian 12.2.0-14) 12.2.0
-*** STARTED Build system tests
-**** STARTED make distcheck
+*** DONE Build system tests
+**** DONE make distcheck
 *Steps*
-Run "make distcheck" in main directory of unixcw.
+Run "make distcheck" in main directory of the project.
 
 *Expected result*
-Distribution package is built correctly
+1. Distribution package is built correctly (no errors during creation of
+   archive).
+2. Automatic tests executed during 'make distcheck' pass.
+3. The distribution package contains all files intended for distribution (use
+   your best judgement here).
 
-**** TODO ./configure options
+*Actual result*
+All three points are a PASS
+
+**** DONE ./configure options
 
 Test that all options supported by ./configure script produce "buildable" code.
 
@@ -46,6 +53,9 @@ Test of configuration flags SUCCEEDED
 
 *Notes*
 The shell script may not work on systems without bash.
+
+*Actual result*
+PASS, no issues found (512 compilations).
 
 *** TODO libcw tests
 Tests using tools from unixcw/src/libcw.
