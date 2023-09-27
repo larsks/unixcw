@@ -57,10 +57,10 @@ The shell script may not work on systems without bash.
 *Actual result*
 PASS, no issues found (512 compilations).
 
-*** TODO libcw tests
+*** STARTED libcw tests
 Tests using tools from unixcw/src/libcw.
 
-**** TODO Main test binary - Null sound system
+**** STARTED Main test binary - Null sound system
 
 *Steps*
 cd src/libcw/tests
