@@ -693,4 +693,10 @@ Move the description out of that file.
 Print value of CXXFLAGS the same way that you print value of CFLAGS in
 summary of ./configure script.
 
+** TODO R0045 use receiver in legacy_api_test_gen_remove_last_character
+
+Use receiver in legacy_api_test_gen_remove_last_character() test function to
+receive played string and to confirm that characters have been removed. The
+receiver is used in tests of related 'modern API' function
+test_cw_gen_remove_last_character().
 
