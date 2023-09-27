@@ -362,7 +362,7 @@ static void cw_rec_tester_display_differences(const cw_rec_tester_t * tester)
 
 void cw_rec_tester_configure(cw_rec_tester_t * tester, cw_easy_legacy_receiver_t * easy_rec, bool use_ranger)
 {
-	cw_rec_tester_init_text_buffers(tester, true);
+	cw_rec_tester_init_text_buffers(tester, false);
 	/* Using Null sound system because this generator is only
 	   used to enqueue text and control key. Sound will be played
 	   by main generator used in tested code. */
