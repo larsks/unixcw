@@ -45,11 +45,11 @@ const char * get_test_result_string(test_result_t result)
 	   (https://en.cppreference.com/w/c/language/string_literal). */
 	switch (result) {
 	case test_result_pass:
-		return BEGIN_GREEN"[PASS]"END_COLOR;
+		return "["BEGIN_GREEN"PASS"END_COLOR"]";
 	case test_result_fail:
-		return   BEGIN_RED"[FAIL]"END_COLOR;
+		return   "["BEGIN_RED"FAIL"END_COLOR"]";
 	default:
-		return   BEGIN_RED"[????]"END_COLOR;
+		return   "["BEGIN_RED"????"END_COLOR"]";
 	}
 }
 
