@@ -693,7 +693,7 @@ int legacy_api_test_tone_queue_callback(cw_test_executor_t * cte)
 		   that captured level may be in a range of values. */
 		const int expected_lower = level - 1;
 		const int expected_higher = level;
-		cte->expect_between_int(cte, expected_lower, data.captured_level, expected_higher, "tone queue callback:           level at callback = %d", data.captured_level);
+		cte->expect_between_int(cte, expected_lower, data.captured_level, expected_higher, "tone queue callback: level at callback = %d", data.captured_level);
 
 		cw_reset_tone_queue();
 	}
