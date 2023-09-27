@@ -68,6 +68,7 @@
 
 #include "test_framework.h"
 #include <test_framework/basic_utils/param_ranger.h>
+#include <test_framework/basic_utils/test_result.h>
 
 
 
@@ -367,7 +368,7 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 
 			const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
-			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+			cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 
 			self->log_info(self, "%s\n", msg_buf);
 		}
@@ -377,7 +378,7 @@ static bool cw_test_expect_op_int_sub(struct cw_test_executor_t * self, int expe
 
 		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected %d, got %d   ***\n", expected_value, received_value);
 
@@ -441,7 +442,7 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 			self->stats->successes++;
 
 			const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
-			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+			cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 			self->log_info(self, "%s\n", msg_buf);
 		}
 		as_expected = true;
@@ -449,7 +450,7 @@ static bool cw_test_expect_op_float_sub(struct cw_test_executor_t * self, float 
 		self->stats->failures++;
 
 		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected %f, got %f   ***\n", (double) expected_value, (double) received_value);
 
@@ -512,7 +513,7 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 			/* FIXME: believe it or not, this line
 			   introduces large delays when running tests
 			   under valgrind/callgrind. */
-			cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+			cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 
 			self->log_info(self, "%s\n", msg_buf);
 		}
@@ -526,7 +527,7 @@ bool cw_test_expect_strcasecmp(struct cw_test_executor_t * self, const char * ex
 		va_end(ap);
 
 		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected [%s], got [%s]   ***\n", expected_value, received_value);
 
@@ -583,14 +584,14 @@ bool cw_test_expect_between_int(struct cw_test_executor_t * self, int expected_l
 	if (expected_lower <= received_value && received_value <= expected_higher) {
 		self->stats->successes++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 		self->log_info(self, "%s %d %d %d\n", msg_buf, expected_lower, received_value, expected_higher);
 
 		as_expected = true;
 	} else {
 		self->stats->failures++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected within %d-%d, got %d   ***\n", expected_lower, expected_higher, received_value);
 
@@ -645,14 +646,14 @@ bool cw_test_expect_null_pointer(struct cw_test_executor_t * self, const void * 
 	if (NULL == pointer) {
 		self->stats->successes++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 		self->log_info(self, "%s\n", msg_buf);
 
 		as_expected = true;
 	} else {
 		self->stats->failures++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected NULL, got %p   ***\n", pointer);
 
@@ -684,7 +685,7 @@ bool cw_test_expect_null_pointer_errors_only(struct cw_test_executor_t * self, c
 		char msg_buf[MSG_BUF_SIZE] = { 0 };
 		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected NULL, got %p   ***\n", pointer);
 
@@ -713,14 +714,14 @@ bool cw_test_expect_valid_pointer(struct cw_test_executor_t * self, const void *
 	if (NULL != pointer) {
 		self->stats->successes++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[ OK ]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_pass));
 		self->log_info(self, "%s\n", msg_buf);
 
 		as_expected = true;
 	} else {
 		self->stats->failures++;
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected valid pointer, got NULL   ***\n");
 
@@ -752,7 +753,7 @@ bool cw_test_expect_valid_pointer_errors_only(struct cw_test_executor_t * self, 
 		char msg_buf[MSG_BUF_SIZE] = { 0 };
 		const int message_len = msg_buff_prepare(self, msg_buf, sizeof (msg_buf), va_buf);
 
-		cw_test_append_status_string(self, msg_buf, message_len, "[FAIL]");
+		cw_test_append_status_string(self, msg_buf, message_len, get_test_result_string(test_result_fail));
 		self->log_error(self, "%s\n", msg_buf);
 		self->log_error(self, "   ***   expected valid pointer, got NULL   ***\n");
 

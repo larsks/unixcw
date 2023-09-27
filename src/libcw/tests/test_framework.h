@@ -140,7 +140,7 @@ typedef struct cw_test_executor_t {
 
 	   You shouldn't put newline character at end of formatting
 	   string. The messages printed by these functions will be followed
-	   by "[ OK ]" or "[FAIL]" tags, and the newline would put these tags
+	   by "[PASS]" or "[FAIL]" tags, and the newline would put these tags
 	   in new line, decreasing readability of test results.
 
 	   @return true if tested value and expected value satisfy given operator (i.e. test passes)
