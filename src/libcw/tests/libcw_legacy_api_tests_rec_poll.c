@@ -456,10 +456,23 @@ static int legacy_api_test_rec_poll_inner(cw_test_executor_t * cte, bool poll_re
 	}
 
 
+	/* A wrapper 'class' around tested receiver. Easy receiver is easier to
+	   use. */
 	cw_easy_legacy_receiver_t * easy_rec = cw_easy_legacy_receiver_new();
 	cw_clear_receive_buffer();
 	cw_set_frequency(cte->config->frequency);
 	cw_generator_start();
+	/* Earlier tests may have set initial receiver speed of global receiver
+	   to some wild value. Reset it here, before the test starts. Do the call
+	   before enabling adaptive receive!
+
+	   TODO acerion 2023.09.28: should we set initial receive speed that
+	   matches generator's send speed? In the future the generator's speed
+	   may be different on each test run. On the other hand if the receiver's
+	   initial speed will be the same as generator's speed, then the receiver
+	   won't get a chance to demonstrate its ability to find the right
+	   receive speed. */
+	cw_reset_send_receive_parameters();
 	cw_enable_adaptive_receive();
 
 	/* Register handler as the CW library keying event callback.
