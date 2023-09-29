@@ -1,8 +1,8 @@
-#+TODO: TODO STARTED FAILED | DONE SKIPPED
+#+TODO: TODO STARTED | FAILED DONE SKIPPED
 # The vertical bar indicates which states are final states.
 
 * TODO Tests for unixcw version a.b.c
-Version of template: 2023.06.10.
+Version of template: 2023.09.29.
 ** TODO <Machine/OS identifier>
 <More details about the machine>
 *** TODO Build system tests
@@ -76,6 +76,8 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+*Actual result*
+
 **** TODO Main test binary - OSS sound system
 
 *Steps*
@@ -86,6 +88,8 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+*Actual result*
 
 **** TODO Main test binary - ALSA sound system
 
@@ -98,6 +102,8 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+*Actual result*
+
 **** TODO Main test binary - PulseAudio sound system
 
 *Steps*
@@ -108,6 +114,8 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+*Actual result*
 
 **** TODO Main test binary - Null sound system
 
@@ -120,6 +128,9 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+*Actual result*
+
 **** TODO Misc tests
 
 ***** TODO pcm sample file is disabled in regular builds

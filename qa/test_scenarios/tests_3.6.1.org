@@ -1,4 +1,4 @@
-#+TODO: TODO STARTED FAILED | DONE SKIPPED
+#+TODO: TODO STARTED | FAILED DONE SKIPPED
 # The vertical bar indicates which states are final states.
 
 * STARTED Tests for unixcw version 3.6.1
@@ -150,6 +150,9 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+*Actual result*
+
 **** TODO Misc tests
 
 ***** TODO pcm sample file is disabled in regular builds
