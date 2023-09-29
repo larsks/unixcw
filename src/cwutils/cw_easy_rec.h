@@ -144,6 +144,22 @@ cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed);
 
 
 /**
+   @brief Wrapper around cw_rec_get_speed() for easy receiver
+
+   @reviewedon 2023.09.29
+
+   @param[in] easy_rec Easy receiver for which to get the speed
+   @param[in] speed Value of speed of @p receiver
+
+   @return CW_SUCCESS on success
+   @return CW_FAILURE if function failed to get speed in receiver
+*/
+cw_ret_t cw_easy_rec_get_speed(cw_easy_rec_t * easy_rec, float * speed);
+
+
+
+
+/**
    @brief Wrapper around cw_rec_set_tolerance() for easy receiver
 
    @reviewedon 2023.08.12

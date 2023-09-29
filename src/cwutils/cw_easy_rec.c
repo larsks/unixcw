@@ -544,6 +544,19 @@ cw_ret_t cw_easy_rec_set_speed(cw_easy_rec_t * easy_rec, int speed)
 
 
 
+cw_ret_t cw_easy_rec_get_speed(cw_easy_rec_t * easy_rec, float * speed)
+{
+	if (NULL == easy_rec || NULL == speed) {
+		fprintf(stderr, "[ERROR] %s:%d: NULL argument\n", __func__, __LINE__);
+		return CW_FAILURE;
+	}
+	*speed = cw_rec_get_speed(easy_rec->rec);
+	return CW_SUCCESS;
+}
+
+
+
+
 cw_ret_t cw_easy_rec_set_tolerance(cw_easy_rec_t * easy_rec, int tolerance)
 {
 	if (NULL == easy_rec) {
