@@ -66,7 +66,7 @@ speaker or buzzer it's easier to notice problems with libcw. Don't waste time
 on testing Null system first, only to hear issues with other sound systems
 later.
 
-**** TODO Main test binary - Console sound system
+**** SKIPPED Main test binary - Console sound system
 
 *Steps*
 cd src/libcw/tests
@@ -77,7 +77,10 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
-**** TODO Main test binary - OSS sound system
+*Actual result*
+Skipped. Console output is not available on this machine
+
+**** SKIPPED Main test binary - OSS sound system
 
 *Steps*
 cd src/libcw/tests
@@ -87,6 +90,9 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+*Actual result*
+Skipped. Console output is not available on this machine
 
 **** TODO Main test binary - ALSA sound system
 
@@ -99,7 +105,7 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
-**** TODO Main test binary - PulseAudio sound system
+**** DONE Main test binary - PulseAudio sound system
 
 *Steps*
 cd src/libcw/tests
@@ -109,6 +115,29 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> P |         0 |        38 |         0 |         0 |         0 |         0 |<-
+   P |       151 |      1003 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+
+*Actual result*
+
+Pass. The failures occurred in 'test_cw_gen_state_callback' test, which is a
+known problem.
 
 **** TODO Main test binary - Null sound system
 
