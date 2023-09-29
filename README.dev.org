@@ -700,3 +700,10 @@ receive played string and to confirm that characters have been removed. The
 receiver is used in tests of related 'modern API' function
 test_cw_gen_remove_last_character().
 
+
+** TODO R0046 Improve timing characteristics of PulseAudio
+
+Results of libcw 'test_cw_gen_state_callback' test for PulseAudio are very
+poor, especially for higher generator's speeds. Find out why the results are
+so bad and fix the root cause.
+

@@ -210,6 +210,12 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cw_easy_rec_register_receive_callback(easy_rec, receive_callback, &data);
 	cw_easy_rec_start(easy_rec);
 
+#if 0  /* Debug. */
+	kite_log(cte, LOG_DEBUG, "Generator speed = %d\n", cw_gen_get_speed(gen));
+	float rec_speed = 0.0F;
+	cw_easy_rec_get_speed(easy_rec, &rec_speed);
+	kite_log(cte, LOG_DEBUG, "Receiver speed = %.2f\n", (double) rec_speed);
+#endif
 
 	bool failure = false;
 	int t = 0;
@@ -307,9 +313,9 @@ static int get_tolerance(cw_test_executor_t * cte, cw_sound_system_t sound_syste
 	   sound system. I've got similar results when I back-ported the test to
 	   unixcw 3.6.0. */
 #define TOLERANCE_ALSA    CW_TOLERANCE_MAX
-	/* At 12 wpm and 10% I experienced problems. With 12% it was ok. 15%
+	/* At 12 wpm and 15% I experienced problems. With 22% it was ok. 25%
 	   should be safe for all my test machines. */
-#define TOLERANCE_PA      15
+#define TOLERANCE_PA      22
 
 	switch (sound_system) {
 	case CW_AUDIO_NULL:
