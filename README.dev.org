@@ -732,10 +732,19 @@ receive played string and to confirm that characters have been removed. The
 receiver is used in tests of related 'modern API' function
 test_cw_gen_remove_last_character().
 
-
 ** TODO R0046 Improve timing characteristics of PulseAudio
 
 Results of libcw 'test_cw_gen_state_callback' test for PulseAudio are very
 poor, especially for higher generator's speeds. Find out why the results are
 so bad and fix the root cause.
+
+
+** TODO R0047 Use standard solution for command line options
+
+cw_cmdline.c is using a solution that looks like a non-standard approach to
+defining command line options:
+""s:|system,d:|device,w:|wpm,t:|tone,v:|volume,1:|alsa-period-size..."
+
+Replace it with getopt(), getopt_long(), 'struct option long_options[]' and
+such.
 
