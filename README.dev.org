@@ -165,7 +165,6 @@ menuentry "FreeBSD 13.2" --class freebsd --class bsd --class os {
 
 
 * Sound systems
-
 ** Console
 
 *** Linux
@@ -200,71 +199,105 @@ devfs_speaker_ruleset="speaker"
 Then restart devfs to load the new rules:
 /etc/rc.d/devfs restart
 
-
 ** ALSA
-"plughw" device
+*** Accessing ALSA directly
 
-https://alsa.opensrc.org/Proc_asound_documentation
-echo 32 > /proc/asound/card0/pcm0p/sub0/prealloc
+On current Linux desktops you may need to disable PulseAudio and PipeWire.
+Otherwise you may get "Device or resource busy" error when trying to access
+ALSA device.
 
+systemctl stop --user pulseaudio.socket
+systemctl stop --user pulseaudio.service
 
+systemctl stop --user pipewire.socket
+systemctl stop --user pipewire.service
 
+*** Finding the right audio card
 
+First find out what playback devices you have:
 
+$ aplay -L
+[...]
 
+hw:CARD=PCH,DEV=0
+    HDA Intel PCH, ALC3204 Analog
+    Direct hardware device without any conversions
+[...]
 
-Use 'lspci' to see if you have a sound card.
-
-
-
-Use 'lsmod | grep snd' to see if you have kernel modules for sound loaded.
-
-
-
-Use modprobe (e.g. 'modprobe snd_hda_intel') to load appropriate kernel
-module if necessary.
-
-Sometimes unloading a module and loading it again helps:
-modprobe -r snd_hda_intel
-modprobe snd_hda_intel
-
-
-
-Check which groups do /dev/snd/* devices belong to, and make sure that your
-user belongs to that group.
+plughw:CARD=PCH,DEV=0
+    HDA Intel PCH, ALC3204 Analog
+    Hardware device with all software conversions
+[...]
 
 
 
-amixer -c <card no>
-amixer -c <card no> set <name (e.g. Master)> unmute
-
-
-
-Use 'aplay -l' to list playback devices. Example:
- aplay -l
+$ aplay -l
  **** List of PLAYBACK Hardware Devices ****
- card 0: Intel [HDA Intel], device 0: VT1708B 8-Ch Analog [VT1708B 8-Ch Analog]
-   Subdevices: 0/1
-   Subdevice #0: subdevice #0
- card 0: Intel [HDA Intel], device 1: VT1708B 8-Ch Digital [VT1708B 8-Ch Digital]
+ card 0: PCH [HDA Intel PCH], device 0: ALC3204 Analog [ALC3204 Analog]
    Subdevices: 1/1
    Subdevice #0: subdevice #0
 
 
 
-Use 'alsamixer' to select correct device. Oftentimes the initial device
-presented by alsamixer shows only one "slider". The correct device will
-present multiple "sliders" for input, output, etc.
-Make sure that appropriate items (siders) are not muted (use 'm' key to
-toggle).
 
+You probably don't want to use device without software conversions, so ignore
+"hw" and use "plughw". With the above example, the following strings are
+acceptable values of "-d" option:
 
+"plughw:CARD=PCH,DEV=0"
+"plughw:PCH,0"
+"plughw:0,0"    <---- "PCH" looked like a label of "card 0", so "PCH" is replaced with "0".
 
-See if ALSA playback works (you should hear a sound):
-   aplay /usr/share/sounds/alsa/<file>
-There is also 'paplay' tool for PulseAudio that does the same.
+*** Troubleshooting from the ground up
 
+1. Use 'lspci' to see if you have a sound card.
+2. Use 'lsmod | grep snd' to see if you have kernel modules for sound loaded.
+3. Use modprobe (e.g. 'modprobe snd_hda_intel') to load appropriate kernel
+   module if necessary.
 
+   Sometimes unloading a module and loading it again helps:
+   modprobe -r snd_hda_intel
+   modprobe snd_hda_intel
+
+4. Check which groups do /dev/snd/* devices belong to, and make sure that
+   your user belongs to that group.
+
+5. Make sure your card is not muted
+
+   amixer -c <card no>
+   amixer -c <card no> set <name (e.g. Master)> unmute
+
+6. Use 'aplay -l' to list playback devices.
+
+   Example:
+   aplay -l
+   **** List of PLAYBACK Hardware Devices ****
+   card 0: Intel [HDA Intel], device 0: VT1708B 8-Ch Analog [VT1708B 8-Ch Analog]
+     Subdevices: 0/1
+     Subdevice #0: subdevice #0
+   card 0: Intel [HDA Intel], device 1: VT1708B 8-Ch Digital [VT1708B 8-Ch Digital]
+     Subdevices: 1/1
+     Subdevice #0: subdevice #0
+
+7. Use 'aplay -L' to learn more about your devices.
+
+8. Use 'alsamixer' to select correct device.
+
+   Oftentimes the initial device presented by alsamixer shows only one
+   "slider". The correct device will present multiple "sliders" for input,
+   output, etc. Make sure that appropriate items (siders) are not muted (use
+   'm' key to toggle).
+
+9. See if ALSA playback works (you should hear a sound)
+
+	aplay /usr/share/sounds/alsa/<file>
+
+	There is also 'paplay' tool for PulseAudio that does the same.
+
+*** Other
+
+https://alsa.opensrc.org/Proc_asound_documentation
+echo 32 > /proc/asound/card0/pcm0p/sub0/prealloc
 
 ** PulseAudio
 
@@ -305,7 +338,6 @@ pulseaudio &
 Testing PulseAudio under valgrind may require setting "VALGRIND=1" env in
 command line. See this thread:
 https://bugs.freedesktop.org/show_bug.cgi?id=42942
-
 
 ** OSS
 
