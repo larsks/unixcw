@@ -694,7 +694,20 @@ void cw_gen_delete(cw_gen_t **gen)
 	if ((*gen)->close_sound_device) {
 		(*gen)->close_sound_device(*gen);
 	} else {
-		cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_GENERATOR, CW_DEBUG_WARNING, MSG_PREFIX "WARNING: 'close' function pointer is NULL, something went wrong");
+		/* This may happen e.g. when generator was not created properly
+		   because a requested sound system is not available. Such system
+		   probably was never opened, so closing it is not required.
+
+		   Notice that there may be also other situations when 'close' is not
+		   set.
+
+		   TODO acerion 2023.09.29: I noticed this message only because
+		   cw_debug_object_dev object is being used in test binary, and the
+		   test binary experienced some specific problem. It's possible that
+		   this situation happens also in cw/cwcp/xcwcp, but I haven't
+		   noticed it yet. Find the root cause of this problem and fix it.
+		*/
+		cw_debug_msg (&cw_debug_object_dev, CW_DEBUG_GENERATOR, CW_DEBUG_WARNING, MSG_PREFIX "'close' function pointer is NULL");
 	}
 
 	pthread_attr_destroy(&(*gen)->thread.attr);
