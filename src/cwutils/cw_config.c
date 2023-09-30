@@ -82,6 +82,28 @@ cw_config_t * cw_config_new(const char * program_name)
 	config->do_combinations = true;
 	config->do_comments = true;
 
+	/* All sound systems should be tested by default. May be overriden by
+	   '-S' command line option. */
+	int s = 0;
+	config->tested_sound_systems[s++] = CW_AUDIO_NULL;
+	config->tested_sound_systems[s++] = CW_AUDIO_CONSOLE;
+	config->tested_sound_systems[s++] = CW_AUDIO_OSS;
+	config->tested_sound_systems[s++] = CW_AUDIO_ALSA;
+	config->tested_sound_systems[s++] = CW_AUDIO_PA;
+	config->tested_sound_systems[s++] = CW_AUDIO_NONE;
+	/* All topics should be tested by default. May be overriden by '-A'
+	   command line option. */
+	int t = 0;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_TQ;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_GEN;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_KEY;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_REC;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_DATA;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_OTHER;
+	config->tested_areas[t++] = LIBCW_TEST_TOPIC_MAX; /* Guard element. */
+	/* TODO acerion 2023.09.30: remove test-related options from cw_config_t.
+	   Production code and test code should not be mixed like this. */
+
 	return config;
 }
 

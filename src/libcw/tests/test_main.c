@@ -114,7 +114,8 @@ int main(int argc, char * const argv[])
 	cte->config->test_loops = 5;
 
 	/* May cause exit on errors or "-h" option. */
-	if (cwt_retv_ok != cte->process_args(cte, argc, argv)) {
+	if (0 != cte->process_args(cte, argc, argv)) {
+		kite_log(cte, LOG_ERR, "Failed to process command line options, exiting\n");
 		exit(EXIT_FAILURE);
 	}
 

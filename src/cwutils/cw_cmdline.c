@@ -825,6 +825,25 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 
 
 	case 'S':
+		/*
+		  None of libcw's "cw_is_X_possible()" functions is called here.
+		  Checking if given sound system is available on current machine is
+		  present in libcw test program.
+
+		  The reason for this is calls to "cw_is_X_possible()" must be done
+		  even if "-S" option is not provided.
+
+		  By default, when "-S" is not specified, all sound systems should be
+		  tested by libcw tester. In that case the calls to
+		  "cw_is_X_possible()" still have to be executed, but they logically
+		  can't be executed here.
+
+		  In such situation the calls will be done in libcw tester, and since
+		  the calls are done there when "-S" is not used, I decide to make
+		  the calls in the tester when "-S" IS used. The code in the tester
+		  is structured in a way that avoids any duplication of
+		  "cw_is_X_possible()".
+		*/
 		optarg_len = strlen(optarg);
 		if (optarg_len > strlen(LIBCW_TEST_ALL_SOUND_SYSTEMS)) {
 			fprintf(stderr, "Too many values for 'sound system' option: '%s'\n", optarg);
@@ -844,56 +863,27 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 			   Otherwise we may mislead the user. */
 			switch (val) {
 			case 'n':
-				if (cw_is_null_possible(NULL)) {
-					config->tested_sound_systems[dest_idx] = CW_AUDIO_NULL;
-					dest_idx++;
-				} else {
-					fprintf(stderr, "Requested null sound system is not available on this machine\n");
-					goto help_and_error;
-				}
+				config->tested_sound_systems[dest_idx++] = CW_AUDIO_NULL;
+				dest_idx++;
 				break;
 			case 'c':
-				if (cw_is_console_possible(NULL)) {
-					config->tested_sound_systems[dest_idx] = CW_AUDIO_CONSOLE;
-					dest_idx++;
-				} else {
-					fprintf(stderr, "Requested console sound system is not available on this machine\n");
-					goto help_and_error;
-
-				}
+				config->tested_sound_systems[dest_idx++] = CW_AUDIO_CONSOLE;
+				dest_idx++;
 				break;
 			case 'o':
-				if (cw_is_oss_possible(NULL)) {
-					config->tested_sound_systems[dest_idx] = CW_AUDIO_OSS;
-					dest_idx++;
-				} else {
-					fprintf(stderr, "Requested OSS sound system is not available on this machine\n");
-					goto help_and_error;
-
-				}
+				config->tested_sound_systems[dest_idx++] = CW_AUDIO_OSS;
+				dest_idx++;
 				break;
 			case 'a':
-				if (cw_is_alsa_possible(NULL)) {
-					config->tested_sound_systems[dest_idx] = CW_AUDIO_ALSA;
-					dest_idx++;
-				} else {
-					fprintf(stderr, "Requested ALSA sound system is not available on this machine\n");
-					goto help_and_error;
-
-				}
+				config->tested_sound_systems[dest_idx++] = CW_AUDIO_ALSA;
+				dest_idx++;
 				break;
 			case 'p':
-				if (cw_is_pa_possible(NULL)) {
-					config->tested_sound_systems[dest_idx] = CW_AUDIO_PA;
-					dest_idx++;
-				} else {
-					fprintf(stderr, "Requested PulseAudio sound system is not available on this machine\n");
-					goto help_and_error;
-
-				}
+				config->tested_sound_systems[dest_idx++] = CW_AUDIO_PA;
+				dest_idx++;
 				break;
 			default:
-				fprintf(stderr, "Unsupported sound system '%c'\n", val);
+				fprintf(stderr, "[ERROR] Unsupported sound system '%c'\n", val);
 				goto help_and_error;
 			}
 		}

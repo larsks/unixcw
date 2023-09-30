@@ -72,10 +72,45 @@ struct cw_test_set_t;
 
 
 
+typedef struct sound_system_config_t {
+	//cw_sound_system_t sound_system;
+
+	/**
+	   Whether a sound system should be tested in current session of test
+	   executor (i.e. during current tests).
+
+	   Sound system may be inactive because it wasn't requested (implicitly
+	   or explicitly) in command line, or because given sound system is not
+	   available on current machine.
+	*/
+	bool active;
+
+	char sound_device[LIBCW_SOUND_DEVICE_NAME_SIZE];
+} sound_system_config_t;
+
+
+
+
+/**
+   @brief Configuration of tests that shall be executed.
+*/
+typedef struct tests_configuration_t {
+	/* Array indexed with distinct CW_AUDIO_* values. CW_AUDIO_SOUNDCARD is
+	   NOT a distinct value. */
+	sound_system_config_t sound_systems[CW_SOUND_SYSTEM_LAST + 1];
+
+	/* List with varying length of added topics. */
+	int topics[LIBCW_TEST_TOPIC_MAX + 1];
+} tests_configuration_t;
+
+
+
+
 struct cw_test_executor_t;
 typedef struct cw_test_executor_t {
 
-	cw_config_t * config;
+	cw_config_t * config; /* Command line options. */
+	tests_configuration_t configuration; /* Configuration of tests. Test executor should follow this configuration. */
 
 	char msg_prefix[32];
 
@@ -268,10 +303,10 @@ typedef struct cw_test_executor_t {
 	   Function exits with EXIT_SUCCESS status when "help" option
 	   was requested. Help text is printed before the exit.
 
-	   @return cwt_retv_ok on success
-	   @return cwt_retv_err otherwise
+	   @return 0 on success
+	   @return -1 otherwise
 	*/
-	cwt_retv (* process_args)(struct cw_test_executor_t * self, int argc, char * const argv[]);
+	int (* process_args)(struct cw_test_executor_t * self, int argc, char * const argv[]);
 
 
 	/**
@@ -364,28 +399,6 @@ typedef struct cw_test_executor_t {
 	   Don't add newline character at the end.
 	*/
 	void (* log_error)(struct cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
-
-	/**
-	   See whether or not a given test topic was requested from
-	   command line. By default, if not specified in command line,
-	   all test topics are requested.
-	*/
-	bool (* test_topic_was_requested)(struct cw_test_executor_t * self, int libcw_test_topic);
-
-	/**
-	   See whether or not a given sound system was requested from
-	   command line. By default, if not specified in command line,
-	   all sound systems are requested.
-
-	   However, if a host machine does not support some sound
-	   system (e.g. because a library is missing), such sound
-	   system is excluded from list of requested sound systems.
-	*/
-	bool (* sound_system_was_requested)(struct cw_test_executor_t * self, cw_sound_system sound_system);
-
-
-
-
 	/**
 	   @brief Main test loop that walks through given @param
 	   @test_sets and executes all test function specified in
