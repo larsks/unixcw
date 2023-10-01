@@ -864,23 +864,18 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 			switch (val) {
 			case 'n':
 				config->tested_sound_systems[dest_idx++] = CW_AUDIO_NULL;
-				dest_idx++;
 				break;
 			case 'c':
 				config->tested_sound_systems[dest_idx++] = CW_AUDIO_CONSOLE;
-				dest_idx++;
 				break;
 			case 'o':
 				config->tested_sound_systems[dest_idx++] = CW_AUDIO_OSS;
-				dest_idx++;
 				break;
 			case 'a':
 				config->tested_sound_systems[dest_idx++] = CW_AUDIO_ALSA;
-				dest_idx++;
 				break;
 			case 'p':
 				config->tested_sound_systems[dest_idx++] = CW_AUDIO_PA;
-				dest_idx++;
 				break;
 			default:
 				fprintf(stderr, "[ERROR] Unsupported sound system '%c'\n", val);
