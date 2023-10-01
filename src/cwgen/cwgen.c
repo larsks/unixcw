@@ -114,6 +114,7 @@ void cwgen_generate_characters(struct cwgen_config *config)
 		struct timeval t;
 		gettimeofday(&t, NULL);
 
+		/* TODO acerion 2023.10.01 use API from src/cwutils/lib/random.h. */
 		srandom(t.tv_usec);
 		is_initialized = true;
 	}

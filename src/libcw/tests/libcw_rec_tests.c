@@ -31,11 +31,10 @@
 
 
 
+#include <cwutils/lib/random.h>
+
 #include "libcw.h"
 #include "libcw2.h"
-
-
-
 
 #include "libcw_debug.h"
 #include "libcw_key.h"
@@ -708,7 +707,9 @@ cw_characters_list * cw_characters_list_new_basic(cw_test_executor_t * cte)
 */
 cw_characters_list * cw_characters_list_new_random(cw_test_executor_t * cte)
 {
-	const size_t n_random_characters = cw_get_character_count() * ((lrand48() % 50) + 30);
+	int x_random = 0;
+	cw_random_get_int(30, 80, &x_random);
+	const size_t n_random_characters = cw_get_character_count() * x_random;
 
 	/* We will use basic characters list (all characters supported
 	   by libcw) as an input for generating random characters
@@ -724,12 +725,13 @@ cw_characters_list * cw_characters_list_new_random(cw_test_executor_t * cte)
 	cte->assert2(cte, random_characters_list->values, "second calloc() failed\n");
 
 
-	size_t space_randomizer = 3;
+	uint32_t space_randomizer = 3;
 	for (size_t i = 0; i < n_random_characters; i++) {
-		int basic_idx = lrand48() % n_basic_characters;
+		uint32_t basic_idx = 0;
+		cw_random_get_uint32(0, n_basic_characters - 1, &basic_idx);
 
 		if (0 == (basic_idx % space_randomizer)) { /* Insert space at random places. */
-			space_randomizer = (lrand48() % (n_basic_characters / 2)) + 3; /* Pick new value for next round. */
+			cw_random_get_uint32(3, (n_basic_characters / 2) + 3, &space_randomizer); /* Pick new value for next round. */
 			random_characters_list->values[i] = ' ';
 
 			/*

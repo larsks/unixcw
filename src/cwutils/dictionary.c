@@ -821,6 +821,7 @@ const char *cw_dictionary_get_random_word(const cw_dictionary_t *dict)
 
 	/* On the first call, seed the random number generator. */
 	if (!is_initialized) {
+		/* TODO acerion 2023.10.01 use API from src/cwutils/lib/random.h. */
 		srand(time(NULL));
 		is_initialized = true;
 	}

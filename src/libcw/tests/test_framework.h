@@ -130,8 +130,16 @@ typedef struct cw_test_executor_t {
 	long uptime_end;
 #endif
 
-	/* Type suitable for srand48(). */
-	long int random_seed;
+	/*
+	  With my current method of generating random seed (see
+	  cwutils/lib/random.c) I could barely generate slightly above 32 random
+	  bits of seed. Therefore 32 bits should suffice for now.
+
+	  srand() expects 'unsigned int' seed, i.e. 4 bytes.
+	  srandom() expects 'unsigned int' seed, i.e. 4 bytes.
+	  srand48() expects 'long' seed, i.e. 8 bytes :(
+	*/
+	uint32_t random_seed;
 
 	/*
 	  Sound system and test topic currently tested.  Should be set right

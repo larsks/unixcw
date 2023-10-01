@@ -65,6 +65,7 @@
 #include "libcw_utils.h"
 #include <cwutils/cw_cmdline.h>
 #include <cwutils/sleep.h>
+#include <cwutils/lib/random.h>
 
 #include "test_framework.h"
 #include <test_framework/basic_utils/param_ranger.h>
@@ -176,29 +177,13 @@ static int select_topics(cw_test_executor_t * cte);
 static int select_random_seed(cw_test_executor_t * cte, const cw_config_t * config)
 {
 	if (config->test_random_seed > 0) {
-		cte->random_seed = config->test_random_seed;
+		cte->random_seed = cw_random_srand(config->test_random_seed);
+		kite_log(cte, LOG_DEBUG, "Random seed is manually assigned value %u\n", cte->random_seed);
 	} else {
-		/*
-		  TODO (acerion) 2023.07.28: use better source of seed.
-
-		  Quality of the source of seed doesn't have security implications.
-		  In situations where just want to have *some* uniqueness of seed,
-		  time(0) seems to be good enough on a system with up-to-date wall
-		  clock.
-
-		  But if the tests will be ever executed on embedded devices that
-		  perhaps won't have an NTP client, or NTP server will be
-		  unavailable, or the device or won't have battery-sustained
-		  real-time clock, the call to time(0) may be returning values from a
-		  small pool. The values would frequently be somewhere from first
-		  hour of first day of January 1970. That would mean a decreased
-		  uniqueness of seed.
-		*/
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		cte->random_seed = (long int) tv.tv_sec;
+		/* 0: allow internal algo to select good seed. */
+		cte->random_seed = cw_random_srand(0);
+		kite_log(cte, LOG_DEBUG, "Random seed is internally picked to be %u\n", cte->random_seed);
 	}
-	srand48(cte->random_seed);
 
 	return 0;
 }
@@ -1470,7 +1455,7 @@ void cw_test_print_test_options(cw_test_executor_t * self)
 	}
 	self->log_info_cont(self, "\n");
 
-	self->log_info(self, "Random seed = %ld\n", self->random_seed);
+	self->log_info(self, "Random seed = %u / 0x%08x\n", self->random_seed, self->random_seed);
 
 	if (strlen(self->config->test_function_name)) {
 		self->log_info(self, "Single function to be tested: '%s'\n", self->config->test_function_name);

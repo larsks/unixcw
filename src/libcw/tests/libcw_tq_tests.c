@@ -31,10 +31,10 @@
 
 
 
+#include <cwutils/lib/random.h>
+
 #include "libcw.h"
 #include "libcw2.h"
-
-
 
 #include "common.h"
 #include "libcw_utils.h"
@@ -145,8 +145,9 @@ int test_cw_tq_capacity_internal(cw_test_executor_t * cte)
 		/* This is a silly test, but let's have any test of
 		   the getter. TODO: come up with better test. */
 
-		const size_t intended_capacity = (lrand48() % 4000) + 10;
-		tq->capacity = intended_capacity;
+		uint32_t intended_capacity = 0;
+		cw_random_get_uint32(10, 4000, &intended_capacity);
+		tq->capacity = (size_t) intended_capacity;
 
 		const size_t readback_capacity = LIBCW_TEST_FUT(cw_tq_capacity_internal)(tq);
 		if (!cte->expect_op_int_errors_only(cte, intended_capacity, "==", readback_capacity, "getting tone queue capacity")) {
@@ -680,7 +681,9 @@ int test_cw_tq_test_capacity_A(cw_test_executor_t * cte)
 	/* We don't need to check tq with capacity ==
 	   CW_TONE_QUEUE_CAPACITY_MAX (yet). Let's test a smaller
 	   queue capacity. */
-	const size_t capacity = (lrand48() % 40) + 30;
+	uint32_t x_random = 0;
+	cw_random_get_uint32(30, 70, &x_random);
+	const size_t capacity = (size_t) x_random;
 	const size_t watermark = capacity - (capacity * 0.2);
 
 	cte->print_test_header(cte, "%s (%zu)", __func__, capacity);
@@ -797,7 +800,9 @@ int test_cw_tq_test_capacity_B(cw_test_executor_t * cte)
 	/* We don't need to check tq with capacity ==
 	   CW_TONE_QUEUE_CAPACITY_MAX (yet). Let's test a smaller
 	   queue. */
-	const size_t capacity = (lrand48() % 40) + 30;
+	uint32_t x_random = 0;
+	cw_random_get_uint32(30, 70, &x_random);
+	const size_t capacity = (size_t) x_random;
 	const size_t watermark = capacity - (capacity * 0.2);
 
 	cte->print_test_header(cte, "%s", __func__);
@@ -1125,7 +1130,8 @@ cwt_retv test_cw_tq_wait_for_level_internal(cw_test_executor_t * cte)
 		/* Notice that level is always smaller than number of
 		   items added to queue. TODO: reconsider if we want
 		   to randomize this value. */
-		const int level = lrand48() % (int) (floorf(0.7F * loops));
+		int level = 0;
+		cw_random_get_int(0, (int) (floorf(0.7F * loops)), &level);
 		const cw_ret_t cwret = LIBCW_TEST_FUT(cw_tq_wait_for_level_internal)(gen->tq, level);
 		if (!cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret, "wait for level = %d, tone queue items count = %d", level, loops)) {
 			wait_failure = true;
@@ -1362,7 +1368,8 @@ int test_cw_tq_gen_operations_B(cw_test_executor_t * cte)
 		return -1;
 	}
 	const size_t capacity = cw_tq_capacity_internal(gen->tq);
-	const int level = lrand48() % (capacity / 2);
+	int level = 0;
+	cw_random_get_int(0, (capacity / 2), &level);
 
 
 	cte->print_test_header(cte, "%s (%d)", __func__, level);

@@ -944,7 +944,7 @@ int cw_process_option(int opt, const char *optarg, cw_config_t *config)
 		break;
 
 	case 'D':
-		config->test_random_seed = atol(optarg);
+		config->test_random_seed = (uint32_t) atol(optarg);
 		break;
 
 	default: /* '?' */

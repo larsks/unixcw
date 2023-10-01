@@ -123,9 +123,11 @@ typedef struct cw_config_t {
 	char test_function_name[128];    /* Execute only a test function with this name. */
 	int test_loops;                  /* How many times tested function should be executed in a a single test function? */
 	bool test_quick_only;            /* Execute tests that are flagged as 'quick enough to make <make check> target run in short time'. */
-	/* Some tests use lrand48() or mrand48(). Use this specific seed
-	   instead of some default value to seed randomness. */
-	long int test_random_seed;
+
+	/* Some tests poll random values from pseudo-random-number generator. By
+	   default the generator is seeded with some random value, but you can
+	   specify the seed yourself, e.g. to reproduce some specific bug. */
+	uint32_t test_random_seed;
 
 	/* Names of specific sound devices that should be used for tests. If
 	   a test should be executed for a group of sound systems, we may
