@@ -23,11 +23,12 @@ noinst_LIBRARIES = libcwutils.a
 # "when the header belongs to a single convenience library or program, we
 # recommend listing it in the program’s or library’s _SOURCES variable"
 libcwutils_a_SOURCES = \
-	wav.c wav.h \
-	misc.c misc.h \
 	elements.c elements.h \
 	elements_detect.c elements_detect.h \
-	element_stats.c element_stats.h
+	element_stats.c element_stats.h \
+	misc.c misc.h \
+	random.c random.h \
+	wav.c wav.h
 
 libcwutils_a_CPPFLAGS = -I$(top_srcdir)/src/libcw/  -I${top_srcdir}/src/
 
