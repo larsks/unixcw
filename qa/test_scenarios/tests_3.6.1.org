@@ -165,7 +165,7 @@ Test logs and summary table for tests shows only well-known problems.
 Pass. The failures occurred in 'test_cw_gen_state_callback' test, which is a
 known problem.
 
-**** TODO Main test binary - Null sound system
+**** DONE Main test binary - Null sound system
 
 *Steps*
 cd src/libcw/tests
@@ -176,8 +176,31 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> N |         0 |        34 |         0 |         0 |         0 |         0 |<-
+   N |       151 |      1003 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 24 minutes, 57 seconds
 
 *Actual result*
+
+Pass. The failures occurred in 'test_cw_gen_state_callback' test, which is a
+known problem.
 
 **** TODO Misc tests
 
