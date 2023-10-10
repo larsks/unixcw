@@ -738,7 +738,6 @@ Results of libcw 'test_cw_gen_state_callback' test for PulseAudio are very
 poor, especially for higher generator's speeds. Find out why the results are
 so bad and fix the root cause.
 
-
 ** TODO R0047 Use standard solution for command line options
 
 cw_cmdline.c is using a solution that looks like a non-standard approach to
@@ -747,4 +746,15 @@ defining command line options:
 
 Replace it with getopt(), getopt_long(), 'struct option long_options[]' and
 such.
+
+
+** TODO R0048 No pause between libcw tests
+
+Each test in libcw test binary is preceded by a short (2-3 seconds) space.
+This space is introduced to give a tester some time to read the test's
+header/description.
+
+This space is unnecessary (and annoying) when the tests are executed during
+"make check". Add a flag that controls the space, and decrease time of
+running of "make check" for libcw.
 
