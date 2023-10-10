@@ -57,7 +57,7 @@ The shell script may not work on systems without bash.
 *Actual result*
 PASS, no issues found (512 compilations).
 
-*** STARTED libcw tests
+*** DONE libcw tests
 Tests using tools from unixcw/src/libcw.
 
 Notice that Null sound system is tested as last one: first run tests on other
@@ -202,9 +202,9 @@ Duration of tests = 24 minutes, 57 seconds
 Pass. The failures occurred in 'test_cw_gen_state_callback' test, which is a
 known problem.
 
-**** TODO Misc tests
+**** DONE Misc tests
 
-***** TODO pcm sample file is disabled in regular builds
+***** DONE pcm sample file is disabled in regular builds
 
 Confirm that by default libcw doesn't create a debug file into which raw PCM
 samples are being written.
@@ -225,6 +225,9 @@ samples are being written.
 5. Confirm that in /tmp there is no file called
    "cw_file_<parameters>_pcm.raw" from _current_ run of program done in
    step 3.
+
+*Actual result*
+Pass. Tested with cw, cwcp and xcwcp. There are no sample files in /tmp.
 
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.

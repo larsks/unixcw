@@ -155,6 +155,8 @@ samples are being written.
    "cw_file_<parameters>_pcm.raw" from _current_ run of program done in
    step 3.
 
+*Actual result*
+
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
 
