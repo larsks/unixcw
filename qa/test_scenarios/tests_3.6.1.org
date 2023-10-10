@@ -94,7 +94,7 @@ Test logs and summary table for tests shows only well-known problems.
 *Actual result*
 Skipped. Console output is not available on this machine
 
-**** TODO Main test binary - ALSA sound system
+**** DONE Main test binary - ALSA sound system
 
 *Steps*
 cd src/libcw/tests
@@ -104,6 +104,32 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> A |         0 |        11 |         0 |         0 |         0 |         0 |<-
+   A |       151 |      1003 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 24 minutes, 54 seconds
+
+*Actual result*
+
+Pass. The failures occurred in 'test_cw_gen_state_callback' test, which is a
+known problem.
 
 **** DONE Main test binary - PulseAudio sound system
 
