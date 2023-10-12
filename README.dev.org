@@ -747,7 +747,6 @@ defining command line options:
 Replace it with getopt(), getopt_long(), 'struct option long_options[]' and
 such.
 
-
 ** TODO R0048 No pause between libcw tests
 
 Each test in libcw test binary is preceded by a short (2-3 seconds) space.
@@ -757,4 +756,7 @@ header/description.
 This space is unnecessary (and annoying) when the tests are executed during
 "make check". Add a flag that controls the space, and decrease time of
 running of "make check" for libcw.
+
+** TODO R0049 Add static code analysis with gcc -fanalyzer
+https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Static-Analyzer-Options.html
 
