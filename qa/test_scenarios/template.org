@@ -2,7 +2,7 @@
 # The vertical bar indicates which states are final states.
 
 * TODO Tests for unixcw version a.b.c
-Version of template: 2023.09.29.
+Version of template: 2023.10.12.
 ** TODO <Machine/OS identifier>
 <More details about the machine>
 *** TODO Build system tests
@@ -160,10 +160,73 @@ samples are being written.
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
 
+**** TODO Tests using *.cw files
+
 Tests that use *.cw files:
 ./src/cw/cw -f src/cw/test.cw
 ./src/cw/cw -f src/cw/demo.cw
 ./src/cw/cw -f src/cw/prelude.cw
+
+*Actual result*
+
+**** TODO Tests of command-line options
+Test that some of command-line options result in expected behaviour of cw.
+
+***** TODO words per minute
+./src/cw/cw -w 10
+./src/cw/cw -w 50
+
+*Actual result*
+
+***** TODO tone (frequency)
+
+./src/cw/cw -t 300
+./src/cw/cw -t 3000
+
+*Actual result*
+
+***** TODO volume
+
+./src/cw/cw -v 30
+./src/cw/cw -v 90
+
+*Actual result*
+
+***** TODO gap
+
+./src/cw/cw -g 0
+./src/cw/cw -g 40
+
+*Actual result*
+
+***** TODO weighting
+
+./src/cw/cw -k 30
+./src/cw/cw -k 70
+
+*Actual result*
+
+***** TODO Null sound system
+
+./srcw/cw/cw -s n
+
+*Actual result*
+
+***** TODO ALSA sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s a -d plughw:CARD=PCH,DEV=0
+
+*Actual result*
+
+***** TODO OSS sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s o
+
+*Actual result*
 
 *** TODO cwcp tests
 Tests of basic usage of unixcw/src/cwcp/cwcp program.
