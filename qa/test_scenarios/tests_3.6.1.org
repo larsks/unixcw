@@ -229,13 +229,85 @@ samples are being written.
 *Actual result*
 Pass. Tested with cw, cwcp and xcwcp. There are no sample files in /tmp.
 
-*** TODO cw tests
+*** DONE cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
+
+**** DONE Tests using *.cw files
 
 Tests that use *.cw files:
 ./src/cw/cw -f src/cw/test.cw
 ./src/cw/cw -f src/cw/demo.cw
 ./src/cw/cw -f src/cw/prelude.cw
+
+*Actual result*
+Pass: all files were played correctly, without noticeable errors.
+
+**** DONE Tests of command-line options
+Test that some of command-line options result in expected behaviour of cw.
+
+***** DONE words per minute
+./src/cw/cw -w 10
+./src/cw/cw -w 50
+
+*Actual result*
+PASS: speed changes.
+
+***** DONE tone (frequency)
+
+./src/cw/cw -t 300
+./src/cw/cw -t 3000
+
+*Actual result*
+PASS: frequency changes.
+
+***** DONE volume
+
+./src/cw/cw -v 30
+./src/cw/cw -v 90
+
+*Actual result*
+PASS: volume changes.
+
+***** DONE gap
+
+./src/cw/cw -g 0
+./src/cw/cw -g 40
+
+*Actual result*
+PASS: gap varies.
+
+***** DONE weighting
+
+./src/cw/cw -k 30
+./src/cw/cw -k 70
+
+*Actual result*
+PASS: weighting varies.
+
+***** DONE Null sound system
+
+./srcw/cw/cw -s n
+
+*Actual result*
+PASS: No sound is produced, but cw appears to be functioning correctly.
+
+***** DONE ALSA sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s a -d plughw:CARD=PCH,DEV=0
+
+*Actual result*
+PASS: Sound is produced as expected.
+
+***** SKIPPED OSS sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s o
+
+*Actual result*
+SKIP: OSS is not available on this machine.
 
 *** TODO cwcp tests
 Tests of basic usage of unixcw/src/cwcp/cwcp program.
