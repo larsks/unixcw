@@ -2,7 +2,7 @@
 # The vertical bar indicates which states are final states.
 
 * TODO Tests for unixcw version a.b.c
-Version of template: 2023.10.12.
+Version of template: 2023.10.16.
 ** TODO <Machine/OS identifier>
 <More details about the machine>
 *** TODO Build system tests
@@ -230,6 +230,74 @@ You may want to first kill pulseaudio and pipewire
 
 *** TODO cwcp tests
 Tests of basic usage of unixcw/src/cwcp/cwcp program.
+
+**** TODO Tests of UI elements
+***** TODO Main modes (character groups)
+
+*Steps*
+1. Select each mode (character group) item in left-hand "Modes" panel.
+2. Press F9 or Enter if necessary to force start of playing.
+
+*Expected results*
+1. For each item the text in main UI area corresponds to each mode (character
+   group). The words consist of intended (expected) characters from character group.
+2. For each item the text is being played correctly.
+
+*Actual results*
+
+***** TODO "Keyboard" mode
+
+*Steps*
+1. In the left-hand "Modes" panel select "Keyboard" item.
+2. Enter few words
+
+*Expected results*
+1. The entered words are visible in main UI area.
+2. The words are played correctly.
+
+*Actual results*
+
+***** TODO Main Function-key controls
+
+*Steps*
+1. In "Mode" menu select any of character groups.
+2. Let cwcp generate sound.
+3. Use the function keys in range F1-F8 to control parameters of played
+   sound.
+
+*Expected results*
+Parameters of newly enqueued text (speed, tone, volume, gap) behave
+corresponding to a value modified through the Function keys.
+
+*Actual results*
+
+***** TODO Practice keys (PageDown/PageUp keys)
+
+*Steps*
+1. Using PageDown/PageUp keys select some value of practice time.
+2. In "Mode" menu select any of character groups.
+3. Let cwcp generate sound.
+
+*Expected results*
+1. The timer at the bottom of the UI counts practice time up.
+2. When the count of minutes of practice time reaches limit set with
+   PageDown/PageUp keys, the practice ends.
+
+*Actual results*
+
+***** TODO "Exit" key
+
+*Steps*
+1. Press F12 ("Exit") key when cwcp is idle and is not generating any text/sound.
+2. Press F12 ("Exit") key when cwcp is generating text and sound.
+
+*Expected results*
+1. cwcp process is terminated.
+2. No "ncurses" artifacts are visible in console window, meaning that the
+   termination was "clean".
+3. No error or warning messages are visible in console window
+
+*Actual results*
 
 *** TODO xcwcp tests
 
