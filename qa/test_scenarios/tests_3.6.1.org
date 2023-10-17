@@ -355,7 +355,7 @@ corresponding to a value modified through the Function keys.
 *Actual results*
 Parameters of sound can be controlled by the Function keys.
 
-***** DONE Practice keys (PageDown/PageUp keys)
+***** DONE Practice time keys (PageDown/PageUp keys)
 
 *Steps*
 1. Using PageDown/PageUp keys select some value of practice time.
@@ -387,10 +387,66 @@ Both points from "Expected results" are satisfied.
 *Actual results*
 All three points from "Expected results" are satisfied.
 
-*** TODO xcwcp tests
+*** DONE xcwcp tests
+**** DONE Tests of UI elements
+***** DONE Main modes (character groups)
 
-**** TODO basics
-Tests of basic usage of unixcw/src/xcwcp/xcwcp program.
+*Steps*
+1. Select each mode (character group) item in "Modes" dropdown menu.
+2. Press Play button if necessary to force start of playing.
+
+*Expected results*
+1. For each item the text in main UI area corresponds to each mode (character
+   group). The words consist of intended (expected) characters from character group.
+2. For each item the text is being played correctly.
+
+*Actual results*
+Both points from "expected results" are satisfied.
+
+***** DONE "Keyboard" mode
+
+*Steps*
+1. In the "Modes" dropdown select "Send Keyboard CW" item.
+2. Enter few words.
+3. Press Play button if necessary to force start of playing.
+
+*Expected results*
+1. The entered words are visible in main UI area.
+2. The words are played correctly.
+
+*Actual results*
+Both points from "expected results" are satisfied.
+
+***** DONE "Receiver" mode
+*Steps*
+1. In the "Modes" dropdown select "Receive Keyed CW" item.
+2. Use mouse or keyboard to simulate Morse key:
+   a. Use mouse Left/Right button to simulate iambic keyer.
+   b. Use keyboard Left/Right key to simulate iambic keyer.
+   c. Use keyboard Space key to simulate straight key.
+   d. Use keyboard Enter key to simulate straight key.
+
+*Expected results*
+For each method of simulating a key, the tested program is able to recognize
+keyed characters.
+
+*Actual results*
+The expected results are more or less satisfied.
+
+***** DONE Main sound controls
+
+*Steps*
+1. In program's "Modes" dropdown select any of character groups.
+2. Let xcwcp generate sound.
+3. Use the spin boxes available in program's toolbar to control parameters of played
+   sound (speed, tone, volume, gap)..
+
+*Expected results*
+Parameters of newly enqueued text (speed, tone, volume, gap) behave
+corresponding to a value modified through the spin boxes.
+
+*Actual results*
+Parameters of sound can be controlled by the spin boxes.
 
 *** TODO cwgen tests
 Tests of basic usage of unixcw/src/cwgen/cwgen program.
