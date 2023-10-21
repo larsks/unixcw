@@ -121,6 +121,7 @@ static uint32_t cw_random_get_seed(void)
 	const uint32_t from_boottime = ((boottime.tv_nsec & 0x1fffffff) << 3) | (boottime.tv_sec & 0x7);
 
 	uint32_t from_realtime = 0;
+#if 0 /* Enabling the code may actually decrease randomness of lrand(). */
 	struct timespec realtime = { 0 };
 	clock_gettime(CLOCK_REALTIME, &realtime); /* CLOCK_REALTIME is wall-clock time. */
 	if (realtime.tv_sec > 365 * 24 * 60 * 60) {
@@ -144,6 +145,7 @@ static uint32_t cw_random_get_seed(void)
 		*/
 		from_realtime = ((realtime.tv_sec & 0x7) << 29) | (realtime.tv_nsec & 0x1fffffff);
 	}
+#endif
 	uint32_t seed = from_boottime ^ from_realtime;
 
 	/* Make sure that seed is never zero. See comment to cw_random_srand()
