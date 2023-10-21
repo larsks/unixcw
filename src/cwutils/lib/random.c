@@ -179,7 +179,7 @@ uint32_t cw_random_srand(uint32_t seed)
 	  unixcw doesn't do cryptography, so non-deterministic sequences are not
 	  required.
 	*/
-	srand48_deterministic(((long int) value);
+	srand48_deterministic((long int) value);
 #else
 	srand48((long int) value);
 #endif
