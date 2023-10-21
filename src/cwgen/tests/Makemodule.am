@@ -1,0 +1,17 @@
+# Programs to be built in current dir
+check_PROGRAMS += src/cwgen/tests/cwgen_args
+
+# Source code files used to build a program.
+src_cwgen_tests_cwgen_args_SOURCES = \
+	src/cwgen/tests/cwgen_args.c \
+	src/cwgen/tests/wordset.c \
+	src/cwgen/tests/wordset.h
+
+src_cwgen_tests_cwgen_args_CPPFLAGS = -I$(top_srcdir)/src/
+
+# Target-specific linker flags (objects to link). Order is important:
+# first static library then dynamic. Otherwise linker may not find
+# symbols from the dynamic library.
+src_cwgen_tests_cwgen_args_LDADD = $(top_builddir)/src/cwutils/lib/libcwutils.a
+
+

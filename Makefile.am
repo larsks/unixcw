@@ -1,7 +1,11 @@
-# Next two lines are for non-recursive automake.
+# Next lines are for non-recursive automake.
 # http://karelzak.blogspot.com/2013/02/non-recursive-automake.html
 noinst_PROGRAMS=
+check_PROGRAMS=
 include src/cwutils/wav_state_detector/Makemodule.am
+if WITH_CWGEN
+include src/cwgen/tests/Makemodule.am
+endif
 
 
 
@@ -16,6 +20,15 @@ EXTRA_DIST = \
 	po/UnixCW.po \
 	THANKS HISTORY \
 	patches # debian
+
+
+
+
+TESTS =
+if WITH_CWGEN
+TESTS += ./src/cwgen/tests/cwgen_args
+endif
+
 
 
 

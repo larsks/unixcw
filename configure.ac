@@ -225,6 +225,8 @@ if test "$enable_cwgen" = "yes" ; then
 else
     AC_MSG_RESULT(no)
 fi
+AM_CONDITIONAL([WITH_CWGEN], [test $enable_cwgen = "yes"])
+WITH_CWGEN=$enable_cwgen
 
 
 # Build cw? Yes by default.

@@ -677,6 +677,8 @@ ENABLE_DEV_LIBCW_DEBUGGING_FALSE
 ENABLE_DEV_LIBCW_DEBUGGING_TRUE
 ENABLE_DEV_RECEIVER_TEST_FALSE
 ENABLE_DEV_RECEIVER_TEST_TRUE
+WITH_CWGEN_FALSE
+WITH_CWGEN_TRUE
 LIBCW_VERSION
 LDCONFIG
 GZIP
@@ -18356,6 +18358,15 @@ else
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 fi
+ if test $enable_cwgen = "yes"; then
+  WITH_CWGEN_TRUE=
+  WITH_CWGEN_FALSE='#'
+else
+  WITH_CWGEN_TRUE='#'
+  WITH_CWGEN_FALSE=
+fi
+
+WITH_CWGEN=$enable_cwgen
 
 
 # Build cw? Yes by default.
@@ -20006,6 +20017,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HOST_IS_FREEBSD_TRUE}" && test -z "${HOST_IS_FREEBSD_FALSE}"; then
   as_fn_error $? "conditional \"HOST_IS_FREEBSD\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_CWGEN_TRUE}" && test -z "${WITH_CWGEN_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_CWGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_DEV_RECEIVER_TEST_TRUE}" && test -z "${ENABLE_DEV_RECEIVER_TEST_FALSE}"; then

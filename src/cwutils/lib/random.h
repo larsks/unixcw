@@ -3,7 +3,7 @@
 
 
 
-
+#include <stdbool.h>
 #include <stdint.h>
 
 
@@ -35,7 +35,7 @@ uint32_t cw_random_srand(uint32_t seed);
 /**
    @brief Generate random integer
 
-   Returned value will be between @p lower and @p upper, inclusive. Value is
+   Generated value will be between @p lower and @p upper, inclusive. Value is
    returned through @p result argument.
 
    Negative values of @p upper and/or @p lower are not (yet) supported.
@@ -55,7 +55,7 @@ int cw_random_get_int(int lower, int upper, int * result);
 /**
    @brief Generate random uint32_t integer
 
-   Returned value will be between @p lower and @p upper, inclusive. Value is
+   Generated value will be between @p lower and @p upper, inclusive. Value is
    returned through @p result argument.
 
    @param[in] lower Lower bound of range of returned values (inclusive)
@@ -66,6 +66,22 @@ int cw_random_get_int(int lower, int upper, int * result);
    @return -1 on failure
 */
 int cw_random_get_uint32(uint32_t lower, uint32_t upper, uint32_t * result);
+
+
+
+
+/**
+   @brief Generate random boolean
+
+   Generated value will be either true or false (duh!). Value is returned
+   through @p result argument.
+
+   @param[out] result Output variable for returned random boolean
+
+   @return 0 on success
+   @return -1 on failure
+*/
+int cw_random_get_bool(bool * result);
 
 
 

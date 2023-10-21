@@ -248,3 +248,24 @@ int cw_random_get_uint32(uint32_t lower, uint32_t upper, uint32_t * result)
 
 
 
+int cw_random_get_bool(bool * result)
+{
+	if (NULL == result) {
+		fprintf(stderr, "[ERROR] %s:%d: Invalid pointer arg\n", __func__, __LINE__);
+		return -1;
+	}
+
+	const uint32_t value = (uint32_t) lrand48();
+	const uint32_t val = value / 10;
+	*result = val % 2;
+#if 0 /* Debug. */
+	fprintf(stderr, "%s:%d: bool = %-5s (from 0x%08x / %12u / %12u integer)\n",
+	        __func__, __LINE__,
+	        *result ? "true" : "false", value, value, val);
+#endif
+	return 0;
+}
+
+
+
+
