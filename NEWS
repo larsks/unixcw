@@ -83,7 +83,7 @@ version 3.6.1 / 2023-xx-yy
     - cw_get_receive_parameters()
     - cw_gen_enqueue_character_no_ics()
 
-  - Improved automatic tests of some of libcw functions
+  - Improved automatic tests of some of libcw functions.
 
   - All code is now compiled with "-D_FORTIFY_SOURCE=1". In the future this
     will be upgraded to "-D_FORTIFY_SOURCE=2".
@@ -95,6 +95,12 @@ version 3.6.1 / 2023-xx-yy
     its global configuration file uses during analysis of code in entire
     package.
 
+  - Adding automatic tests of cwgen. The tests cover a significant portion of
+    cwgen's functionality and are executed during "make check". This greatly
+    reduces need for manual tests of cwgen.
+
+  - Adding automatic tests of cwutils/combine_arguments().
+
 
   Debian:
 
@@ -104,6 +110,7 @@ version 3.6.1 / 2023-xx-yy
   - Integrated changes from Debian patch
     0004-reprotest_collate_make_fix.patch: language-independent sorting that
     allows reproducible builds.
+
 
 ----------------------------------------------------------------------------
 
