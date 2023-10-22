@@ -76,6 +76,11 @@ version 3.6.1 / 2023-xx-yy
     "-g -O2" to "-O2". This still can be overriden by setting CXXFLAGS env
     variable.
 
+  - GNU GPL copyright notice printed by programs (e.g. when ran with "-v"
+    option) is now more in line with information presented in
+    https://www.gnu.org/licenses/old-licenses/gpl-2.0.html#SEC4. In other
+    words the copyright notice is less custom and much more standard.
+
 
   Quality Assurance:
 
