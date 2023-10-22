@@ -106,7 +106,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = noinst/bin/wav_state_detector$(EXEEXT)
-check_PROGRAMS = $(am__EXEEXT_1)
+check_PROGRAMS = src/cwutils/tests/cwutils_tests$(EXEEXT) \
+	$(am__EXEEXT_1)
 
 # Programs to be built in current dir
 @WITH_CWGEN_TRUE@am__append_1 = src/cwgen/tests/cwgen_args
@@ -148,6 +149,13 @@ src_cwgen_tests_cwgen_args_OBJECTS =  \
 	$(am_src_cwgen_tests_cwgen_args_OBJECTS)
 @WITH_CWGEN_TRUE@src_cwgen_tests_cwgen_args_DEPENDENCIES =  \
 @WITH_CWGEN_TRUE@	$(top_builddir)/src/cwutils/lib/libcwutils.a
+am_src_cwutils_tests_cwutils_tests_OBJECTS =  \
+	src/cwutils/tests/cwutils_tests-main.$(OBJEXT) \
+	src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.$(OBJEXT)
+src_cwutils_tests_cwutils_tests_OBJECTS =  \
+	$(am_src_cwutils_tests_cwutils_tests_OBJECTS)
+src_cwutils_tests_cwutils_tests_DEPENDENCIES =  \
+	$(top_builddir)/src/cwutils/lib_cw.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -165,7 +173,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po \
 	src/cwgen/tests/$(DEPDIR)/cwgen_args-cwgen_args.Po \
-	src/cwgen/tests/$(DEPDIR)/cwgen_args-wordset.Po
+	src/cwgen/tests/$(DEPDIR)/cwgen_args-wordset.Po \
+	src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po \
+	src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -186,9 +196,11 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(noinst_bin_wav_state_detector_SOURCES) \
-	$(src_cwgen_tests_cwgen_args_SOURCES)
+	$(src_cwgen_tests_cwgen_args_SOURCES) \
+	$(src_cwutils_tests_cwutils_tests_SOURCES)
 DIST_SOURCES = $(noinst_bin_wav_state_detector_SOURCES) \
-	$(am__src_cwgen_tests_cwgen_args_SOURCES_DIST)
+	$(am__src_cwgen_tests_cwgen_args_SOURCES_DIST) \
+	$(src_cwutils_tests_cwutils_tests_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -435,6 +447,7 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.inc.in \
 	$(srcdir)/src/cwgen/tests/Makemodule.am \
+	$(srcdir)/src/cwutils/tests/Makemodule.am \
 	$(srcdir)/src/cwutils/wav_state_detector/Makemodule.am AUTHORS \
 	COPYING ChangeLog INSTALL NEWS README THANKS compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
@@ -626,6 +639,18 @@ top_srcdir = @top_srcdir@
 noinst_bin_wav_state_detector_SOURCES = ./src/cwutils/wav_state_detector/main.c
 noinst_bin_wav_state_detector_CPPFLAGS = -I$(top_srcdir)/src
 noinst_bin_wav_state_detector_LDADD = ./src/cwutils/lib/libcwutils.a -L./src/libcw/.libs -lcw
+src_cwutils_tests_cwutils_tests_SOURCES = \
+	src/cwutils/tests/main.c \
+	src/cwutils/tests/cmdline_combine_arguments.c \
+	src/cwutils/tests/cmdline_combine_arguments.h
+
+src_cwutils_tests_cwutils_tests_CPPFLAGS = -I$(top_srcdir)/src
+
+# TODO acerion 2023.09.02: I decided to re-use existing lib_cw.a (which is
+# built for cw program, not for the test program). Re-think building multiple
+# convenience libraries in cwutils. Maybe we could have just one, with all
+# the functions in it?
+src_cwutils_tests_cwutils_tests_LDADD = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.libs -lcw
 
 # Source code files used to build a program.
 @WITH_CWGEN_TRUE@src_cwgen_tests_cwgen_args_SOURCES = \
@@ -648,14 +673,14 @@ EXTRA_DIST = \
 	THANKS HISTORY \
 	patches # debian
 
-TESTS = $(am__append_2)
+TESTS = ./src/cwutils/tests/cwutils_tests $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .log .o .obj .test .test$(EXEEXT) .trs
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(srcdir)/src/cwgen/tests/Makemodule.am $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(srcdir)/src/cwutils/tests/Makemodule.am $(srcdir)/src/cwgen/tests/Makemodule.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -677,7 +702,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles);; \
 	esac;
-$(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(srcdir)/src/cwgen/tests/Makemodule.am $(am__empty):
+$(srcdir)/src/cwutils/wav_state_detector/Makemodule.am $(srcdir)/src/cwutils/tests/Makemodule.am $(srcdir)/src/cwgen/tests/Makemodule.am $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -739,11 +764,28 @@ src/cwgen/tests/cwgen_args-wordset.$(OBJEXT):  \
 src/cwgen/tests/cwgen_args$(EXEEXT): $(src_cwgen_tests_cwgen_args_OBJECTS) $(src_cwgen_tests_cwgen_args_DEPENDENCIES) $(EXTRA_src_cwgen_tests_cwgen_args_DEPENDENCIES) src/cwgen/tests/$(am__dirstamp)
 	@rm -f src/cwgen/tests/cwgen_args$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(src_cwgen_tests_cwgen_args_OBJECTS) $(src_cwgen_tests_cwgen_args_LDADD) $(LIBS)
+src/cwutils/tests/$(am__dirstamp):
+	@$(MKDIR_P) src/cwutils/tests
+	@: > src/cwutils/tests/$(am__dirstamp)
+src/cwutils/tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) src/cwutils/tests/$(DEPDIR)
+	@: > src/cwutils/tests/$(DEPDIR)/$(am__dirstamp)
+src/cwutils/tests/cwutils_tests-main.$(OBJEXT):  \
+	src/cwutils/tests/$(am__dirstamp) \
+	src/cwutils/tests/$(DEPDIR)/$(am__dirstamp)
+src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.$(OBJEXT):  \
+	src/cwutils/tests/$(am__dirstamp) \
+	src/cwutils/tests/$(DEPDIR)/$(am__dirstamp)
+
+src/cwutils/tests/cwutils_tests$(EXEEXT): $(src_cwutils_tests_cwutils_tests_OBJECTS) $(src_cwutils_tests_cwutils_tests_DEPENDENCIES) $(EXTRA_src_cwutils_tests_cwutils_tests_DEPENDENCIES) src/cwutils/tests/$(am__dirstamp)
+	@rm -f src/cwutils/tests/cwutils_tests$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(src_cwutils_tests_cwutils_tests_OBJECTS) $(src_cwutils_tests_cwutils_tests_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f ./src/cwutils/wav_state_detector/*.$(OBJEXT)
 	-rm -f src/cwgen/tests/*.$(OBJEXT)
+	-rm -f src/cwutils/tests/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -751,6 +793,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/cwgen/tests/$(DEPDIR)/cwgen_args-cwgen_args.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/cwgen/tests/$(DEPDIR)/cwgen_args-wordset.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -824,6 +868,34 @@ src/cwgen/tests/cwgen_args-wordset.obj: src/cwgen/tests/wordset.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwgen_tests_cwgen_args_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/cwgen/tests/cwgen_args-wordset.obj `if test -f 'src/cwgen/tests/wordset.c'; then $(CYGPATH_W) 'src/cwgen/tests/wordset.c'; else $(CYGPATH_W) '$(srcdir)/src/cwgen/tests/wordset.c'; fi`
 
+src/cwutils/tests/cwutils_tests-main.o: src/cwutils/tests/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/cwutils/tests/cwutils_tests-main.o -MD -MP -MF src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Tpo -c -o src/cwutils/tests/cwutils_tests-main.o `test -f 'src/cwutils/tests/main.c' || echo '$(srcdir)/'`src/cwutils/tests/main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Tpo src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cwutils/tests/main.c' object='src/cwutils/tests/cwutils_tests-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/cwutils/tests/cwutils_tests-main.o `test -f 'src/cwutils/tests/main.c' || echo '$(srcdir)/'`src/cwutils/tests/main.c
+
+src/cwutils/tests/cwutils_tests-main.obj: src/cwutils/tests/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/cwutils/tests/cwutils_tests-main.obj -MD -MP -MF src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Tpo -c -o src/cwutils/tests/cwutils_tests-main.obj `if test -f 'src/cwutils/tests/main.c'; then $(CYGPATH_W) 'src/cwutils/tests/main.c'; else $(CYGPATH_W) '$(srcdir)/src/cwutils/tests/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Tpo src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cwutils/tests/main.c' object='src/cwutils/tests/cwutils_tests-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/cwutils/tests/cwutils_tests-main.obj `if test -f 'src/cwutils/tests/main.c'; then $(CYGPATH_W) 'src/cwutils/tests/main.c'; else $(CYGPATH_W) '$(srcdir)/src/cwutils/tests/main.c'; fi`
+
+src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.o: src/cwutils/tests/cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.o -MD -MP -MF src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo -c -o src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.o `test -f 'src/cwutils/tests/cmdline_combine_arguments.c' || echo '$(srcdir)/'`src/cwutils/tests/cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cwutils/tests/cmdline_combine_arguments.c' object='src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.o `test -f 'src/cwutils/tests/cmdline_combine_arguments.c' || echo '$(srcdir)/'`src/cwutils/tests/cmdline_combine_arguments.c
+
+src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.obj: src/cwutils/tests/cmdline_combine_arguments.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.obj -MD -MP -MF src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo -c -o src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.obj `if test -f 'src/cwutils/tests/cmdline_combine_arguments.c'; then $(CYGPATH_W) 'src/cwutils/tests/cmdline_combine_arguments.c'; else $(CYGPATH_W) '$(srcdir)/src/cwutils/tests/cmdline_combine_arguments.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Tpo src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cwutils/tests/cmdline_combine_arguments.c' object='src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(src_cwutils_tests_cwutils_tests_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.obj `if test -f 'src/cwutils/tests/cmdline_combine_arguments.c'; then $(CYGPATH_W) 'src/cwutils/tests/cmdline_combine_arguments.c'; else $(CYGPATH_W) '$(srcdir)/src/cwutils/tests/cmdline_combine_arguments.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -831,6 +903,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf noinst/bin/.libs noinst/bin/_libs
 	-rm -rf src/cwgen/tests/.libs src/cwgen/tests/_libs
+	-rm -rf src/cwutils/tests/.libs src/cwutils/tests/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1082,6 +1155,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+./src/cwutils/tests/cwutils_tests.log: ./src/cwutils/tests/cwutils_tests
+	@p='./src/cwutils/tests/cwutils_tests'; \
+	b='./src/cwutils/tests/cwutils_tests'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 ./src/cwgen/tests/cwgen_args.log: ./src/cwgen/tests/cwgen_args
 	@p='./src/cwgen/tests/cwgen_args'; \
 	b='./src/cwgen/tests/cwgen_args'; \
@@ -1339,6 +1419,8 @@ distclean-generic:
 	-rm -f noinst/bin/$(am__dirstamp)
 	-rm -f src/cwgen/tests/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/cwgen/tests/$(am__dirstamp)
+	-rm -f src/cwutils/tests/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/cwutils/tests/$(am__dirstamp)
 	-rm -f src/cwutils/wav_state_detector/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/cwutils/wav_state_detector/$(am__dirstamp)
 
@@ -1355,6 +1437,8 @@ distclean: distclean-recursive
 		-rm -f ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
 	-rm -f src/cwgen/tests/$(DEPDIR)/cwgen_args-cwgen_args.Po
 	-rm -f src/cwgen/tests/$(DEPDIR)/cwgen_args-wordset.Po
+	-rm -f src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+	-rm -f src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-libtool distclean-tags
@@ -1405,6 +1489,8 @@ maintainer-clean: maintainer-clean-recursive
 		-rm -f ./src/cwutils/wav_state_detector/$(DEPDIR)/noinst_bin_wav_state_detector-main.Po
 	-rm -f src/cwgen/tests/$(DEPDIR)/cwgen_args-cwgen_args.Po
 	-rm -f src/cwgen/tests/$(DEPDIR)/cwgen_args-wordset.Po
+	-rm -f src/cwutils/tests/$(DEPDIR)/cwutils_tests-cmdline_combine_arguments.Po
+	-rm -f src/cwutils/tests/$(DEPDIR)/cwutils_tests-main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
