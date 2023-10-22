@@ -435,7 +435,7 @@ manually/visually check the output of the tests.
 
 *Steps*
 1. Enable xcwcp's receiver tests
-  ./configure --enable-xcwcp-rec-test
+  ./configure --enable-dev-receiver-test
 2. Compile xcwcp
    make
 3. Run xcwcp, use "Run Receiver Test" item in modes menu
@@ -444,9 +444,10 @@ manually/visually check the output of the tests.
 5. Check in console that the summary says "success":
    "[II] Test result: success"
 
-*Expected result*
+*Expected results*
 1. No errors reported in console.
 2. Test's summary indicates success.
 
+*Actual results*
 
 
