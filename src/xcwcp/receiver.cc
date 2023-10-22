@@ -710,7 +710,7 @@ void * receiver_input_generator_fn(void * arg)
 	Receiver * xcwcp_receiver = (Receiver *) arg;
 
 	cw_rec_tester_init(&xcwcp_receiver->rec_tester);
-	cw_rec_tester_init_text_buffers(&xcwcp_receiver->rec_tester, 1);
+	cw_rec_tester_init_text_buffers(&xcwcp_receiver->rec_tester, false);
 
 
 	/* Using Null sound system because this generator is only used

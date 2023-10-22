@@ -3,7 +3,7 @@
 
 * STARTED Tests for unixcw version 3.6.1
 Version of template: 2023.06.10.
-** STARTED Main laptop, Debian GNU/Linux 12
+** DONE Main laptop, Debian GNU/Linux 12
 gcc (Debian 12.2.0-14) 12.2.0
 *** DONE Build system tests
 **** DONE make distcheck
@@ -525,12 +525,12 @@ manually/visually check the output of the tests.
 *Actual results*
 Both points from expected results are satisfied.
 
-*** TODO receiving functionality
-**** TODO xcwcp receiver tests
+*** DONE receiving functionality
+**** DONE xcwcp receiver tests
 
 *Steps*
 1. Enable xcwcp's receiver tests
-  ./configure --enable-xcwcp-rec-test
+  ./configure --enable-dev-receiver-test
 2. Compile xcwcp
    make
 3. Run xcwcp, use "Run Receiver Test" item in modes menu
@@ -539,9 +539,12 @@ Both points from expected results are satisfied.
 5. Check in console that the summary says "success":
    "[II] Test result: success"
 
-*Expected result*
+*Expected results*
 1. No errors reported in console.
 2. Test's summary indicates success.
+
+*Actual results*
+Expected results are satisfied.
 
 
 
