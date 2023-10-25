@@ -161,6 +161,30 @@ AC_SUBST(LDCONFIG)
 
 
 
+# On Alpine Linux 3.17..3.18 using busybox/gzip, the "--best" option doesn't
+# exit, and the "-d" and "-{1-9}" don't mix well.
+#
+# if test -d "unixcw-3.6.1"; then find "unixcw-3.6.1" -type d ! -perm -200 -exec chmod u+w {} ';' && rm -rf "unixcw-3.6.1" || { sleep 5 && rm -rf "unixcw-3.6.1"; }; else :; fi
+# case 'unixcw-3.6.1.tar.gz' in \
+# *.tar.gz*) \
+#  eval GZIP= gzip --best -dc unixcw-3.6.1.tar.gz | ${TAR-tar} xf - ;;\
+# *.tar.bz2*) \
+# [...]
+# esac
+# gzip: unrecognized option: best
+# BusyBox v1.36.1 (2023-10-09 08:04:29 UTC) multi-call binary.
+#
+# Usage: gzip [-cfkdt123456789] [FILE]...
+# [...]
+#
+# This snippet from cwdaemon 0.12.0 fixes this.
+my_gzip_env="--best"
+if gzip --best -d 2>&1 | grep "unrecognized" > /dev/null; then
+   my_gzip_env=""
+fi
+AC_SUBST(GZIP_ENV, $my_gzip_env)
+
+
 
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
