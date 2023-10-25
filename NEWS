@@ -117,6 +117,18 @@ version 3.6.1 / 2023-xx-yy
     allows reproducible builds.
 
 
+  Alpine Linux:
+
+  - unixcw now explicitly defines _FORTIFY_SOURCE in CFLAGS, with value '1'.
+    This causes the following warning during compilation:
+
+        <command-line>: warning: "_FORTIFY_SOURCE" redefined
+        <built-in>: note: this is the location of the previous definition
+
+    I plan to change value of _FORTIFY_SOURCE to '2' in next release of
+    unixcw.
+
+
 ----------------------------------------------------------------------------
 
 
