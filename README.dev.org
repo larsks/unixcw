@@ -100,8 +100,21 @@ menuentry "Alpine Linux 3.17" {
 
 *** Generic tips
 
+**** mount
+
 Mount a pendrive
 mount -t msdosfs /dev/da0s1 /mnt/
+
+FreeBSD probably doesn't support journaling in Linux's ext filesystems, so
+they have to be mounted with "-t ext2fs" option passed to "mount" command.
+
+**** mc
+
+When you encounter this problem when starting mc:
+    common.c: unimplemented subshell type 1
+    read (subshell_pty...): No such file or directory (2)
+then run mc like this:
+    mc -u
 
 *** Binary packages
 
