@@ -36,11 +36,11 @@
 /* Define to 1 if you have the `asound' library (-lasound). */
 #undef HAVE_LIBASOUND
 
+/* Define to 1 if you have the `c' library (-lc). */
+#undef HAVE_LIBC
+
 /* Define to 1 if you have the `curses' library (-lcurses). */
 #undef HAVE_LIBCURSES
-
-/* Define to 1 if you have the `intl' library (-lintl). */
-#undef HAVE_LIBINTL
 
 /* Define to 1 if you have the <libintl.h> header file. */
 #undef HAVE_LIBINTL_H

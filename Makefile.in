@@ -154,8 +154,9 @@ am_src_cwutils_tests_cwutils_tests_OBJECTS =  \
 	src/cwutils/tests/cwutils_tests-cmdline_combine_arguments.$(OBJEXT)
 src_cwutils_tests_cwutils_tests_OBJECTS =  \
 	$(am_src_cwutils_tests_cwutils_tests_OBJECTS)
+am__DEPENDENCIES_1 =
 src_cwutils_tests_cwutils_tests_DEPENDENCIES =  \
-	$(top_builddir)/src/cwutils/lib_cw.a
+	$(top_builddir)/src/cwutils/lib_cw.a $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -488,7 +489,6 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 DIST_ARCHIVES = $(distdir).tar.gz
-GZIP_ENV = --best
 DIST_TARGETS = dist-gzip
 # Exists only to be overridden by the user if desired.
 AM_DISTCHECK_DVI_TARGET = dvi
@@ -532,6 +532,7 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
 GZIP = @GZIP@
+GZIP_ENV = @GZIP_ENV@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -650,7 +651,9 @@ src_cwutils_tests_cwutils_tests_CPPFLAGS = -I$(top_srcdir)/src
 # built for cw program, not for the test program). Re-think building multiple
 # convenience libraries in cwutils. Maybe we could have just one, with all
 # the functions in it?
-src_cwutils_tests_cwutils_tests_LDADD = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.libs -lcw
+src_cwutils_tests_cwutils_tests_LDADD =  \
+	$(top_builddir)/src/cwutils/lib_cw.a \
+	-L$(top_builddir)/src/libcw/.libs -lcw $(INTL_LIB)
 
 # Source code files used to build a program.
 @WITH_CWGEN_TRUE@src_cwgen_tests_cwgen_args_SOURCES = \

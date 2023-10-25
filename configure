@@ -680,6 +680,7 @@ ENABLE_DEV_RECEIVER_TEST_TRUE
 WITH_CWGEN_FALSE
 WITH_CWGEN_TRUE
 LIBCW_VERSION
+GZIP_ENV
 LDCONFIG
 GZIP
 INTL_LIB
@@ -14117,11 +14118,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++11 features" >&5
 printf %s "checking for $CXX option to enable C++11 features... " >&6; }
-if test ${ac_cv_prog_cxx_cxx11+y}
+if test ${ac_cv_prog_cxx_11+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_cxx11=no
+  ac_cv_prog_cxx_11=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14163,11 +14164,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++98 features" >&5
 printf %s "checking for $CXX option to enable C++98 features... " >&6; }
-if test ${ac_cv_prog_cxx_cxx98+y}
+if test ${ac_cv_prog_cxx_98+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_cxx98=no
+  ac_cv_prog_cxx_98=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -18032,23 +18033,70 @@ DL_LIB=
 # TODO: consider using AC_CHECK_LIB(ossaudio, _oss_ioctl)
 OSS_LIB=
 
-# Explicit linking with libintl is needed on FreeBSD (12.1).
+
+
+
+# Explicit linking with libintl is needed on:
+# - FreeBSD (12.1, 13.2)
+# - Alpine Linux (3.18.4)
+#
+# I'm not using AC_SEARCH_LIBS because I don't want to append libintl through
+# LIBS to LDADD of all unixcw programs. Only some programs require linking
+# with a library that provides textdomain().
+#
+# TODO acerion 2023.10.25: check if xcwcp (which doesn't require
+# textdomain()), when passed LIBS=-libintl during compilation, links with
+# this library at run time.
+#
+# TODO acerion 2023.10.25: searching for textdomain() should be executed only
+# when unixcw programs using textdomain() and friends are enabled for
+# compilation. If we only compile libcw + xcwcp, checking for textdomain() is
+# completely unnecessary.
 INTL_LIB=
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for textdomain in -lc" >&5
+printf %s "checking for textdomain in -lc... " >&6; }
+if test ${ac_cv_lib_c_textdomain+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-IS_FREEBSD=false
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char textdomain ();
+int
+main (void)
+{
+return textdomain ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_c_textdomain=yes
+else $as_nop
+  ac_cv_lib_c_textdomain=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_c_textdomain" >&5
+printf "%s\n" "$ac_cv_lib_c_textdomain" >&6; }
+if test "x$ac_cv_lib_c_textdomain" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBC 1" >>confdefs.h
 
-case $host_os in
-    *linux*|*Linux*)
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Detected Linux: $host_os" >&5
-printf "%s\n" "$as_me: Detected Linux: $host_os" >&6;}
-	# Needed because of dynamic loading of libraries in libcw.
-	DL_LIB=\"-ldl\"
-	;;
-    *freebsd*|*FreeBSD*)
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Detected FreeBSD: $host_os" >&5
-printf "%s\n" "$as_me: Detected FreeBSD: $host_os" >&6;}
-	IS_FREEBSD=true
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for textdomain in -lintl" >&5
+  LIBS="-lc $LIBS"
+
+else $as_nop
+  # Success, we are probably on OS with glibc
+             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for textdomain in -lintl" >&5
 printf %s "checking for textdomain in -lintl... " >&6; }
 if test ${ac_cv_lib_intl_textdomain+y}
 then :
@@ -18085,15 +18133,32 @@ fi
 printf "%s\n" "$ac_cv_lib_intl_textdomain" >&6; }
 if test "x$ac_cv_lib_intl_textdomain" = xyes
 then :
-  printf "%s\n" "#define HAVE_LIBINTL 1" >>confdefs.h
-
-  LIBS="-lintl $LIBS"
-
+  # Try finding the function in separate libintl.
+                           INTL_LIB=-lintl
+else $as_nop
+  # Success, i18n function found in libintl.
+                           as_fn_error $? "Can't find 'textdomain' function in neither libc nor libintl, cannot continue." "$LINENO" 5
 fi
 
-	if test $ac_cv_lib_intl_textdomain = 'yes' ; then
-	   INTL_LIB=\"-lintl\"
-	fi
+fi
+ # Failure. Can't continue.
+
+
+
+
+IS_FREEBSD=false
+
+case $host_os in
+    *linux*|*Linux*)
+	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Detected Linux: $host_os" >&5
+printf "%s\n" "$as_me: Detected Linux: $host_os" >&6;}
+	# Needed because of dynamic loading of libraries in libcw.
+	DL_LIB=\"-ldl\"
+	;;
+    *freebsd*|*FreeBSD*)
+	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Detected FreeBSD: $host_os" >&5
+printf "%s\n" "$as_me: Detected FreeBSD: $host_os" >&6;}
+	IS_FREEBSD=true
 	;;
     *openbsd*|*OpenBSD*)
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Detected OpenBSD: $host_os" >&5
@@ -18232,6 +18297,31 @@ fi
 
 
 
+
+
+
+# On Alpine Linux 3.17..3.18 using busybox/gzip, the "--best" option doesn't
+# exit, and the "-d" and "-{1-9}" don't mix well.
+#
+# if test -d "unixcw-3.6.1"; then find "unixcw-3.6.1" -type d ! -perm -200 -exec chmod u+w {} ';' && rm -rf "unixcw-3.6.1" || { sleep 5 && rm -rf "unixcw-3.6.1"; }; else :; fi
+# case 'unixcw-3.6.1.tar.gz' in \
+# *.tar.gz*) \
+#  eval GZIP= gzip --best -dc unixcw-3.6.1.tar.gz | ${TAR-tar} xf - ;;\
+# *.tar.bz2*) \
+# [...]
+# esac
+# gzip: unrecognized option: best
+# BusyBox v1.36.1 (2023-10-09 08:04:29 UTC) multi-call binary.
+#
+# Usage: gzip [-cfkdt123456789] [FILE]...
+# [...]
+#
+# This snippet from cwdaemon 0.12.0 fixes this.
+my_gzip_env="--best"
+if gzip --best -d 2>&1 | grep "unrecognized" > /dev/null; then
+   my_gzip_env=""
+fi
+GZIP_ENV=$my_gzip_env
 
 
 
@@ -18981,8 +19071,8 @@ printf "%s\n" "no" >&6; }
 fi
 
 pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" >&5
-printf %s "checking for Qt5Widgets Qt5Gui Qt5Core >= 5.0.0... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for QT5" >&5
+printf %s "checking for QT5... " >&6; }
 
 if test -n "$QT5_CFLAGS"; then
     pkg_cv_QT5_CFLAGS="$QT5_CFLAGS"
@@ -19022,7 +19112,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -19031,12 +19121,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-                QT5_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
+	        QT5_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
         else
-                QT5_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
+	        QT5_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
         fi
-        # Put the nasty error message in config.log where it belongs
-        echo "$QT5_PKG_ERRORS" >&5
+	# Put the nasty error message in config.log where it belongs
+	echo "$QT5_PKG_ERRORS" >&5
 
 
 
@@ -19047,7 +19137,7 @@ printf "%s\n" "$as_me: WARNING: Cannot find Qt5 files - unable to build xcwcp" >
 
 
 elif test $pkg_failed = untried; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 
 
@@ -19058,8 +19148,8 @@ printf "%s\n" "$as_me: WARNING: Cannot find Qt5 files - unable to build xcwcp" >
 
 
 else
-        QT5_CFLAGS=$pkg_cv_QT5_CFLAGS
-        QT5_LIBS=$pkg_cv_QT5_LIBS
+	QT5_CFLAGS=$pkg_cv_QT5_CFLAGS
+	QT5_LIBS=$pkg_cv_QT5_LIBS
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 
