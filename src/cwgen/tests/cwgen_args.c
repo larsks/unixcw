@@ -55,6 +55,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#if defined(__FreeBSD__)
+#include <sys/types.h> /* open() and its flags on FreeBSD. */
+#include <sys/stat.h>
+#endif
 #include <unistd.h>
 
 #include <cwutils/lib/random.h>
