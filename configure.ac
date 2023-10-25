@@ -78,8 +78,34 @@ DL_LIB=
 # TODO: consider using AC_CHECK_LIB(ossaudio, _oss_ioctl)
 OSS_LIB=
 
-# Explicit linking with libintl is needed on FreeBSD (12.1).
+
+
+
+# Explicit linking with libintl is needed on:
+# - FreeBSD (12.1, 13.2)
+# - Alpine Linux (3.18.4)
+#
+# I'm not using AC_SEARCH_LIBS because I don't want to append libintl through
+# LIBS to LDADD of all unixcw programs. Only some programs require linking
+# with a library that provides textdomain().
+#
+# TODO acerion 2023.10.25: check if xcwcp (which doesn't require
+# textdomain()), when passed LIBS=-libintl during compilation, links with
+# this library at run time.
+#
+# TODO acerion 2023.10.25: searching for textdomain() should be executed only
+# when unixcw programs using textdomain() and friends are enabled for
+# compilation. If we only compile libcw + xcwcp, checking for textdomain() is
+# completely unnecessary.
 INTL_LIB=
+AC_CHECK_LIB(c, textdomain,
+             [], # Success, we are probably on OS with glibc
+             [AC_CHECK_LIB(intl, textdomain, # Try finding the function in separate libintl.
+                           [INTL_LIB=-lintl], # Success, i18n function found in libintl.
+                           [AC_MSG_ERROR([Can't find 'textdomain' function in neither libc nor libintl, cannot continue.])])]) # Failure. Can't continue.
+
+
+
 
 IS_FREEBSD=false
 AC_CANONICAL_HOST
@@ -92,10 +118,6 @@ case $host_os in
     *freebsd*|*FreeBSD*)
 	AC_MSG_NOTICE([Detected FreeBSD: $host_os])
 	IS_FREEBSD=true
-	AC_CHECK_LIB(intl, textdomain)
-	if test $ac_cv_lib_intl_textdomain = 'yes' ; then
-	   INTL_LIB=\"-lintl\"
-	fi
 	;;
     *openbsd*|*OpenBSD*)
 	AC_MSG_NOTICE([Detected OpenBSD: $host_os])

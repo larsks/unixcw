@@ -12,6 +12,7 @@ src_cwutils_tests_cwutils_tests_CPPFLAGS = -I$(top_srcdir)/src
 # built for cw program, not for the test program). Re-think building multiple
 # convenience libraries in cwutils. Maybe we could have just one, with all
 # the functions in it?
-src_cwutils_tests_cwutils_tests_LDADD = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.libs -lcw
+src_cwutils_tests_cwutils_tests_LDADD  = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.libs -lcw
+src_cwutils_tests_cwutils_tests_LDADD += $(INTL_LIB)
 
 
