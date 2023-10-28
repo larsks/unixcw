@@ -232,6 +232,7 @@ Build-time requirements for unixcw:
    console buzzer in libcw.
  - ncurses development files for building cwcp;
  - QT5 development files for building xcwcp;
+ - gawk for generating man page for libcw;
 
 
 
