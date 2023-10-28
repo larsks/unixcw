@@ -551,7 +551,7 @@ kernel 6.1.59-0-lts
 musl-1.2.4-r2
 gcc (Alpine 12.2.1_git20220924-r10) 12.2.1 20220924
 *** STARTED Build system tests
-**** STARTED make distcheck
+**** DONE make distcheck
 
 *Steps*
 Run "make distcheck" in main directory of the project.
@@ -565,6 +565,12 @@ Run "make distcheck" in main directory of the project.
 
 *Actual result*
 
+Pass. The archive is being built correctly, distcheck tests pass.
+
+There are few autotools warnings when build system files are being
+re-generated (see below), but this is not a major issue - it can be addressed
+in later releases.
+
 configure.ac:46: warning: The macro `AC_PROG_LIBTOOL' is obsolete.
 configure.ac:46: You should run autoupdate.
 m4/libtool.m4:99: AC_PROG_LIBTOOL is expanded from...
@@ -577,7 +583,6 @@ configure.ac:538: warning: The macro `AC_HEADER_TIME' is obsolete.
 configure.ac:538: You should run autoupdate.
 ./lib/autoconf/headers.m4:743: AC_HEADER_TIME is expanded from...
 configure.ac:538: the top level
-
 
 **** TODO ./configure options
 
