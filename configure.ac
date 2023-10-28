@@ -97,11 +97,12 @@ OSS_LIB=
 # when unixcw programs using textdomain() and friends are enabled for
 # compilation. If we only compile libcw + xcwcp, checking for textdomain() is
 # completely unnecessary.
+#
 INTL_LIB=
-AC_CHECK_LIB(c, textdomain,
-             [], # Success, we are probably on OS with glibc
-             [AC_CHECK_LIB(intl, textdomain, # Try finding the function in separate libintl.
-                           [INTL_LIB=-lintl], # Success, i18n function found in libintl.
+AC_CHECK_LIB(intl, textdomain, # Try finding the function in separate libintl.
+             [INTL_LIB=-lintl], # Success, i18n function found in libintl.
+             [AC_CHECK_LIB(c, textdomain,
+                           [], # Success, we are probably on OS with glibcs
                            [AC_MSG_ERROR([Can't find 'textdomain' function in neither libc nor libintl, cannot continue.])])]) # Failure. Can't continue.
 
 
