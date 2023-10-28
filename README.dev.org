@@ -432,7 +432,7 @@ libtoolize
       actions and changes more visible in the changelog/NEWS file.
 
 * Bugs, feature requests
-** TODO R0001 Bug: -lintl on Alpine is not added to linker flags
+** DONE R0001 Bug: -lintl on Alpine is not added to linker flags
 
 Compilation of cw on Alpine 1.17.3 is failing because linker can't find intl function:
    /usr/lib/gcc/x86_64-alpine-linux-musl/12.2.1/../../../../x86_64-alpine-linux-musl/bin/ld: /home/acerion/unixcw/unixcw/src/cwutils/i18n.c:63: undefined reference to `libintl_gettext'
@@ -442,6 +442,12 @@ it's a matter of getting linker flags on Alpine right.
 
 See 'AC_CHECK_LIB(intl, textdomain)' in configure.ac - we probably already do
 something to address this on for FreeBSD.
+
+
+
+FIXED in 3.6.1 in commits f1ee07c6c5d4a0791dbf3a23a0b87f5c05c91ed3 and
+b08d96a22490eccbe8acc6b71882b828682615ef. Code detecting whether to link with
+intl library on Alpine and FreeBSD has been reworked a bit.
 
 ** TODO R0002 Feature: allow disabling cw and cwgen through ./configure
 A problem with -lintl on Alpine shows that even such simple
