@@ -92,10 +92,6 @@ menuentry "Alpine Linux 3.17" {
 	initrd /boot/initramfs-lts
 }
 
-
-
-
-
 ** FreeBSD
 
 *** Generic tips
@@ -174,8 +170,6 @@ menuentry "FreeBSD 13.2" --class freebsd --class bsd --class os {
 	set kFreeBSD.vfs.root.mountfrom=ufs:/dev/ada0s9a
 	set kFreeBSD.vfs.root.mountfrom.options=rw
 }
-
-
 
 * Sound systems
 ** Console
@@ -430,6 +424,19 @@ libtoolize
       Let users know that there are specific actions taken and changes made
       to increase quality of the software that they will be using. Make the
       actions and changes more visible in the changelog/NEWS file.
+
+   9. Sharing a partition between OSes installed on a single PC.
+
+      1. FreeBSD can mount Linux 'ext4' filesystem, but only if you use
+         'ext2fs' as type. FreeBSD doesn't support journaling on ext3/4
+         filesystems.
+      2. It may be necessary to create users with the same UID and GID on all
+         OSes. Otherwise 'mount' will not recognize UID and GID in mounted
+         filesystem as belonging to a valid and known local user, and all
+         files and directories will have 1000:1000 UID:GID.
+
+         Consult a man page for the command creating user accounts about
+         explicitly specifying UID and GID of a new user.
 
 * Bugs, feature requests
 ** DONE R0001 Bug: -lintl on Alpine is not added to linker flags
