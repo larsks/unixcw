@@ -731,6 +731,12 @@ static void test_helper_tq_callback(void * ptr)
    Fill tone queue with short tones, then check that we can move the
    volume through its entire range.  Flush the queue when complete.
 
+   TODO acerion 2023.11.02: make the test more similar to
+   test_cw_gen_volume_functions().
+
+   TODO acerion 2023.11.02: move tests of test_cw_gen_volume_functions() to
+   separate test function. Mark the test function as "quick test".
+
    @reviewed on 2019-10-13
 */
 int legacy_api_test_volume_functions(cw_test_executor_t * cte)
@@ -740,7 +746,10 @@ int legacy_api_test_volume_functions(cw_test_executor_t * cte)
 
 	int vol_min = -1;
 	int vol_max = -1;
-	const int vol_delta = 5;
+
+	/* '5' was too large: test was too short and I was not able to fully
+	   confirm changes to volume. */
+	const int vol_delta = 2;
 
 	/* Test: get range of allowed volumes. */
 	{
