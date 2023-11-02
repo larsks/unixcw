@@ -620,7 +620,7 @@ The shell script may not work on systems without bash.
 
 *Actual result*
 
-*** TODO libcw tests
+*** STARTED libcw tests
 Tests using tools from unixcw/src/libcw.
 
 Notice that Null sound system is tested as last one: first run tests on other
@@ -642,7 +642,13 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Actual result*
 
-**** TODO Main test binary - OSS sound system
+**** SKIPPED Main test binary - OSS sound system
+
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access OSS directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
 
 *Steps*
 cd src/libcw/tests
@@ -655,7 +661,16 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Actual result*
 
-**** TODO Main test binary - ALSA sound system
+Skipped: this machine doesn't support direct OSS. Perhaps I could force ALSA
+to emulate OSS, but what's the point...
+
+**** STARTED Main test binary - ALSA sound system
+
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access ALSA directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
 
 *Steps*
 cd src/libcw/tests
@@ -668,7 +683,7 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Actual result*
 
-**** TODO Main test binary - PulseAudio sound system
+**** DONE Main test binary - PulseAudio sound system
 
 *Steps*
 cd src/libcw/tests
@@ -679,7 +694,31 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> P |         0 |        18 |         0 |         0 |         0 |         0 |<-
+   P |       151 |      1003 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 25 minutes, 6 seconds
+
 *Actual result*
+
+Pass. The failures come from a test of generator that is known to be
+sometimes failing (the test with timings of generator callback).
 
 **** TODO Main test binary - Null sound system
 
