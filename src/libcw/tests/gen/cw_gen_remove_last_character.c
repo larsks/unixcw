@@ -162,9 +162,6 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 		// Clearing of receiver appears to be unnecessary.
 		//cw_easy_rec_clear(easy_rec);
 
-		if (failure) {
-			break;
-		}
 
 		/* The main part of the test: comparing enqueued string with what has
 		   been played and received. There are spaces at the end of strings
@@ -179,8 +176,10 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 				"oooo" ""     " "
 			};
 
-			cte->expect_strcasecmp(cte, expected_results[chars_to_remove], data.accumulator,
-			                       "Removal of last %d character(s)", chars_to_remove);
+			if (!cte->expect_strcasecmp(cte, expected_results[chars_to_remove], data.accumulator,
+										"Removal of last %d character(s)", chars_to_remove)) {
+				failure = true;
+			}
 		}
 	}
 

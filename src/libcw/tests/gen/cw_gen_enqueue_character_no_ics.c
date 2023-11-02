@@ -253,9 +253,11 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 
 		/* The main part of the test: comparing enqueued string with what has
 		   been played and received. */
-		cte->expect_strcasecmp(cte, g_test_data[t].expected_result, data.accumulator,
-		                       "Enqueue of char w/o ics, in: [%s], out: [%s]",
-		                       g_test_data[t].input, data.accumulator);
+		if (!cte->expect_strcasecmp(cte, g_test_data[t].expected_result, data.accumulator,
+									"Enqueue of char w/o ics, in: [%s], out: [%s]",
+									g_test_data[t].input, data.accumulator)) {
+			failure = true;
+		}
 		t++;
 	}
 
