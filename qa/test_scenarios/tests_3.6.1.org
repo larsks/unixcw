@@ -646,7 +646,7 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Preconditions*
 
-On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+On Linux machine you may need to disable PulseAudio and/or PipeWire sound
 server before being able to access OSS directly. Refer to instructions in
 project's README.dev.org for details on how to stop these sound servers.
 
@@ -668,7 +668,7 @@ to emulate OSS, but what's the point...
 
 *Preconditions*
 
-On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+On Linux machine you may need to disable PulseAudio and/or PipeWire sound
 server before being able to access ALSA directly. Refer to instructions in
 project's README.dev.org for details on how to stop these sound servers.
 

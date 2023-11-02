@@ -80,6 +80,12 @@ Test logs and summary table for tests shows only well-known problems.
 
 **** TODO Main test binary - OSS sound system
 
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access OSS directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
+
 *Steps*
 cd src/libcw/tests
 ./libcw_tests -S o
@@ -92,6 +98,12 @@ Test logs and summary table for tests shows only well-known problems.
 *Actual result*
 
 **** TODO Main test binary - ALSA sound system
+
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access ALSA directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
 
 *Steps*
 cd src/libcw/tests
