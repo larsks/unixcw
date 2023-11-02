@@ -213,6 +213,13 @@ On current Linux desktops you may need to disable PulseAudio and PipeWire.
 Otherwise you may get "Device or resource busy" error when trying to access
 ALSA device.
 
+On some systems (e.g. Alpine Linux 3.18.4), pulseaudio server is started only
+when PulseAudio sound system is needed, e.g. when PulseAudio sound system is
+requested in command line: "./src/cw/cw -s p". After ~20 seconds of
+inactivity the server is automatically stopped.
+
+**** Disabling the servers on machines with systemd
+
 systemctl stop --user pulseaudio.socket
 systemctl stop --user pulseaudio.service
 
@@ -300,6 +307,25 @@ acceptable values of "-d" option:
 	aplay /usr/share/sounds/alsa/<file>
 
 	There is also 'paplay' tool for PulseAudio that does the same.
+
+
+10. Try yet another trick with specifying device name (this comes from
+    https://wiki.archlinux.org/title/Advanced_Linux_Sound_Architecture#Test_your_changes):
+
+	a. get cards with "aplay -L | grep :CARD"
+
+	   alpine:~# aplay -L | grep :CARD
+       sysdefault:CARD=Intel                 <---- this one
+       front:CARD=Intel,DEV=0
+
+    b. Run aplay with device specified by "-D". Notice that you only specify
+       "card", but not "device".
+
+	   aplay -v /usr/share/sounds/alsa/Front_Center.wav -D sysdefault:Intel
+
+	c. You can now run unixcw programs using the same argument as device:
+
+	   ./libcw_tests -S a -X sysdefault:Intel
 
 *** Other
 
