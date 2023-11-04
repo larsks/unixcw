@@ -41,6 +41,7 @@
 #include "libcw_utils.h"
 #include "test_framework.h"
 #include <cw_easy_rec.h>
+#include <cwutils/lib/random.h>
 
 
 
@@ -53,7 +54,7 @@ extern const char * test_invalid_strings[];
 
 
 static cwt_retv test_cw_gen_new_start_stop_delete_sub(cw_test_executor_t * cte, const char * function_name, bool do_new, bool do_start, bool do_stop, bool do_delete);
-static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, int seconds);
+static int test_cw_gen_forever_sub(cw_test_executor_t * cte, int seconds, bool * pass);
 
 
 
@@ -518,21 +519,30 @@ cwt_retv test_cw_gen_tone_slope_shape_enums(cw_test_executor_t * cte)
    experiencing 100% CPU usage on one of cores with ALSA sound system when HW
    configuration of the ALSA sound system was incorrect.
 
-   @reviewed on 2020-10-15
+   @reviewedon 2023-11-04
 */
-cwt_retv test_cw_gen_forever_internal(cw_test_executor_t * cte)
+cwt_retv test_cw_gen_forever_internal(cw_test_executor_t * kite)
 {
-	const int loops = cte->get_loops_count(cte);
-	const int seconds = 7;
+	kite->print_test_header(kite, "%s", __func__);
 
-	cte->print_test_header(cte, "%s (%d loops, %d seconds)", __func__, loops, seconds);
+	bool pass = true;
 
+	const int loops = kite->get_loops_count(kite);
 	for (int i = 0; i < loops; i++) {
-		const cwt_retv rv = test_cw_gen_forever_sub(cte, seconds);
-		cte->expect_op_int(cte, cwt_retv_ok, "==", rv, "'forever' test");
+		int seconds = 0;
+		if (0 != cw_random_get_int(1, 8, &seconds)) {
+			kite_log(kite, LOG_ERR, "Failed to get random integer for seconds\n");
+			return cwt_retv_err;
+		}
+
+		kite->log_info(kite, "Test %d/%d, %d seconds\n", i + 1, loops, seconds); /* For better information on test progress. */
+		if (0 != test_cw_gen_forever_sub(kite, seconds, &pass)) {
+			kite_log(kite, LOG_ERR, "Failed to test single forever element\n");
+			return cwt_retv_err;
+		}
 	}
 
-	cte->print_test_footer(cte, __func__);
+	kite_on_test_completion(kite, __func__, pass ? test_result_pass : test_result_fail);
 
 	return cwt_retv_ok;
 }
@@ -541,14 +551,28 @@ cwt_retv test_cw_gen_forever_internal(cw_test_executor_t * cte)
 
 
 /**
-   @reviewed on 2020-05-10
+   @brief Enqueue a single "forever" element of given duration
+
+   Function enqueues a single "forever" element, waits for given duration and
+   then terminates the element.
+
+   The "forever" element consists of rising slope, "plateau", and falling slope.
+
+   @reviewedon 2023-11-04
+
+   @param[in/out] cte Test executor
+   @param[in] seconds Duration of enqueued "forever" element
+   @param[out] pass Whether a test passed or failed
+
+   @return 0 if test was performed without interruptions
+   @return -1 otherwise
 */
-static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__((unused)) int seconds)
+static int test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__((unused)) int seconds, bool * pass)
 {
 	cw_gen_t * gen = cw_gen_new(&cte->current_gen_conf);
 	if (NULL == gen) {
 		cte->log_error(cte, "failed to create generator\n");
-		return cwt_retv_err;
+		return -1;
 	}
 
 	cw_gen_start(gen);
@@ -561,13 +585,14 @@ static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__(
 	cw_tone_t tone;
 	CW_TONE_INIT(&tone, freq, slope_duration, CW_SLOPE_MODE_RISING_SLOPE);
 	const cw_ret_t cwret1 = cw_tq_enqueue_internal(gen->tq, &tone);
-	cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret1, "enqueue first tone"); /* Use "errors only" here because this is not a core part of test. */
+	/* Use "errors only" here because this is not a core part of test. */
+	(*pass) = cte->expect_op_int_errors_only(cte, CW_SUCCESS, "==", cwret1, "enqueue first tone") && (*pass);
 
 	CW_TONE_INIT(&tone, freq, gen->quantum_duration, CW_SLOPE_MODE_NO_SLOPES);
 	tone.is_forever = true;
 	tone.debug_id = 'f';
 	const cw_ret_t cwret2 = cw_tq_enqueue_internal(gen->tq, &tone);
-	cte->expect_op_int(cte, CW_SUCCESS, "==", cwret2, "enqueue forever tone");
+	(*pass) = cte->expect_op_int(cte, CW_SUCCESS, "==", cwret2, "enqueue forever tone") && (*pass);
 
 #ifdef __FreeBSD__  /* Tested on FreeBSD 10. */
 	/* Separate path for FreeBSD because for some reason signals
@@ -588,7 +613,7 @@ static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__(
 	CW_TONE_INIT(&tone, freq, slope_duration, CW_SLOPE_MODE_FALLING_SLOPE);
 	tone.debug_id = 'e';
 	const cw_ret_t cwret3 = cw_tq_enqueue_internal(gen->tq, &tone);
-	cte->expect_op_int(cte, CW_SUCCESS, "==", cwret3, "silence the generator");
+	(*pass) = cte->expect_op_int(cte, CW_SUCCESS, "==", cwret3, "silence the generator") && (*pass);
 
 	cw_gen_wait_for_queue_level(gen, 0);
 	cw_gen_wait_for_end_of_current_tone(gen);
@@ -596,7 +621,7 @@ static cwt_retv test_cw_gen_forever_sub(cw_test_executor_t * cte, __attribute__(
 	cw_gen_stop(gen);
 	cw_gen_delete(&gen);
 
-	return cwt_retv_ok;
+	return 0;
 }
 
 
