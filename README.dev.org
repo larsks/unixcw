@@ -416,6 +416,10 @@ perf record --call-graph dwarf -F 200  -g  ./src/libcw/tests/.libs/libcw_test_al
 perf report --stdio
 perf report
 
+* Machine-specific info
+
+Celeron machine, Alpine, ALSA sound system: use "sysdefault:Intel" as sound device.
+
 * Build system
 autoheader
 autoreconf -fvi
