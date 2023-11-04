@@ -347,6 +347,15 @@ pactl list cards
 pactl list sinks
 
 
+*** Troubleshooing from the ground up
+
+1. Check whether PulseAudio sees any cards
+   pacmd list-cards
+
+2. Reload kernel module for your sound card
+   modprobe -r X
+   modprobe X
+
 *** Sinks
 
 List PulseAudio sink names (names that can be passed as values of '-d'
