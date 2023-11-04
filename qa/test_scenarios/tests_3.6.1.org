@@ -629,7 +629,7 @@ speaker or buzzer it's easier to notice problems with libcw. Don't waste time
 on testing Null system first, only to hear issues with other sound systems
 later.
 
-**** TODO Main test binary - Console sound system
+**** DONE Main test binary - Console sound system
 
 *Steps*
 cd src/libcw/tests
@@ -639,8 +639,31 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> C |         0 |        42 |         0 |         0 |         0 |         0 |<-
+   C |       151 |       999 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 24 minutes, 55 seconds
+
 
 *Actual result*
+
+Pass. The failures come as usual from test_cw_gen_state_callback(). I have
+checked the divergences between expected result and actual result and the
+divergences are still acceptable.
 
 **** SKIPPED Main test binary - OSS sound system
 
@@ -790,7 +813,7 @@ Duration of tests = 25 minutes, 6 seconds
 Pass. The failures come from a test of generator that is known to be
 sometimes failing (the test with timings of generator callback).
 
-**** TODO Main test binary - Null sound system
+**** DONE Main test binary - Null sound system
 
 *Steps*
 cd src/libcw/tests
@@ -802,7 +825,33 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> N |         0 |        14 |         0 |         0 |         0 |         0 |<-
+   N |       151 |       999 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 24 minutes, 55 seconds
+
 *Actual result*
+
+Pass.
+
+As usual, the test_cw_gen_state_callback() test is failing, but the
+divergences from expected results aren't high.
 
 **** TODO Misc tests
 
