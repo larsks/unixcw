@@ -188,9 +188,7 @@ cwt_retv test_cw_gen_remove_last_character(cw_test_executor_t * cte)
 	gen_destroy(&gen);
 	cw_easy_rec_delete(&easy_rec);
 
-	cte->expect_op_int(cte, false, "==", failure, "Remove last character");
-
-	cte->print_test_footer(cte, __func__);
+	kite_on_test_completion(cte, __func__, failure ? test_result_fail : test_result_pass);
 
 	return cwt_retv_ok;
 }

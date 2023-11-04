@@ -119,7 +119,7 @@ static bool cw_test_expect_valid_pointer_errors_only(struct cw_test_executor_t *
 static void cw_assert2(struct cw_test_executor_t * self, bool condition, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 
-static void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...);
+static void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...) __attribute__ ((format (printf, 2, 3)));
 static void cw_test_print_test_footer(cw_test_executor_t * self, const char * test_name);
 static void cw_test_append_status_string(cw_test_executor_t * self, char * msg_buf, int message_len, const char * status_string);
 
@@ -897,20 +897,106 @@ static bool test_topic_is_in_cmdline_options(cw_test_executor_t * self, int libc
 
 
 
+/**
+   The length of this string must be as long as maximal length of messages
+   printed to console.
+ */
+static char g_dashes[MSG_BUF_SIZE] = { 0 };
+
+
+
+
+/**
+   @brief Write a text with dashes on left and right side
+
+   @reviewedon 2023.11.04
+
+   @param[in/out] kite Test executor
+   @param[in] severity Severity of log to use when printing the separator
+   @param[in] dashes Buffer with dashes
+   @param[in] text Text to be displayed between dashes
+
+   @return Count of printed characters
+*/
+static size_t write_message_in_dashes(cw_test_executor_t * kite, int severity, const char * text)
+{
+	if (NULL == kite->file_out) {
+		return 0;
+	}
+
+	/* TODO acerion 2023.11.04: check if severity is sufficient to print to
+	   output. */
+
+	/* One-time init of global buffer. */
+	if (g_dashes[0] == '\0') {
+		memset(g_dashes, '-', sizeof (g_dashes) - 1);
+		g_dashes[sizeof (g_dashes) - 1] = '\0';
+	}
+
+	const size_t severity_len = kite_log(kite, severity, "%s", ""); /* To have "INFO" prefix in the printed line. */
+	const size_t text_len = strlen(" ") + strlen(text) + strlen(" "); /* "text" is surrounded by space on each side. */
+	int n_dashes = 0;
+	if ((size_t) kite->console_n_cols > severity_len + text_len) {
+		n_dashes = kite->console_n_cols - severity_len - text_len;
+	}
+	const int n_dashes_left = n_dashes / 2; /* Count of dashes on left side of text. */
+	const int n_dashes_right = n_dashes - n_dashes_left; /* Count of dashes on right side of text. */
+
+	size_t written = 0;
+	written += fwrite(g_dashes, sizeof (char), n_dashes_left, kite->file_out);
+	written += fwrite(" ", sizeof (char), strlen(" "), kite->file_out);
+	written += fwrite(text, sizeof (char), strlen(text), kite->file_out);
+	written += fwrite(" ", sizeof (char), strlen(" "), kite->file_out);
+	written += fwrite(g_dashes, sizeof (char), n_dashes_right, kite->file_out);
+
+	fwrite("\n", sizeof (char), 1, kite->file_out);
+
+	return written;
+}
+
+
+
+
+/**
+   @brief Print separator line consisting of N dash characters
+
+   @reviewedon 2023.11.04
+
+   @param[in/out] kite Text executor
+   @param[in] severity Severity of log to use when printing the separator
+*/
+static void write_dashes(cw_test_executor_t * kite, int severity)
+{
+	if (NULL == kite->file_out) {
+		return;
+	}
+
+	/* TODO acerion 2023.11.04: check if severity is sufficient to print to
+	   output. */
+
+	/* One-time init of global buffer. */
+	if (g_dashes[0] == '\0') {
+		memset(g_dashes, '-', sizeof (g_dashes) - 1);
+		g_dashes[sizeof (g_dashes) - 1] = '\0';
+	}
+
+	const int severity_len = kite_log(kite, severity, "%s", ""); /* To have "INFO" prefix in the printed line. */
+	fwrite(g_dashes, sizeof (char), kite->console_n_cols - severity_len, kite->file_out);
+	fwrite("\n", sizeof (char), 1, kite->file_out);
+}
+
+
+
+
 void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...)
 {
 	self->log_info_cont(self, "\n");
 
-	self->log_info(self, "Beginning of test\n");
-
-	{
-		self->log_info(self, " ");
-		for (size_t i = 0; i < self->console_n_cols - (strlen ("[II]  ")); i++) {
-			self->log_info_cont(self, "-");
-		}
-		self->log_info_cont(self, "\n");
-	}
-
+#if 0
+	/* For tests of overflows in function. */
+	const char * long_text = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyz";
+#endif
+	write_message_in_dashes(self, LOG_INFO, "Info about this test");
 
 	char va_buf[256] = { 0 };
 	va_list ap;
@@ -923,13 +1009,7 @@ void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...)
 	self->log_info(self, "Current sound system: %s\n", self->get_current_sound_system_label(self));
 	self->log_info(self, "Current sound device: '%s'\n", self->get_current_sound_device(self));
 
-	{
-		self->log_info(self, " ");
-		for (size_t i = 0; i < self->console_n_cols - (strlen ("[II]  ")); i++) {
-			self->log_info_cont(self, "-");
-		}
-		self->log_info_cont(self, "\n");
-	}
+	write_dashes(self, LOG_INFO);
 }
 
 
@@ -938,6 +1018,34 @@ void cw_test_print_test_header(cw_test_executor_t * self, const char * fmt, ...)
 void cw_test_print_test_footer(cw_test_executor_t * self, const char * test_name)
 {
 	self->log_info(self, "End of test: %s\n", test_name);
+}
+
+
+
+
+void kite_on_test_completion(cw_test_executor_t * kite, const char * test_name, test_result_t test_result)
+{
+	write_message_in_dashes(kite, LOG_INFO, "Overall result of this test");
+
+	char msg_buf[MSG_BUF_SIZE] = { 0 };
+	size_t n = msg_buff_prepare(kite, msg_buf, sizeof (msg_buf), test_name);
+
+	cw_test_append_status_string(kite, msg_buf, n, get_test_result_string(test_result));
+	kite->log_info(kite, "%s\n", msg_buf);
+
+	write_dashes(kite, LOG_INFO);
+
+	switch (test_result) {
+	case test_result_pass:
+		kite->stats->successes++;
+		break;
+	case test_result_fail:
+		kite->stats->failures++;
+		break;
+	default:
+		kite_log(kite, LOG_ERR, "Unexpected test result value %d\n", test_result);
+		break;
+	}
 }
 
 
@@ -1199,7 +1307,7 @@ void cw_test_deinit(cw_test_executor_t * self)
 
 
 
-int kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...)
+size_t kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...)
 {
 	if (NULL == executor->file_out) {
 		return 0;

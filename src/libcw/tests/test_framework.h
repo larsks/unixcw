@@ -27,6 +27,7 @@
 
 
 
+#include <test_framework/basic_utils/test_result.h>
 #include <test_framework/basic_utils/resource_meas.h>
 
 
@@ -150,7 +151,7 @@ typedef struct cw_test_executor_t {
 	int current_topic;
 
 	/* Limit of characters that can be printed to console in one row. */
-	int console_n_cols;
+	int console_n_cols; /* TODO acerion 2023.11.04: consider making it size_t instead of int. */
 
 	/* This array holds stats for all distinct sound systems, and
 	   is indexed by cw_audio_systems enum. This means that first
@@ -448,9 +449,9 @@ typedef struct cw_test_executor_t {
    @param[in] severity Severity level (e.g. LOG_ERR, LOG_INFO)
    @param[in] fmt Format string of message
 
-   @return number of characters printed
+   @return Number of characters printed. Zero may (but doesn't have to) indicate an error.
 */
-int kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
+size_t kite_log(struct cw_test_executor_t * executor, int severity, const char * fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 
 
@@ -465,6 +466,33 @@ int kite_log(struct cw_test_executor_t * executor, int severity, const char * fm
    is no "deinit" function.
 */
 void cw_test_init(cw_test_executor_t * self, FILE * stdout, FILE * stderr, const char * msg_prefix);
+
+
+
+
+/**
+   @brief Take actions at end of single test
+
+   Call the function at the very end of test function to display indication
+   that test function with name @param function_name has completed its work.
+   Also display PASS/FAIL status depending on value of @p test_result.
+
+   Update counters of test successes/failures in @p kite according to value
+   of @p test_result.
+
+   TODO acerion 2023.11.04: use this function in all tests. The function
+   should present test result in consistent way for all tests, and should be
+   the only function that is incrementing counters of test
+   successes/failures. The increment should be removed from all other
+   functions: only this function should be doing the incrementing.
+
+   @reviewedon 2023.11.04
+
+   @param[in/out] kite Test executor
+   @param[in] test_name Name of test that has just completed
+   @param[in] test_result Result of the completed test
+*/
+void kite_on_test_completion(cw_test_executor_t * kite, const char * test_name, test_result_t test_result);
 
 
 

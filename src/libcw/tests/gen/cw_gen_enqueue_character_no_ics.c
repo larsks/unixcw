@@ -267,9 +267,7 @@ cwt_retv test_cw_gen_enqueue_character_no_ics(cw_test_executor_t * cte)
 	cw_gen_stop(gen);
 	gen_destroy(&gen);
 
-	cte->expect_op_int(cte, false, "==", failure, "Enqueue character without ics");
-
-	cte->print_test_footer(cte, __func__);
+	kite_on_test_completion(cte, __func__, failure ? test_result_fail : test_result_pass);
 
 	return cwt_retv_ok;
 }
