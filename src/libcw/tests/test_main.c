@@ -133,18 +133,21 @@ int main(int argc, char * const argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	/* Separate outputs of tests from final messages printed below. */
+	cte->log_info_cont(cte, "\n");
+
 	const unsigned int errors_count = cte->get_total_errors_count(cte);
-	if (0 != errors_count) {
-		cte->log_error(cte, "Non-zero errors count: %u\n", errors_count);
+	if (0 == errors_count) {
+		cte->log_info(cte, "Total errors count: %u\n", errors_count);
+		/* "make check" facility requires this message to be printed on
+		   stdout; don't localize it. */
+		kite_log(cte, LOG_INFO, "Test result: success\n");
+		exit(EXIT_SUCCESS);
+	} else {
+		cte->log_error(cte, "Total errors count: %u\n", errors_count);
+		kite_log(cte, LOG_ERR, "Test result: failure");
 		exit(EXIT_FAILURE);
 	}
-	cte->log_info(cte, "Total errors count: %u\n", errors_count);
-
-	/* "make check" facility requires this message to be
-	   printed on stdout; don't localize it */
-	cte->log_info(cte, "Test result: success\n\n");
-
-	exit(EXIT_SUCCESS);
 }
 
 
