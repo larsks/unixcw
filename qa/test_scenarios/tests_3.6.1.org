@@ -664,7 +664,7 @@ Test logs and summary table for tests shows only well-known problems.
 Skipped: this machine doesn't support direct OSS. Perhaps I could force ALSA
 to emulate OSS, but what's the point...
 
-**** STARTED Main test binary - ALSA sound system
+**** DONE Main test binary - ALSA sound system
 
 *Preconditions*
 
@@ -681,7 +681,77 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> A |         0 |        34 |         0 |         0 |         0 |         0 |<-
+   A |       151 |      1003 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+Duration of tests = 25 minutes, 3 seconds
+
 *Actual result*
+
+Pass.
+
+Three functions have failed:
+
+ - test_cw_gen_state_callback() - the usual problems with generator's callback.
+   One thing worth noticing is the high divergence for first element:
+
+   [INFO ] speed               = 4 WPM
+   [INFO ] Element   1, state 0, type = 'M'; previous element: duration =    812692.00 us, divergence =   -9.701%        <---- over 9%
+
+ - test_cw_gen_remove_last_character()
+
+   First element of first character is not recognized correctly, most
+   probably because of problems with generator's callback. I have observed
+   PCM file with samples and all elements of the first characters have
+   correct durations, so the generator generates correct samples, but calls
+   the callback incorrectly. This is in line with the results in the test
+   above.
+
+   [II] You will now hear 'oooo' followed by 4 's' characters
+   [EE] cw_rec_identify_mark_internal: 1264: libcw/rec: '': identify: unrecognized mark, duration = 217337 [us]
+   [EE] cw_rec_identify_mark_internal: 1266: libcw/rec: '': identify: dot limits: 50000 - 150000 [us]
+   [EE] cw_rec_identify_mark_internal: 1268: libcw/rec: '': identify: dash limits: 250000 - 350000 [us]
+   [EE] cw_rec_identify_mark_internal: 1278: libcw/rec: '': identify: unrecognized mark in non-adaptive receive
+   [DD] received character 'M'
+   [DD] received character 'O'
+   [DD] received character 'O'
+   [DD] received character 'O'
+   [DD] received character 'S'
+   [DD] received character 'S'
+   [DD] received character 'S'
+   [DD] received character 'S'
+   [DD] received character ' '
+   [EE] libcw/tests: Removal of last 0 character(s)                 [FAIL]
+   [EE]    ***   expected [oooossss ], got [MOOOSSSS ]   ***
+
+ - test_cw_gen_enqueue_character_no_ics()
+
+   For some reasons easy rec can't recognize some characters. Most probably
+   because of problems with generator's callback (see previous two failed
+   tests).
+
+
+Because the problems didn't appear on this machine with PulseAudio sound
+system, and because they didn't appear on my main laptop wheh using ALSA, and
+because the two last problems probably existed in previous releases too (but
+weren't discovered because of lack of good tests), then I'm deciding to mark
+this test as PASS.
 
 **** DONE Main test binary - PulseAudio sound system
 
