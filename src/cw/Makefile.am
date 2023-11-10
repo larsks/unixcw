@@ -38,7 +38,8 @@ cw_LDADD = $(top_builddir)/src/cwutils/lib_cw.a -L$(top_builddir)/src/libcw/.lib
 man_MANS = cw.1
 # and mark it as distributable, too
 EXTRA_DIST = cw.1 \
-	demo.cw prelude.cw test.cw
+	demo.cw prelude.cw test.cw \
+	tests/basic_options.sh
 
 
 
