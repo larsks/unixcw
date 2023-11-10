@@ -916,37 +916,19 @@ Tests that use *.cw files:
 **** TODO Tests of command-line options
 Test that some of command-line options result in expected behaviour of cw.
 
-***** TODO words per minute
-./src/cw/cw -w 10
-./src/cw/cw -w 50
+***** TODO basic options through script
 
-*Actual result*
+*Prerequisites*
+1. Adjust parameters of ./src/cw/tests/basic_options.sh as needed on given
+   platform, e.g. change value of $DEVICE.
 
-***** TODO tone (frequency)
-
-./src/cw/cw -t 300
-./src/cw/cw -t 3000
-
-*Actual result*
-
-***** TODO volume
-
-./src/cw/cw -v 30
-./src/cw/cw -v 90
-
-*Actual result*
-
-***** TODO gap
-
-./src/cw/cw -g 0
-./src/cw/cw -g 40
-
-*Actual result*
-
-***** TODO weighting
-
-./src/cw/cw -k 30
-./src/cw/cw -k 70
+*Steps*
+1. Run script: ./src/cw/tests/basic_options.sh
+2. Obseve text info informing about tested options, listen to played sounds,
+3. Confirm that sound's parameters (volume, gap, tone, etc.) matches the info
+   printed by the script.
+4. Observe whether entire text (especially its beginning and end) is played
+   correctly.
 
 *Actual result*
 
@@ -969,6 +951,29 @@ You may want to first kill pulseaudio and pipewire
 You may want to first kill pulseaudio and pipewire
 
 ./src/cw/cw -s o
+
+*Actual result*
+
+**** TODO basic behaviour in a "session"
+
+One of previous tests ("through script") has been passing text to cw through
+unix pipe. If I remember correctly, such setup may behave a bit differently
+than a setup in which a text is entered through keyboard in a started cw
+program (started cw program waits for input from user, so called "session").
+
+In one of such setups, in some circumstances, the initial part of text was
+not played correctly.
+
+In order to verify behaviour of cw in a "session", run this test.
+
+TODO acerion 2023.11.10: check what was the problem and in which specific
+circumstances it occurred.
+
+*Steps*
+1. Start cw: ./src/cw/cw
+2. Enter any text
+3. Observe whether entire text (especially its beginning and end) is played
+   correctly
 
 *Actual result*
 
