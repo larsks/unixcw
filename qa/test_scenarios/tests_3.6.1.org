@@ -550,7 +550,7 @@ Expected results are satisfied.
 kernel 6.1.59-0-lts
 musl-1.2.4-r2
 gcc (Alpine 12.2.1_git20220924-r10) 12.2.1 20220924
-*** STARTED Build system tests
+*** DONE Build system tests
 **** DONE make distcheck
 
 *Steps*
