@@ -175,9 +175,9 @@ Tests of basic usage of unixcw/src/cw/cw program.
 **** TODO Tests using *.cw files
 
 Tests that use *.cw files:
-./src/cw/cw -f src/cw/test.cw
-./src/cw/cw -f src/cw/demo.cw
-./src/cw/cw -f src/cw/prelude.cw
+./src/cw/cw -f src/cw/test.cw           #  4 min 58 sec
+./src/cw/cw -f src/cw/demo.cw           #  9 min 54 sec
+./src/cw/cw -f src/cw/prelude.cw        #  1 min 54 sec
 
 *Actual result*
 
