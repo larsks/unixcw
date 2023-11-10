@@ -642,7 +642,7 @@ all_options[4]="--disable-cwgen"
 all_options[5]="--disable-cw"
 all_options[6]="--disable-cwcp"
 
-*** STARTED libcw tests
+*** DONE libcw tests
 Tests using tools from unixcw/src/libcw.
 
 Notice that Null sound system is tested as last one: first run tests on other
@@ -875,7 +875,7 @@ Pass.
 As usual, the test_cw_gen_state_callback() test is failing, but the
 divergences from expected results aren't high.
 
-**** TODO Misc tests
+**** DONE Misc tests
 
 ***** TODO pcm sample file is disabled in regular builds
 
