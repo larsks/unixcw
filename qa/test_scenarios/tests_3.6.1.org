@@ -584,7 +584,7 @@ configure.ac:538: You should run autoupdate.
 ./lib/autoconf/headers.m4:743: AC_HEADER_TIME is expanded from...
 configure.ac:538: the top level
 
-**** TODO ./configure options
+**** DONE ./configure options
 
 Test that all options supported by ./configure script produce "buildable" code.
 
@@ -619,6 +619,28 @@ Test of configuration flags SUCCEEDED
 The shell script may not work on systems without bash.
 
 *Actual result*
+
+Pass. No compilation errors were found (with the limited count of options).
+
+Tests on this machine were done with limited count of options. This is a
+relatively weak machine so I wanted to run this test in reasonable time.
+
+Since this platform does not allow me compilation with xcwpc, this option is
+not included.
+
+Dev options are also removed because this platform is not a main development
+platform for me.
+
+So this is the set of tested options:
+
+let total_options_count=7
+all_options[0]="--disable-console"
+all_options[1]="--disable-oss"
+all_options[2]="--disable-alsa"
+all_options[3]="--disable-pulseaudio"
+all_options[4]="--disable-cwgen"
+all_options[5]="--disable-cw"
+all_options[6]="--disable-cwcp"
 
 *** STARTED libcw tests
 Tests using tools from unixcw/src/libcw.
