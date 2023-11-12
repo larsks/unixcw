@@ -1219,10 +1219,10 @@ Pass. No reported errors. Visual inspection found no issues.
 *Actual results*
 Skipped. I don't compile xcwcp on this platform.
 
-** TODO FreeBSD 13.2-RELEASE-p4 (Celeron, x86_64)
+** STARTED FreeBSD 13.2-RELEASE-p4 (Celeron, x86_64)
 gcc (FreeBSD Ports Collection) 12.2.0
-*** TODO Build system tests
-**** TODO make distcheck
+*** STARTED Build system tests
+**** DONE make distcheck
 
 *Steps*
 Run "./configure && make distcheck" in main directory of the project.
@@ -1235,6 +1235,7 @@ Run "./configure && make distcheck" in main directory of the project.
    your best judgement here).
 
 *Actual result*
+Pass. The distribution package is created correctly.
 
 **** TODO ./configure options
 
