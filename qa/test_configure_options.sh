@@ -51,6 +51,14 @@
 
 # TODO: the path to bash on FreeBSD is /usr/local/bin/bash
 
+# TODO acerion 2023.11.12: There should be an option for the script to not
+# exit on a failure of test iteration. The failure of a specific iteration
+# should be noted, and the script should continue with next iteration. The
+# reason for such behaviour is to catch all errors in all configurations, not
+# just the first one. If you run the script over night, then in the morning
+# you would want to see a test report with all faulty combinations of
+# ./configure's options, not just the first fault.
+
 
 
 
