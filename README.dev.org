@@ -526,25 +526,28 @@ FIXED in 3.6.1 in commits f1ee07c6c5d4a0791dbf3a23a0b87f5c05c91ed3 and
 b08d96a22490eccbe8acc6b71882b828682615ef. Code detecting whether to link with
 intl library on Alpine and FreeBSD has been reworked a bit.
 
-** TODO R0002 Feature: allow disabling cw and cwgen through ./configure
+** DONE R0002 Feature: allow disabling cw and cwgen through ./configure
 A problem with -lintl on Alpine shows that even such simple
 application as cw can fail to build. To allow a quick workaround for
 users, add "--disable-cw" to configure script.
 
 While you are at it, add similar flag for cwgen.
 
-** TODO R0003 Use suseconds_t for duration variables?
+DONE: --disable-cwgen and --disable-cw flags have been added in
+387c68f46bc2683ae82bf1c0a56de1badb188615.
 
-** TODO R0004 Detect unusually long times when joining generator's thread
+** TODO [#C] R0003 Use suseconds_t for duration variables?
+
+** TODO [#B] R0004 Detect unusually long times when joining generator's thread
 
 Usually it's 2-5 microseconds, anything longer may be a sign of problems.
 
-** TODO R0005 Module prefixes of equal length
+** TODO [#C] R0005 Module prefixes of equal length
 
 To improve readability of debug messages, all values of MSG_PREFIX (like
 "libcw/gen" or "libcw/alsa") should have the same length.
 
-** TODO R0006 Detect missing function definitions
+** TODO [#B] R0006 Detect missing function definitions
 In order to detect libcw function declarations without definitions, write a
 code that tries to generate code that calls all libcw public functions. If
 definition of any function declared in public header is missing, linking
@@ -554,32 +557,32 @@ Rationale: today I have detected (by sheer luck) that cw_set_debug_flags()
 declaration existed in libcw_debug.h, but the function was not defined
 anywhere.
 
-** TODO R0007 Don't display unsupported sound systems
+** TODO [#C] R0007 Don't display unsupported sound systems
 Don't show in help texts ("-h") information about sound systems
 disabled during compilation. Don't show ALSA/PulseAudio information on
 FreeBSD.
 
-** TODO R0008 'Enter' in cw
+** TODO [#B] R0008 'Enter' in cw
 Just pressing 'Enter' in cw leads to calls of
 gen->write_buffer_to_sound_device(). It should not.
 
-** TODO R0009 CPU usage of pulseaudio
+** TODO [#A] R0009 CPU usage of pulseaudio
 Verify cpu usage of "pulseadio" process when "cw" is started and is doing
 nothing at all.
 
-** TODO R0010 math library in dependencies
+** TODO [#B] R0010 math library in dependencies
 
 Look at this warning displayed when Debian packages are being built:
 
 dpkg-shlibdeps: warning: package could avoid a useless dependency if debian/cw/usr/bin/cwgen debian/cw/usr/bin/cw were not linked against libm.so.6 (they use none of the library's symbols)
 dpkg-shlibdeps: warning: package could avoid a useless dependency if debian/cwcp/usr/bin/cwcp was not linked against libm.so.6 (it uses none of the library's symbols)
 
-** TODO R0011 Space in xcwcp
+** TODO [#B] R0011 Space in xcwcp
 Double-check if the first character added to text area in xcwcp is a space. If it is, then fix it.
-** TODO R0012 Slope duration for tones at highest speeds
+** TODO [#B] R0012 Slope duration for tones at highest speeds
 For tones at highest speeds the current tone slope duration may be too long,
 and the tones may be malformed. The duration may have to be shortened.
-** TODO R0013 Correct source of frequency in console code
+** TODO [#B] R0013 Correct source of frequency in console code
 libcw tests that should generate varying frequency (like
 legacy_api_test_cw_queue_tone()) don't generate the varying
 frequencies for console sound system. This is probably related to
@@ -589,10 +592,10 @@ argument from.
 This doesn't have impact on cw/cwcp/xcwcp, but should be fixed
 nevertheless.
 
-** TODO R0014 Integrate contents of recent debian/ directory
+** TODO [#B] R0014 Integrate contents of recent debian/ directory
 Use contents of the latest files from debian.org.
 
-** TODO R0015 freedesktop.org menu file
+** TODO [#C] R0015 freedesktop.org menu file
 
 From Debian people:
 
@@ -603,32 +606,40 @@ at the link below. [...]
 https://salsa.debian.org/debian-hamradio-team/unixcw/-/commit/91a480d31452ba356e1b30ef172fc9cc830053fc
 "
 
-** TODO R0016 Add to configure.ac a check for GNU make on build machine
+** TODO [#C] R0016 Add to configure.ac a check for GNU make on build machine
 
 unixcw's Makefiles may not work with non-GNU make on non Linux machines.
 
-** TODO R0017 Add to configure.ac a check for pkg-config
+2023.11.12 acerion: no problems observed with recent Alpine and FreeBSD, so
+the priority is just #C.
+
+** TODO [#C] R0017 Add to configure.ac a check for pkg-config
 
  It is necessary for configuring QT4 application (xcwcp).
 
-** TODO R0018 Make qa_test_configure_options.sh portable
+** WONT-DO R0018 Make qa_test_configure_options.sh portable
 
 Some shells (on FreeBSD) don't like the options[] table.
 
-** TODO R0019 Flags for disabling modules
+2023.11.12 acerion: It's possible to install and use bash on FreeBSD.
+Therefore this ticket is WONT-DO.
+
+** TODO [#C] R0019 Flags for disabling modules
 
 After finalizing split of libcw into modules, add configure flags for
 disabling modules (e.g. --disable-libcw-receiver, --disable-libcw-key).
 
-** TODO R0020 pkg-config + ncurses
+** TODO [#C] R0020 pkg-config + ncurses
 
 Check if it's possible to use pkg-config to get ncurses compilation flags.
 
-** TODO R0021 Debian patch for reproducible builds
+** DONE R0021 Debian patch for reproducible builds
 Integrate this patch:
 https://salsa.debian.org/debian-hamradio-team/unixcw/-/blob/master/debian/patches/0004-reprotest_collate_make_fix.patch
 
-** TODO R0022 "level 1" in test_cw_tq_gen_operations_B
+2023.11.12 acerion: Implemented in b384868e6ae0705e148bd14ffe924d8f0f4ac2d3.
+
+** TODO [#B] R0022 "level 1" in test_cw_tq_gen_operations_B
 Investigate value "1" in this test. Is it valid/acceptable for tests?
 
 [II] Beginning of test
@@ -645,7 +656,7 @@ Investigate value "1" in this test. Is it valid/acceptable for tests?
 [II] libcw/tests: waiting for level 0 (final)                             [ OK ]
 [II] End of test: test_cw_tq_gen_operations_B
 
-** TODO R0023 Receiver errors
+** TODO [#B] R0023 Receiver errors
 [II] libcw/tests: Poll representation                                     [ OK ]
 [EE] cw_rec_poll_representation: 1597: libcw/rec: 'global rec': poll: space duration == INT_MAX
 
@@ -656,7 +667,7 @@ cw_start_receive_tone: Numerical result out of range
 [EE] cw_rec_mark_end: 1070: libcw/rec: 'global rec': mark_end: receiver state not RS_MARK: RS_IDLE
 [II] Polled character 'U'
 
-** TODO R0024 Each failed test should be logged to file
+** TODO [#B] R0024 Each failed test should be logged to file
 Having the failed tests logged to a file will make it easier to track
 problems and come back to them later. Right now all we have is a long,
 long log of tests (where both successful and failed tests are printed)
@@ -668,21 +679,25 @@ tests) would be a useful middle ground.
 
 This would require buffering of a test in memory and dumping it to
 file on errors.
-** TODO R0025 Count ALSA errors in tests framework:
+** TODO [#B] R0025 Count ALSA errors in tests framework:
  + write: writei: Input/output error / -5
  + underruns
  + other
 This will require propagating them from libcw's ALSA module up to test
 framework, but it would help a lot in registering and tracking problems.
 
-** TODO R0026 Print summary table also to disc file
+** TODO [#C] R0026 Print summary table also to disc file
 It will be easier to copy/paste test results on non-X systems from a
-disc file to qa/tests.org.
-** TODO R0027 Track failing tests
+disc file to qa/test_scenarios/*.org.
+** TODO [#B] R0027 Track failing tests
 Learn how to recognize which functions fail, learn how to count their
 failures and track them over time and over OSes. Perhaps each test should
 have its unique id that would be preserved even if a test function was
 renamed or split.
+
+2023.11.12: this is useful when you want to recognize if the failures you see
+today are the same failures that you saw in the previous release.
+
 ** TODO [#A] R0028 Short first element in test_cw_gen_state_callback
 
 On Alpine/N150 the first recorded element in test_cw_gen_state_callback has
@@ -746,22 +761,28 @@ test_cw_gen_remove_last_character).
 [INFO ] Element   7, state 0, type = 'M'; previous element: duration =    901353.00 us, divergence =    0.150%
 [INFO ] Element   8, state 1, type = '.'; previous element: duration =    298665.00 us, divergence =   -0.445%
 
-** TODO R0029 Add code checkers tests
-Add "run clang-tidy and cppcheck" for each platform and each package to
-qa/tests.org.
+** TODO [#A] R0029 Add code checkers tests
+Add to test scenarios in qa/test_scenarios/. a "run clang-tidy and cppcheck"
+test for each platform and each package.
 
-** TODO R0030 Fix long duration of valgrind tests
+** TODO [#C] R0030 Fix long duration of valgrind tests
 When libcw tests binary is executed under valgrind, its execution
 takes a lot of time because the tests call vsnprintf() a lot
 (indirectly through snprintf() and vsnprintf()). We can really shorten
 the duration of tests if only we will find a way to decrease usage of
 these functions.
-** TODO R0031 Implement a fully automatic testing of cwgen's output
+** TODO [#C] R0031 Implement a fully automatic testing of cwgen's output
 Pass to cwgen all combinations of command line args, and examine if
 cwgen's output is generating what is requested. Also check randomness
 of output.
-** TODO R0032 Test of installation and usage of library
-Add following test to tests of unixcw:
+
+2023.11.12 acerion: automatic test added in
+03066d8dc55057bee412a2ccd4811297335bd579 generates random combinations of
+command line options, but it still can be improved. Because we now have some
+basic form of fix for this, I'm specifying prio as #C.
+
+** TODO [#B] R0032 Test of installation and usage of library
+Add following manual/semiautomatic test to test scenarios of unixcw:
 1. Compile the install unixcw:
 ./configure --prefix=$HOME && make && make install
 2. Compile cwdaemon using libcw headers and library installed in
@@ -770,29 +791,29 @@ PKG_CONFIG_PATH=$HOME/lib/pkgconfig/ ./configure && make
 3. Run cwdaemon using libcw library installed in $HOME.
 LD_LIBRARY_PATH+=$LD_LIBRARY_PATH:$HOME/lib ./src/cwdaemon -x p -n
 ./examples/example.sh
-** TODO R0033 Add 'build Debian package' test
-Add "run 'build Debian package' test" to list of tests in qa/tests.org.
-** TODO R0034 Add qa/ script for reproducible Debian builds
+** TODO [#B] R0033 Add 'build Debian package' test
+Add "run 'build Debian package' test" to list of tests in qa/test_scenarios/.
+** TODO [#C] R0034 Add qa/ script for reproducible Debian builds
 https://manpages.debian.org/buster/reprotest/reprotest.1.en.html
-** TODO R0035 Feature: remove cw_assert() from libcw
+** TODO [#B] R0035 Feature: remove cw_assert() from libcw
 
 Replace it with dev debug message that is compiled only in dev builds.
-** TODO R0036 Feature: run tests with dev features enabled
+** TODO [#B] R0036 Feature: run tests with dev features enabled
 There are sections of code that are enabled only in dev builds: e.g. some
 additional checks and safeguards. The unit/integration code must have a
 chance at triggering these checks and safeguards.
-** TODO R0037 Feature: non-hardcoded package version number
+** TODO [#C] R0037 Feature: non-hardcoded package version number
 
 Right now the package number (e.g. 3.6.0) is explicitly given in many places
 in the package. Come up with a way to at least decrease the count of places
 where the number is hardcoded - use some #define or something like this.
-** TODO R0038 Feature: changelogs in Debian packages
+** TODO [#C] R0038 Feature: changelogs in Debian packages
 Debian packages contain changelog files that describe user-facing changes.
 The files are somehow taken from unixcw package, but are now outdated. Do
 something to make them up-to-date.
 
 Example file: cwcp_3.6.1-1_amd64.deb/CONTENTS/usr/share/doc/cwcp/changelog.gz
-** TODO R0039 'warn unused return value'
+** TODO [#B] R0039 'warn unused return value'
 
 During building of Debian packages I noticed a compiler warning:
 
@@ -804,7 +825,7 @@ my flags?
 It may be required to set -D_FORTIFY_SOURCE=1 (or =2) to see this warning
 during compilation time.
 
-** TODO R0040 Add more compilation flags
+** TODO [#A] R0040 Add more compilation flags
 
 Generic: -Wunused -Wsign-conversion -Wmisleading-indentation -Wduplicated-branches -Walloc-zero -Wconversion -Wformat-signedness -Wuninitialized -Winit-self -Wundef -Wunused-macros -Wstrict-aliasing -Wattributes -Wmain -Wpointer-arith -Wunused-result
 
@@ -817,20 +838,21 @@ For Debian: -Wdate-time
 Inspired by:
 https://medium.com/@costaparas/the-gcc-warning-flags-every-c-programmer-should-know-about-8846c4a9bc94
 https://cpp-polska.pl/post/flagi-wall-i-wextra-to-nie-wszystko-czyli-zbior-przydatnych-flag-do-gcc
+https://interrupt.memfault.com/blog/best-and-worst-gcc-clang-compiler-flags
 
-** TODO R0041 Bump value of -D_FORTIFY_SOURCE from 1 to 2
+** TODO [#A] R0041 Bump value of -D_FORTIFY_SOURCE from 1 to 2
 
 configure.ac specifies this macro for C and for C++, but with value of '1'.
 Increase the value to '2' and do lots of tests to ensure that no run-time
 errors occur.
 
-** TODO R0042 Clean up compilation flags in configure.ac
+** TODO [#B] R0042 Clean up compilation flags in configure.ac
 
 Right now the section of code in configure.ac that adds compilation flags
 (-Wxyz) is messy. Clean it up. Remove sections related to unsupported
 compilers - you can't test them anyway.
 
-** TODO R0043 QA in README and NEWS
+** TODO [#A] R0043 QA in README and NEWS
 
 1. Add to README some information about QA mechanisms in the package:
  - automatic tests of libcw and other components,
@@ -847,25 +869,27 @@ Let users of unixcw know that there is some QA effort put into this software.
 There is already some description of QA measures in src/libcw/tests/README.
 Move the description out of that file.
 
-** TODO R0044 CXXFLAGS in configure.ac
+** TODO [#C] R0044 print CXXFLAGS in configure.ac
+
+RELATED TO R0054.
 
 Print value of CXXFLAGS the same way that you print value of CFLAGS in
 summary of ./configure script.
 
-** TODO R0045 use receiver in legacy_api_test_gen_remove_last_character
+** TODO [#A] R0045 use receiver in legacy_api_test_gen_remove_last_character
 
 Use receiver in legacy_api_test_gen_remove_last_character() test function to
 receive played string and to confirm that characters have been removed. The
 receiver is used in tests of related 'modern API' function
 test_cw_gen_remove_last_character().
 
-** TODO R0046 Improve timing characteristics of PulseAudio
+** TODO [#A] R0046 Improve timing characteristics of PulseAudio
 
 Results of libcw 'test_cw_gen_state_callback' test for PulseAudio are very
 poor, especially for higher generator's speeds. Find out why the results are
 so bad and fix the root cause.
 
-** TODO R0047 Use standard solution for command line options
+** TODO [#B] R0047 Use standard solution for command line options
 
 cw_cmdline.c is using a solution that looks like a non-standard approach to
 defining command line options:
@@ -874,7 +898,7 @@ defining command line options:
 Replace it with getopt(), getopt_long(), 'struct option long_options[]' and
 such.
 
-** TODO R0048 No pause between libcw tests
+** TODO [#B] R0048 No pause between libcw tests
 
 Each test in libcw test binary is preceded by a short (2-3 seconds) space.
 This space is introduced to give a tester some time to read the test's
@@ -884,16 +908,16 @@ This space is unnecessary (and annoying) when the tests are executed during
 "make check". Add a flag that controls the space, and decrease time of
 running of "make check" for libcw.
 
-** TODO R0049 Add static code analysis with gcc -fanalyzer
+** TODO [#A] R0049 Add static code analysis with gcc -fanalyzer
 https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Static-Analyzer-Options.html
 
-** TODO R0050 Add receiver functionality to cwcp
+** TODO [#B] R0050 Add receiver functionality to cwcp
 User has asked for similar "receiver" functionality as it exists in xcwcp,
 where you can use either keyboard (Enter/Space/Up/Down keys) or mouse
 Left/Right buttons) to simulate Morse key, and let a program interpret input
 from the Morse key.
 
-** TODO R0051 Fix console sound system on FreeBSD
+** TODO [#B] R0051 Fix console sound system on FreeBSD
 
 Console sound system doesn't work on FreeBSD.
 
@@ -918,4 +942,31 @@ libcw/tests: wait for level: length of queue after end of waiting[EE]  failure: 
 [EE] libcw/tests: wait for level (queue length)                  [FAIL]
 [EE]    ***   expected 0, got 1   ***
 [II] End of test: test_cw_tq_wait_for_level_internal
+
+
+** TODO [#C] R0053 proper use of LIBS in configure.ac
+
+-lm, -lintl and perhaps other libs should be just added to LIBS in
+ configure.ac. I think that current usage of LIBS in configure.ac is not
+ standard one. Clean this up.
+
+If you are afraid that some programs will link at run-time with unwanted
+libraries (e.g. xcwpc linking with libintl even though xcwcp doesn't need
+it), then this may point to an error in unixcw build system files.
+
+** TODO [#C] R0054 print LIBS in configure.ac
+
+BLOCKED BY R0053.
+RELATED TO R0044.
+
+Print value of LIBS the same way that you print value of CFLAGS in
+summary of ./configure script.
+
+** TODO [#A] R0055 prerelease checklist should be versioned
+
+This document: qa/prerelease_checklist.org.
+
+Just like the test scenarios are versioned.
+
+Each release should have its own permanent document with assigned version.
 
