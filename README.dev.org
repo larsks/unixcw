@@ -469,13 +469,26 @@ libtoolize
       1. FreeBSD can mount Linux 'ext4' filesystem, but only if you use
          'ext2fs' as type. FreeBSD doesn't support journaling on ext3/4
          filesystems.
-      2. It may be necessary to create users with the same UID and GID on all
+
+      2. FreeBSD may have problems with running fsck_ext2 (?) on an ext2
+         partition during boot up, and this will lead to FreeBSD starting in
+         single-user mode (FreeBSD will want you to fix a problem with
+         ext2/ext4 partition).
+
+      3. It may be necessary to create users with the same UID and GID on all
          OSes. Otherwise 'mount' will not recognize UID and GID in mounted
          filesystem as belonging to a valid and known local user, and all
          files and directories will have 1000:1000 UID:GID.
 
          Consult a man page for the command creating user accounts about
          explicitly specifying UID and GID of a new user.
+
+   10. Always assign priorities to tickets in README.dev.org
+
+       Having tickets without priorities leads to bad prioritization of
+       future work.
+
+       Use "C-c ," in Emacs to assign priority (A/B/C) to org-mode TODO item.
 
 * Bugs, feature requests
 ** DONE R0001 Bug: -lintl on Alpine is not added to linker flags
