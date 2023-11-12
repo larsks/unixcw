@@ -1364,7 +1364,7 @@ least 3.6.0: in 3.6.0 there were two errors in "tone queue" category.
 Pass. It looks like the problems reported in tests are known problems.
 Relevant tickets have been added or updated in README.dev.org.
 
-**** TODO Main test binary - ALSA sound system
+**** SKIPPED Main test binary - ALSA sound system
 
 *Preconditions*
 
@@ -1386,8 +1386,9 @@ Test logs and summary table for tests shows only well-known problems.
 *Test statistics table*
 
 *Actual result*
+Skipped. ALSA is not supported on this platform.
 
-**** TODO Main test binary - PulseAudio sound system
+**** SKIPPED Main test binary - PulseAudio sound system
 
 *Steps*
 
@@ -1403,6 +1404,7 @@ Test logs and summary table for tests shows only well-known problems.
 *Test statistics table*
 
 *Actual result*
+Skipped. PulseAudio is not supported on this platform.
 
 **** TODO Main test binary - Null sound system
 
