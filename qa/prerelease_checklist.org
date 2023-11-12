@@ -3,6 +3,12 @@
 Based on https://cdw.sourceforge.net/documentation/release_checklist/release_checklist.html
 
 
+* TODO Review opened tickets
+
+You may have some plans for current dev cycle, but take a look at opened
+tickets. Maybe there is some high-priority ticket that needs to be included
+in current dev cycle?
+
 * TODO Define scope of changes to be done in this release
 
 Describe them here, and stick to them during the development phase. Don't
