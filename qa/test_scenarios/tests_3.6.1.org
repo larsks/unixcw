@@ -1566,11 +1566,11 @@ circumstances it occurred.
 *Actual result*
 Pass. Didn't obsere any problems with played sound.
 
-*** TODO cwcp tests
+*** DONE cwcp tests
 Tests of basic usage of unixcw/src/cwcp/cwcp program.
 
-**** TODO Tests of UI elements
-***** TODO Main modes (character groups)
+**** DONE Tests of UI elements
+***** DONE Main modes (character groups)
 
 *Steps*
 1. Select each mode (character group) item in left-hand "Modes" panel.
@@ -1583,7 +1583,10 @@ Tests of basic usage of unixcw/src/cwcp/cwcp program.
 
 *Actual results*
 
-***** TODO "Keyboard" mode
+Pass. All grops produce expected sound, with words made from expected
+characters.
+
+***** DONE "Keyboard" mode
 
 *Steps*
 1. In the left-hand "Modes" panel select "Keyboard" item.
@@ -1594,8 +1597,9 @@ Tests of basic usage of unixcw/src/cwcp/cwcp program.
 2. The words are played correctly.
 
 *Actual results*
+Pass. The entered words are played correctly.
 
-***** TODO Main Function-key controls
+***** DONE Main Function-key controls
 
 *Steps*
 1. In "Mode" menu select any of character groups.
@@ -1609,7 +1613,9 @@ corresponding to a value modified through the Function keys.
 
 *Actual results*
 
-***** TODO Practice time keys (PageDown/PageUp keys)
+Pass. Properties of played Morse code change according to the set parameters.
+
+***** DONE Practice time keys (PageDown/PageUp keys)
 
 *Steps*
 1. Using PageDown/PageUp keys select some value of practice time.
@@ -1622,8 +1628,10 @@ corresponding to a value modified through the Function keys.
    PageDown/PageUp keys, the practice ends.
 
 *Actual results*
+Pass. The keys control practice time as expected. The practice ends when
+expected.
 
-***** TODO "Exit" key
+***** DONE "Exit" key
 
 *Steps*
 1. Press F12 ("Exit") key when cwcp is idle and is not generating any text/sound.
@@ -1636,8 +1644,12 @@ corresponding to a value modified through the Function keys.
 3. No error or warning messages are visible in console window
 
 *Actual results*
+Pass. cwcp is exited correctly. No errors or artifacts are present.
 
-*** TODO xcwcp tests
+*** SKIPPED xcwcp tests
+
+Skipped. xcwcp is not compiled on this platform.
+
 **** TODO Tests of UI elements
 ***** TODO Main modes (character groups)
 
@@ -1694,10 +1706,10 @@ corresponding to a value modified through the spin boxes.
 
 *Actual results*
 
-*** TODO cwgen tests
+*** DONE cwgen tests
 Tests of basic usage of unixcw/src/cwgen/cwgen program.
 
-**** TODO Manual tests of cwgen
+**** DONE Manual tests of cwgen
 
 A significant part of cwgen's functionality is tested automatically through
 code in 'src/cwgen/tests' subdirectory. This means that the manual tests
@@ -1742,8 +1754,9 @@ In each of the above steps, the text printed to console matches the command
 line options passed to cwgen.
 
 *Actual results*
+Pass. All outputs are as expected.
 
-**** TODO Automatic tests of cwgen
+**** DONE Automatic tests of cwgen
 
 Automatic tests are executed on every "make check", which happens a lot
 during development. This test from this test scenario is meant to
@@ -1767,9 +1780,10 @@ manually/visually check the output of the tests.
    options.
 
 *Actual results*
+Pass. Visual inspection found no errors.
 
-*** TODO receiving functionality
-**** TODO xcwcp receiver tests
+*** SKIPPED receiving functionality
+**** SKIPPED xcwcp receiver tests
 
 *Steps*
 1. Enable xcwcp's receiver tests
@@ -1787,4 +1801,5 @@ manually/visually check the output of the tests.
 2. Test's summary indicates success.
 
 *Actual results*
+Skipped. xcwcp is not being compiled on this platform.
 
