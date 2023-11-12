@@ -9,7 +9,7 @@ Version of template: 2023.10.16.
 **** TODO make distcheck
 
 *Steps*
-Run "make distcheck" in main directory of the project.
+Run "./configure && make distcheck" in main directory of the project.
 
 *Expected result*
 1. Distribution package is built correctly (no errors during creation of
@@ -68,6 +68,10 @@ later.
 **** TODO Main test binary - Console sound system
 
 *Steps*
+
+./configure
+make
+make check
 cd src/libcw/tests
 ./libcw_tests -S c
 
@@ -87,6 +91,10 @@ server before being able to access OSS directly. Refer to instructions in
 project's README.dev.org for details on how to stop these sound servers.
 
 *Steps*
+
+./configure
+make
+make check
 cd src/libcw/tests
 ./libcw_tests -S o
 
@@ -106,6 +114,10 @@ server before being able to access ALSA directly. Refer to instructions in
 project's README.dev.org for details on how to stop these sound servers.
 
 *Steps*
+
+./configure
+make
+make check
 cd src/libcw/tests
 ./libcw_tests -S a
 
@@ -119,6 +131,10 @@ Test logs and summary table for tests shows only well-known problems.
 **** TODO Main test binary - PulseAudio sound system
 
 *Steps*
+
+./configure
+make
+make check
 cd src/libcw/tests
 ./libcw_tests -S p
 
@@ -132,6 +148,10 @@ Test logs and summary table for tests shows only well-known problems.
 **** TODO Main test binary - Null sound system
 
 *Steps*
+
+./configure
+make
+make check
 cd src/libcw/tests
 ./libcw_tests -S n
 
