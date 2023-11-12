@@ -1219,3 +1219,486 @@ Pass. No reported errors. Visual inspection found no issues.
 *Actual results*
 Skipped. I don't compile xcwcp on this platform.
 
+** TODO FreeBSD 13.2-RELEASE-p4 (Celeron, x86_64)
+gcc (FreeBSD Ports Collection) 12.2.0
+*** TODO Build system tests
+**** TODO make distcheck
+
+*Steps*
+Run "./configure && make distcheck" in main directory of the project.
+
+*Expected result*
+1. Distribution package is built correctly (no errors during creation of
+   archive).
+2. Automatic tests executed during 'make distcheck' pass.
+3. The distribution package contains all files intended for distribution (use
+   your best judgement here).
+
+*Actual result*
+
+**** TODO ./configure options
+
+Test that all options supported by ./configure script produce "buildable" code.
+
+*Steps*
+Run ./qa/test_configure_options.sh
+
+*Expected result*
+
+The script should not report any failure.
+
+Example of failed test:
+
+$ qa/test_configure_options.sh
+128: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+Test of configuration flags FAILED
+$ echo $?
+255
+
+Example of successful test:
+
+$ qa/test_configure_options.sh
+128: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+127: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-oss &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+126: ./configure --enable-dev --disable-xcwcp --disable-cwcp --disable-pulseaudio --disable-alsa --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+[...]
+3: ./configure --disable-oss &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+2: ./configure --disable-console &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+1: ./configure &>/dev/null && make &>/dev/null && make check &>/dev/null && make clean &>/dev/null
+Test of configuration flags SUCCEEDED
+
+*Notes*
+The shell script may not work on systems without bash.
+
+*Actual result*
+
+*** TODO libcw tests
+Tests using tools from unixcw/src/libcw.
+
+Notice that Null sound system is tested as last one: first run tests on other
+sound systems that allow you to hear some sound. With a real sound from
+speaker or buzzer it's easier to notice problems with libcw. Don't waste time
+on testing Null system first, only to hear issues with other sound systems
+later.
+
+**** TODO Main test binary - Console sound system
+
+*Steps*
+./configure
+make
+make check
+cd src/libcw/tests
+./libcw_tests -S c
+
+*Expected results*
+Test logs and summary table for tests shows only well-known problems.
+
+*Test statistics table*
+
+*Actual result*
+
+**** TODO Main test binary - OSS sound system
+
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access OSS directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
+
+*Steps*
+
+./configure
+make
+make check
+cd src/libcw/tests
+./libcw_tests -S o
+
+*Expected results*
+Test logs and summary table for tests shows only well-known problems.
+
+*Test statistics table*
+
+*Actual result*
+
+**** TODO Main test binary - ALSA sound system
+
+*Preconditions*
+
+On Linux machine, you may need to disable PulseAudio and/or PipeWire sound
+server before being able to access ALSA directly. Refer to instructions in
+project's README.dev.org for details on how to stop these sound servers.
+
+*Steps*
+
+./configure
+make
+make check
+cd src/libcw/tests
+./libcw_tests -S a
+
+*Expected results*
+Test logs and summary table for tests shows only well-known problems.
+
+*Test statistics table*
+
+*Actual result*
+
+**** TODO Main test binary - PulseAudio sound system
+
+*Steps*
+
+./configure
+make
+make check
+cd src/libcw/tests
+./libcw_tests -S p
+
+*Expected results*
+Test logs and summary table for tests shows only well-known problems.
+
+*Test statistics table*
+
+*Actual result*
+
+**** TODO Main test binary - Null sound system
+
+*Steps*
+
+./configure
+make
+make check
+cd src/libcw/tests
+./libcw_tests -S n
+
+*Expected results*
+
+Test logs and summary table for tests shows only well-known problems.
+
+*Test statistics table*
+
+*Actual result*
+
+**** TODO Misc tests
+
+***** TODO pcm sample file is disabled in regular builds
+
+Confirm that by default libcw doesn't create a debug file into which raw PCM
+samples are being written.
+
+*Steps*
+
+1. Confirm that in /tmp there is no file called
+   "cw_file_<parameters>_pcm.raw" from previous runs of programs/tests.
+
+2. Build package
+./configure && make
+
+3. Start a program that uses libcw to generate sound. Play any string.
+./src/cw/cw
+
+4. Exit the program.
+
+5. Confirm that in /tmp there is no file called
+   "cw_file_<parameters>_pcm.raw" from _current_ run of program done in
+   step 3.
+
+*Actual result*
+
+*** TODO cw tests
+Tests of basic usage of unixcw/src/cw/cw program.
+
+**** TODO Tests using *.cw files
+
+Tests that use *.cw files:
+./src/cw/cw -f src/cw/test.cw           #  4 min 58 sec
+./src/cw/cw -f src/cw/demo.cw           #  9 min 54 sec
+./src/cw/cw -f src/cw/prelude.cw        #  1 min 54 sec
+
+*Actual result*
+
+**** TODO Tests of command-line options
+Test that some of command-line options result in expected behaviour of cw.
+
+***** TODO basic options through script
+
+*Prerequisites*
+1. Adjust parameters of ./src/cw/tests/basic_options.sh as needed on given
+   platform, e.g. change value of $DEVICE.
+
+*Steps*
+1. Run script: ./src/cw/tests/basic_options.sh
+2. Obseve text info informing about tested options, listen to played sounds,
+3. Confirm that sound's parameters (volume, gap, tone, etc.) matches the info
+   printed by the script.
+4. Observe whether entire text (especially its beginning and end) is played
+   correctly.
+
+*Actual result*
+
+***** TODO Null sound system
+
+./srcw/cw/cw -s n
+
+*Actual result*
+
+***** TODO ALSA sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s a -d plughw:CARD=PCH,DEV=0
+
+*Actual result*
+
+***** TODO OSS sound system
+
+You may want to first kill pulseaudio and pipewire
+
+./src/cw/cw -s o
+
+*Actual result*
+
+**** TODO basic behaviour in a "session"
+
+One of previous tests ("through script") has been passing text to cw through
+unix pipe. If I remember correctly, such setup may behave a bit differently
+than a setup in which a text is entered through keyboard in a started cw
+program (started cw program waits for input from user, so called "session").
+
+In one of such setups, in some circumstances, the initial part of text was
+not played correctly.
+
+In order to verify behaviour of cw in a "session", run this test.
+
+TODO acerion 2023.11.10: check what was the problem and in which specific
+circumstances it occurred.
+
+*Steps*
+1. Start cw: ./src/cw/cw
+2. Enter any text
+3. Observe whether entire text (especially its beginning and end) is played
+   correctly
+
+*Actual result*
+
+*** TODO cwcp tests
+Tests of basic usage of unixcw/src/cwcp/cwcp program.
+
+**** TODO Tests of UI elements
+***** TODO Main modes (character groups)
+
+*Steps*
+1. Select each mode (character group) item in left-hand "Modes" panel.
+2. Press F9 or Enter if necessary to force start of playing.
+
+*Expected results*
+1. For each item the text in main UI area corresponds to each mode (character
+   group). The words consist of intended (expected) characters from character group.
+2. For each item the text is being played correctly.
+
+*Actual results*
+
+***** TODO "Keyboard" mode
+
+*Steps*
+1. In the left-hand "Modes" panel select "Keyboard" item.
+2. Enter few words
+
+*Expected results*
+1. The entered words are visible in main UI area.
+2. The words are played correctly.
+
+*Actual results*
+
+***** TODO Main Function-key controls
+
+*Steps*
+1. In "Mode" menu select any of character groups.
+2. Let cwcp generate sound.
+3. Use the function keys in range F1-F8 to control parameters of played
+   sound.
+
+*Expected results*
+Parameters of newly enqueued text (speed, tone, volume, gap) behave
+corresponding to a value modified through the Function keys.
+
+*Actual results*
+
+***** TODO Practice time keys (PageDown/PageUp keys)
+
+*Steps*
+1. Using PageDown/PageUp keys select some value of practice time.
+2. In "Mode" menu select any of character groups.
+3. Let cwcp generate sound.
+
+*Expected results*
+1. The timer at the bottom of the UI counts practice time up.
+2. When the count of minutes of practice time reaches limit set with
+   PageDown/PageUp keys, the practice ends.
+
+*Actual results*
+
+***** TODO "Exit" key
+
+*Steps*
+1. Press F12 ("Exit") key when cwcp is idle and is not generating any text/sound.
+2. Press F12 ("Exit") key when cwcp is generating text and sound.
+
+*Expected results*
+1. cwcp process is terminated.
+2. No "ncurses" artifacts are visible in console window, meaning that the
+   termination was "clean".
+3. No error or warning messages are visible in console window
+
+*Actual results*
+
+*** TODO xcwcp tests
+**** TODO Tests of UI elements
+***** TODO Main modes (character groups)
+
+*Steps*
+1. Select each mode (character group) item in "Modes" dropdown menu.
+2. Press Play button if necessary to force start of playing.
+
+*Expected results*
+1. For each item the text in main UI area corresponds to each mode (character
+   group). The words consist of intended (expected) characters from character group.
+2. For each item the text is being played correctly.
+
+*Actual results*
+
+***** TODO "Keyboard" mode
+
+*Steps*
+1. In the "Modes" dropdown select "Send Keyboard CW" item.
+2. Enter few words.
+3. Press Play button if necessary to force start of playing.
+
+*Expected results*
+1. The entered words are visible in main UI area.
+2. The words are played correctly.
+
+*Actual results*
+
+***** TODO "Receiver" mode
+*Steps*
+1. In the "Modes" dropdown select "Receive Keyed CW" item.
+2. Use mouse or keyboard to simulate Morse key:
+   a. Use mouse Left/Right button to simulate iambic keyer.
+   b. Use keyboard Left/Right key to simulate iambic keyer.
+   c. Use keyboard Space key to simulate straight key.
+   d. Use keyboard Enter key to simulate straight key.
+
+*Expected results*
+For each method of simulating a key, the tested program is able to recognize
+keyed characters.
+
+*Actual results*
+
+***** TODO Main sound controls
+
+*Steps*
+1. In program's "Modes" dropdown select any of character groups.
+2. Let xcwcp generate sound.
+3. Use the spin boxes available in program's toolbar to control parameters of played
+   sound (speed, tone, volume, gap)..
+
+*Expected results*
+Parameters of newly enqueued text (speed, tone, volume, gap) behave
+corresponding to a value modified through the spin boxes.
+
+*Actual results*
+
+*** TODO cwgen tests
+Tests of basic usage of unixcw/src/cwgen/cwgen program.
+
+**** TODO Manual tests of cwgen
+
+A significant part of cwgen's functionality is tested automatically through
+code in 'src/cwgen/tests' subdirectory. This means that the manual tests
+described here are only meant as a double-check that the automatic tests
+didn't miss any grave problems.
+
+The test steps mention "visual inspection". This means: look at cwgen's
+output, see if it more or less matches command line options passed to cwgen,
+and move on to next step.
+
+*Steps*
+
+1. Visually inspect count of groups (words) in output of
+   ./src/cwgen/cwgen -g 9
+
+2. Visually inspect size of groups (words) in output of
+   ./src/cwgen/cwgen --groupsize 3
+
+3. Visually inspect size of groups (words) in output of
+   ./src/cwgen/cwgen --groupsize 2-7
+
+4. Visually inspect count of repeats, i.e. number of times a given word has
+   been *additionally* printed after first printing of a word:
+   ./src/cwgen/cwgen -r 2
+
+5. Visually inspect characters used in groups (words) in output of
+   ./src/cwgen/cwgen --charset "aBc0"
+
+6. Visually inspect count of characters in output of
+   ./src/cwgen/cwgen --limit 12
+
+7. Visually inspect cwgen's help text in output of
+   ./src/cwgen/cwgen -h
+
+8. Visually inspect copyright notice in output of
+   ./src/cwgen/cwgen -v
+
+
+*Expected results*
+
+In each of the above steps, the text printed to console matches the command
+line options passed to cwgen.
+
+*Actual results*
+
+**** TODO Automatic tests of cwgen
+
+Automatic tests are executed on every "make check", which happens a lot
+during development. This test from this test scenario is meant to
+manually/visually check the output of the tests.
+
+*Steps*
+1. Compile automatic tests with this command:
+   ./configure && make && make check
+2. Execute manually the binary responsible for automatic tests of cwgen.
+   ./src/cwgen/tests/cwgen_args
+
+   a. Run the binary 5 times.
+   b. Each time check whether the binary didn't report errors.
+   c. Each time look at debug showing argv, i.e. the list of cwgen's command
+      line options. Compare the output of tests with the list of the options.
+
+
+*Expected results*
+1. The test binary doesn't report errors (warnings are allowed).
+2. Debugs generated by the test binary match the list of cwgen's command line
+   options.
+
+*Actual results*
+
+*** TODO receiving functionality
+**** TODO xcwcp receiver tests
+
+*Steps*
+1. Enable xcwcp's receiver tests
+  ./configure --enable-dev-receiver-test
+2. Compile xcwcp
+   make
+3. Run xcwcp, use "Run Receiver Test" item in modes menu
+   Observe console during and after execution of the test.
+4. At the end of received text press "pause" button to end the test.
+5. Check in console that the summary says "success":
+   "[II] Test result: success"
+
+*Expected results*
+1. No errors reported in console.
+2. Test's summary indicates success.
+
+*Actual results*
+
