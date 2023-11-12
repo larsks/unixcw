@@ -1303,7 +1303,7 @@ correctly) on FreeBSD.
 
 There is a note/ticket added to README.dev.org about this problem.
 
-**** TODO Main test binary - OSS sound system
+**** DONE Main test binary - OSS sound system
 
 *Preconditions*
 
@@ -1324,7 +1324,45 @@ Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
 
+libcw tests: Statistics of tests (failures/total)
+
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   N |           |           |           |           |           |           |  
+   N |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> O |         2 |        40 |         0 |         0 |         0 |         0 |<-
+   O |       152 |       999 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+
+Failed functions:
+
+test_cw_gen_state_callback: usual problems with calling a callback on changes
+of state of generator.
+
+test_cw_gen_enqueue_character_no_ics: the same situation as with ALSA on Alpine:
+the removal of characters works correctly - it's the receiver part (used in
+verification of played sounds) that is failing.
+
+test_cw_gen_remove_last_character: the same situation as with ALSA on Alpine:
+the removal of characters works correctly - it's the receiver part (used in
+verification of played sounds) that is failing.
+
+test_cw_tq_wait_for_level_internal: this is probably a problem known since at
+least 3.6.0: in 3.6.0 there were two errors in "tone queue" category.
+
 *Actual result*
+Pass. It looks like the problems reported in tests are known problems.
+Relevant tickets have been added or updated in README.dev.org.
 
 **** TODO Main test binary - ALSA sound system
 
