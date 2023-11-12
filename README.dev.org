@@ -94,6 +94,12 @@ menuentry "Alpine Linux 3.17" {
 
 ** FreeBSD
 
+*** Disk space
+
+10GB of disc space for FreeBSD 12.1 is not enough to have comfortable working
+env, as I'm constantly running into "no free space left" message. 15GB or
+even 20GB would be more adequate.
+
 *** Generic tips
 
 **** mount
@@ -133,7 +139,6 @@ pgk info
 **** Remove package
 pkg remove
 
-
 *** Source code packages
 
 https://www.freebsd.org/doc/handbook/ports-using.html#ports-upgrading-tools
@@ -147,7 +152,6 @@ make install clean
 portmaster -a
 or in case of errors:
 portmaster -af
-
 
 *** grub entry
 
@@ -436,26 +440,32 @@ libtoolize
 
 * Lessons learned
 
-   1. Use the test template that you created in qa/tests.org. It's a
-      time saver and a good way to organize tests.
+   1. For doing a set of tests before a release, use the test template that
+      you created in qa/test_scenarios/. It's a time saver and a good way to
+      organize tests.
+
    2. Learn how to muffle the console buzzer. It's really annoying
       during long tests.
+
    3. CPU usage is important, especially on older/weaker
       machines. Learn how to measure it and monitor it during
       execution of programs and tests.
+
    4. Lower latency of audio streams leads to higher CPU usage,
       especially for PulseAudio. Find a good way to balance these two
       things.
+
    5. Set limited and clear goals for each release at the beginning of
       development phase. This will allow you to avoid long development cycles
-      and feature creep.
-   6. 10GB of disc space for FreeBSD 12.1 is not enough to have comfortable
-      working env, as I'm constantly running into "no free space left"
-      message. 15GB or even 20GB would be more adequate.
-   7. When writing commit messages, try to formulate them in a way that will
+      and feature creep. Project's prerelease checklist has a point dedicated
+      to this, somewhere at the begin of the dev cycle (it's called "Define
+      scope of changes to be done in this release").
+
+   6. When writing commit messages, try to formulate them in a way that will
       be easy to copy to release notes. When possible, add a summary that
       will be meaningful from user's or integrator's point of view.
-   8. Maintain a section called "Quality Assurance" in changelog/NEWS file.
+
+   7. Maintain a section called "Quality Assurance" in changelog/NEWS file.
       Put there changes related to:
       a. increasing quality of code in the package,
       b. increasing security of program(s) compiled from the package.
@@ -464,7 +474,7 @@ libtoolize
       to increase quality of the software that they will be using. Make the
       actions and changes more visible in the changelog/NEWS file.
 
-   9. Sharing a partition between OSes installed on a single PC.
+   8. Sharing a partition between OSes installed on a single PC.
 
       1. FreeBSD can mount Linux 'ext4' filesystem, but only if you use
          'ext2fs' as type. FreeBSD doesn't support journaling on ext3/4
@@ -483,12 +493,20 @@ libtoolize
          Consult a man page for the command creating user accounts about
          explicitly specifying UID and GID of a new user.
 
-   10. Always assign priorities to tickets in README.dev.org
+   9. Always assign priorities to tickets in README.dev.org
 
-       Having tickets without priorities leads to bad prioritization of
-       future work.
+      Having tickets without priorities leads to bad prioritization of
+      future work.
 
-       Use "C-c ," in Emacs to assign priority (A/B/C) to org-mode TODO item.
+      Use "C-c ," in Emacs to assign priority (A/B/C) to org-mode TODO item.
+
+   10. When you make important change to package, document it in
+       NEWS/CHANGELOG immediately. Don't postpone this to last week before
+       release.
+
+	   Trying to compile NEWS items from a commit log or from other sources
+       at the end of dev cycle is a dumb idea that will make you wish you
+       were documenting important changes as they were happening.
 
 * Bugs, feature requests
 ** DONE R0001 Bug: -lintl on Alpine is not added to linker flags
