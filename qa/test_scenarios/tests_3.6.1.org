@@ -1,7 +1,7 @@
 #+TODO: TODO STARTED | FAILED DONE SKIPPED
 # The vertical bar indicates which states are final states.
 
-* STARTED Tests for unixcw version 3.6.1
+* DONE Tests for unixcw version 3.6.1
 Version of template: 2023.06.10.
 ** DONE Main laptop, Debian GNU/Linux 12
 gcc (Debian 12.2.0-14) 12.2.0
@@ -1219,9 +1219,9 @@ Pass. No reported errors. Visual inspection found no issues.
 *Actual results*
 Skipped. I don't compile xcwcp on this platform.
 
-** STARTED FreeBSD 13.2-RELEASE-p4 (Celeron, x86_64)
+** DONE FreeBSD 13.2-RELEASE-p4 (Celeron, x86_64)
 gcc (FreeBSD Ports Collection) 12.2.0
-*** STARTED Build system tests
+*** DONE Build system tests
 **** DONE make distcheck
 
 *Steps*
@@ -1237,7 +1237,7 @@ Run "./configure && make distcheck" in main directory of the project.
 *Actual result*
 Pass. The distribution package is created correctly.
 
-**** TODO ./configure options
+**** DONE ./configure options
 
 Test that all options supported by ./configure script produce "buildable" code.
 
@@ -1272,6 +1272,20 @@ Test of configuration flags SUCCEEDED
 The shell script may not work on systems without bash.
 
 *Actual result*
+
+Pass. No compilation errors found.
+
+Due to limited power of this machine and due to limited count of features
+supported on this machine, I have tested only the following set of options:
+
+let total_options_count=7
+all_options[0]="--disable-console"
+all_options[1]="--disable-oss"
+all_options[2]="--disable-alsa"
+all_options[3]="--disable-pulseaudio"
+all_options[4]="--disable-cwgen"
+all_options[5]="--disable-cw"
+all_options[6]="--disable-cwcp"
 
 *** DONE libcw tests
 Tests using tools from unixcw/src/libcw.
