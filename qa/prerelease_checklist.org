@@ -211,7 +211,7 @@ compilation on users' computers due to -Werror.
 * DONE Make sure that debug and optimization compiler flags are correct
 
 Make sure that CFLAGS of code that is almost ready for release doesn't
-contain "-g -O". Do this before testing phase so that the code that you test
+contain "-g -O0". Do this before testing phase so that the code that you test
 has been compiled with options similar to options used for release.
 
 * DONE Do the testing per test scenarios
@@ -223,10 +223,10 @@ testing next release, to see if you haven't reintroduced them.
 
 The test scenarios describe both manual and automatic tests.
 
-* TODO Make sure that debug and optimization compiler flags are correct (again)
+* DONE Make sure that debug and optimization compiler flags are correct (again)
 
 Make sure that CFLAGS of code that is almost ready for release doesn't
-contain "-g -O". Do this test for a second time (after testing phase): maybe
+contain "-g -O0". Do this test for a second time (after testing phase): maybe
 you have added the flags during fixing of some issues found during testing
 phase.
 
@@ -252,7 +252,7 @@ the package:
    - package documentation (NEWS/README/README.dev.org/man pages/installation
      instructions, other)
 
-* TODO Review the opened tickets, find fixed ones
+* DONE Review the opened tickets, find fixed ones
 
 Review the list of opened tickets from README.dev.org -> "Buts, feature
 requests". It may happen that some of them have been fixed during your work
