@@ -831,3 +831,13 @@ where you can use either keyboard (Enter/Space/Up/Down keys) or mouse
 Left/Right buttons) to simulate Morse key, and let a program interpret input
 from the Morse key.
 
+** TODO R0051 Fix console sound system on FreeBSD
+
+Console sound system doesn't work on FreeBSD.
+
+Trying to use vanilla code with /dev/console device doesn't work at all in FreeBSD 13.2.
+
+Trying to define LIBCW_CONSOLE_USE_SPKRTONE and use /dev/speaker works only
+partially: some of libcw tests pass, but other tests (e.g.
+legacy_api_test_straight_key) do not (there is no sound at all).
+

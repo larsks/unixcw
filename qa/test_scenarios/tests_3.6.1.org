@@ -1273,7 +1273,7 @@ The shell script may not work on systems without bash.
 
 *Actual result*
 
-*** TODO libcw tests
+*** STARTED libcw tests
 Tests using tools from unixcw/src/libcw.
 
 Notice that Null sound system is tested as last one: first run tests on other
@@ -1282,7 +1282,7 @@ speaker or buzzer it's easier to notice problems with libcw. Don't waste time
 on testing Null system first, only to hear issues with other sound systems
 later.
 
-**** TODO Main test binary - Console sound system
+**** SKIPPED Main test binary - Console sound system
 
 *Steps*
 ./configure
@@ -1297,6 +1297,11 @@ Test logs and summary table for tests shows only well-known problems.
 *Test statistics table*
 
 *Actual result*
+
+Skipped due to console sound system not functioning (not implemented
+correctly) on FreeBSD.
+
+There is a note/ticket added to README.dev.org about this problem.
 
 **** TODO Main test binary - OSS sound system
 

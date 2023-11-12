@@ -362,7 +362,7 @@ static cw_ret_t cw_console_write_with_spkrtone_internal(cw_gen_t * gen, const cw
 		spkrtone.frequency = 0; /* https://man.netbsd.org/speaker.4: "A frequency of zero is interpreted as a rest." */
 	} else {
 		spkrtone.frequency = tone->frequency;
-		fprintf(stderr, "%d\n", tone->frequency);
+		//fprintf(stderr, "%d\n", tone->frequency);
 	}
 	spkrtone.duration = tone->duration / (10 * 1000); /* .duration in tone_t is "in 1/100ths of a second" (https://man.netbsd.org/speaker.4). */
 	const int rv = ioctl(gen->console.sound_sink_fd, SPKRTONE, &spkrtone);
