@@ -1448,9 +1448,9 @@ test_cw_gen_enqueue_character_no_ics - incorrect recognition of first element
 *Actual result*
 Pass. Tests fail in known places.
 
-**** TODO Misc tests
+**** DONE Misc tests
 
-***** TODO pcm sample file is disabled in regular builds
+***** DONE pcm sample file is disabled in regular builds
 
 Confirm that by default libcw doesn't create a debug file into which raw PCM
 samples are being written.
@@ -1473,6 +1473,7 @@ samples are being written.
    step 3.
 
 *Actual result*
+Pass. No sample files in /tmp.
 
 *** TODO cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
