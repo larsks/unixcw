@@ -242,6 +242,12 @@ You may want to first kill pulseaudio and pipewire
 
 *Actual result*
 
+***** TODO PulseAudio sound system
+
+./src/cw/cw -s p
+
+*Actual result*
+
 **** TODO basic behaviour in a "session"
 
 One of previous tests ("through script") has been passing text to cw through

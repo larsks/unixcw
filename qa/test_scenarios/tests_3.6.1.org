@@ -1475,10 +1475,10 @@ samples are being written.
 *Actual result*
 Pass. No sample files in /tmp.
 
-*** TODO cw tests
+*** DONE cw tests
 Tests of basic usage of unixcw/src/cw/cw program.
 
-**** TODO Tests using *.cw files
+**** DONE Tests using *.cw files
 
 Tests that use *.cw files:
 ./src/cw/cw -f src/cw/test.cw           #  4 min 58 sec
@@ -1486,11 +1486,12 @@ Tests that use *.cw files:
 ./src/cw/cw -f src/cw/prelude.cw        #  1 min 54 sec
 
 *Actual result*
+Pass. All files were played correctly.
 
-**** TODO Tests of command-line options
+**** DONE Tests of command-line options
 Test that some of command-line options result in expected behaviour of cw.
 
-***** TODO basic options through script
+***** DONE basic options through script
 
 *Prerequisites*
 1. Adjust parameters of ./src/cw/tests/basic_options.sh as needed on given
@@ -1506,29 +1507,42 @@ Test that some of command-line options result in expected behaviour of cw.
 
 *Actual result*
 
-***** TODO Null sound system
+The parameters of sound are changing as expected. No problems with played
+tones were observed.
+
+***** DONE Null sound system
 
 ./srcw/cw/cw -s n
 
 *Actual result*
+Pass. No errors were observed
 
-***** TODO ALSA sound system
+***** SKIPPED ALSA sound system
 
 You may want to first kill pulseaudio and pipewire
 
 ./src/cw/cw -s a -d plughw:CARD=PCH,DEV=0
 
 *Actual result*
+Skipped. ALSA is not available on this machine.
 
-***** TODO OSS sound system
+***** DONE OSS sound system
 
 You may want to first kill pulseaudio and pipewire
 
 ./src/cw/cw -s o
 
 *Actual result*
+Sounds played correctly. No errors observed.
 
-**** TODO basic behaviour in a "session"
+***** SKIPPED PulseAudio sound system
+
+./src/cw/cw -s p
+
+*Actual result*
+Skipped. PulseAudio is not available on this machine.
+
+**** DONE basic behaviour in a "session"
 
 One of previous tests ("through script") has been passing text to cw through
 unix pipe. If I remember correctly, such setup may behave a bit differently
@@ -1550,6 +1564,7 @@ circumstances it occurred.
    correctly
 
 *Actual result*
+Pass. Didn't obsere any problems with played sound.
 
 *** TODO cwcp tests
 Tests of basic usage of unixcw/src/cwcp/cwcp program.
