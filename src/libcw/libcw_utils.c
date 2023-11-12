@@ -274,6 +274,7 @@ void cw_usleep_internal(int usecs)
 	do {
 		struct timespec req = { .tv_sec = remaining.tv_sec, .tv_nsec = remaining.tv_nsec };
 		//fprintf(stderr, " -- sleeping for %ld s, %ld ns\n", req.tv_sec, req.tv_nsec);
+		/* TODO acerion 2023.11.11: use clock_nanosleep() with MONOTONIC clock ID. */
 		rv = nanosleep(&req, &remaining);
 		if (rv) {
 			//fprintf(stderr, " -- remains %ld s, %ld ns\n", remaining.tv_sec, remaining.tv_nsec);

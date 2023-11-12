@@ -1273,7 +1273,7 @@ The shell script may not work on systems without bash.
 
 *Actual result*
 
-*** STARTED libcw tests
+*** DONE libcw tests
 Tests using tools from unixcw/src/libcw.
 
 Notice that Null sound system is tested as last one: first run tests on other
@@ -1406,7 +1406,7 @@ Test logs and summary table for tests shows only well-known problems.
 *Actual result*
 Skipped. PulseAudio is not supported on this platform.
 
-**** TODO Main test binary - Null sound system
+**** DONE Main test binary - Null sound system
 
 *Steps*
 
@@ -1421,8 +1421,32 @@ cd src/libcw/tests
 Test logs and summary table for tests shows only well-known problems.
 
 *Test statistics table*
+     | tone queue| generator |    key    |  receiver |    data   |    other  |
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+-> N |         0 |        79 |         0 |         0 |         0 |         0 |<-
+   N |       151 |       999 |        48 |      1426 |        30 |       431 |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   C |           |           |           |           |           |           |  
+   C |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   O |           |           |           |           |           |           |  
+   O |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   A |           |           |           |           |           |           |  
+   A |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+   P |           |           |           |           |           |           |  
+   P |           |           |           |           |           |           |  
+   --+-----------+-----------+-----------+-----------+-----------+-----------+
+
+Failed tests:
+
+test_cw_gen_state_callback - big divergences
+
+test_cw_gen_enqueue_character_no_ics - incorrect recognition of first element
 
 *Actual result*
+Pass. Tests fail in known places.
 
 **** TODO Misc tests
 
