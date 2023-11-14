@@ -3,13 +3,13 @@
 Based on https://cdw.sourceforge.net/documentation/release_checklist/release_checklist.html
 
 
-* TODO Review opened tickets
+* SKIPPED Review opened tickets
 
 You may have some plans for current dev cycle, but take a look at opened
 tickets. Maybe there is some high-priority ticket that needs to be included
 in current dev cycle?
 
-* TODO Define scope of changes to be done in this release
+* SKIPPED Define scope of changes to be done in this release
 
 Describe them here, and stick to them during the development phase. Don't
 extend the scope unless really necessary (e.g. unless you find a serious
@@ -21,12 +21,12 @@ requests' list, put the ticket numbers on the list below.
 The goals of this development cycle are:
 1.
 
-* TODO Add -Werror to CFLAGS
+* SKIPPED Add -Werror to CFLAGS
 During development phase you don't want to introduce any issues that can be
 caught by compiler. -Werror will make sure that you will fix them before they
 slip into repo.
 
-* TODO Review 'terminology'
+* SKIPPED Review 'terminology'
 
 Refresh your knowledge of terminology and conventions for code and
 documentation by reading the related section in README.dev.org.
@@ -34,7 +34,7 @@ documentation by reading the related section in README.dev.org.
 Do this in order to avoid introducing non-compliant changes in code or
 documentation.
 
-* TODO Review 'lessons learned'
+* SKIPPED Review 'lessons learned'
 
 The previous development cycle may have happened a long time ago, and you may
 have forgotten the lessons learned during the previous development cycle.
@@ -230,28 +230,6 @@ contain "-g -O0". Do this test for a second time (after testing phase): maybe
 you have added the flags during fixing of some issues found during testing
 phase.
 
-* TODO Review changes - documentation and test scenarios template
-
-After those elements are done, you are ready to describe what has changed in
-the package:
- - the changes that were planned for the release,
- - fixes during global review,
- - static code analysis,
- - deciding soname of library and version of package,
- - syncing with changes made in Debian,
- - doing tests per test scenarios and introducing fixes of bugs found that way,
-
-1. Review changes in code, documentation and other files. Based on that, make
-   necessary changes to:
-   - qa/test_scenarios/template.org: add, remove or update test cases
-   - package documentation (NEWS/README/README.dev.org/man pages/installation
-     instructions, other)
-2. Review changes noted down in commit log. Based on that, make necessary
-   changes to:
-   - qa/test_scenarios/template.org: add, remove or update test cases
-   - package documentation (NEWS/README/README.dev.org/man pages/installation
-     instructions, other)
-
 * DONE Review the opened tickets, find fixed ones
 
 Review the list of opened tickets from README.dev.org -> "Buts, feature
@@ -260,13 +238,26 @@ in this development cycle, but you didn't notice it.
 
 Read the list of opened tickets, find the tickets that describe already fixed
 bug or already implemented feature, and close them.
+* TODO Review descriptions of changes
 
-* TODO Spellcheck
+Review information about what was changed in current releases:
+ - NEWS file
+ - ChangeLog file
+ - README file
+ - man page files (there are several man pages, check them all)
 
-Spell-check user-facing files: NEWS, README, change logs, man pages, other
-documents.
+Make sure that:
+ - the information is factually correct,
+ - the sentences and paragraphs are logically correct.
+ - the structures of documents are valid.
 
+* TODO Run a spell check on documentation
 
+Spell-check user-facing files:
+ - NEWS
+ - README
+ - ChangeLog
+ - man page files (there are several man pages, check them all)
 
 * TODO Localization
 
@@ -293,6 +284,13 @@ Do this now, you may want to reuse some content from files updated in point
 online yet, there is still some testing to do.
 
 Make sure that contact information available on your website is correct.
+
+* TODO Update date in copyright notices
+
+Update date (year) in the copyright statements like this one in all relevant
+files:
+
+    Copyright (C) 2011-2021  John Doe (email@domain.com)
 
 * TODO Prepare release archive
 
