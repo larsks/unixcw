@@ -961,11 +961,13 @@ RELATED TO R0044.
 Print value of LIBS the same way that you print value of CFLAGS in
 summary of ./configure script.
 
-** TODO [#A] R0055 release checklist should be versioned
+** DONE [#A] R0055 release checklist should be versioned
 
 This document: qa/release_checklist/*.org.
 
 Just like the test scenarios are versioned.
 
 Each release should have its own permanent document with assigned version.
+
+2023.11.14 acerion: implemented in ec46802661bf453b6b2d2c38d08999b2994d3ad3
 
