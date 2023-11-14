@@ -457,7 +457,7 @@ libtoolize
 
    5. Set limited and clear goals for each release at the beginning of
       development phase. This will allow you to avoid long development cycles
-      and feature creep. Project's prerelease checklist has a point dedicated
+      and feature creep. Project's release checklist has a point dedicated
       to this, somewhere at the begin of the dev cycle (it's called "Define
       scope of changes to be done in this release").
 
@@ -860,7 +860,7 @@ compilers - you can't test them anyway.
  - compiler flags,
  - other
 
-2. Add to prerelease checklist some steps that will require:
+2. Add to release checklist some steps that will require:
  - reviewing of recent QA changes and adding them to NEWS file,
  - reviewing of recent QA changes and updating QA section in README.
 
@@ -943,7 +943,6 @@ libcw/tests: wait for level: length of queue after end of waiting[EE]  failure: 
 [EE]    ***   expected 0, got 1   ***
 [II] End of test: test_cw_tq_wait_for_level_internal
 
-
 ** TODO [#C] R0053 proper use of LIBS in configure.ac
 
 -lm, -lintl and perhaps other libs should be just added to LIBS in
@@ -962,9 +961,9 @@ RELATED TO R0044.
 Print value of LIBS the same way that you print value of CFLAGS in
 summary of ./configure script.
 
-** TODO [#A] R0055 prerelease checklist should be versioned
+** TODO [#A] R0055 release checklist should be versioned
 
-This document: qa/prerelease_checklist.org.
+This document: qa/release_checklist/*.org.
 
 Just like the test scenarios are versioned.
 
