@@ -2,7 +2,7 @@ version 3.6.1 / 2023-xx-yy
 
   libcw:
 
-  - Fixing 'cw timing' problem
+  - Fixing "cw timing" problem
     Commit faa8c85052b30a788672568cab083791f0043b78
 
     Problem:
@@ -30,7 +30,7 @@ version 3.6.1 / 2023-xx-yy
     Some libcw tests have been improved and other tests have been added to
     automatically test some of libcw APIs that may be affected.
 
-    'simple receiver' type has been improved to make it more helpful in
+    "simple receiver" type has been improved to make it more helpful in
     discovering problems with timings.
 
     Automatic test in which generated samples are stored to disc file and then
