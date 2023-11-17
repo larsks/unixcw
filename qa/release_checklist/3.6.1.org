@@ -280,7 +280,7 @@ All translatable strings are called by "gettext_noop()" or "_()" functions
 
 acerion 2023.11.17: skipped: localization is not a priority for me now.
 
-* TODO Update your website files
+* DONE Update your website files
 
 If your project has a homepage, update content of website files so that the
 website informs visitors about new release, latest changes and new features.
@@ -358,10 +358,8 @@ If your source code management repository supports tags, you may want to tag
 this specific snapshot with name of release. If you are SCM wizard, you
 should know what to do in such situations anyway :)
 
-* TODO Advertise your software
-
-Make sure that people around the world know about new release of your
-software. Check sites like freshmeat.net, your local Linux Users Group
-website, or your local Linux fans page. See if you can post an announcement
-there.
+This is a bit of a chicken-and-egg situation: if you tag first and then mark
+this item as DONE, then the tagged commit won't represent a fully closed
+release. But if you change this item to DONE and only then tag a commit, you
+will claim that an item is DONE before it's done :)
 
