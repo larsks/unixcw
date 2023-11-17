@@ -14118,11 +14118,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++11 features" >&5
 printf %s "checking for $CXX option to enable C++11 features... " >&6; }
-if test ${ac_cv_prog_cxx_11+y}
+if test ${ac_cv_prog_cxx_cxx11+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_11=no
+  ac_cv_prog_cxx_cxx11=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14164,11 +14164,11 @@ if test x$ac_prog_cxx_stdcxx = xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++98 features" >&5
 printf %s "checking for $CXX option to enable C++98 features... " >&6; }
-if test ${ac_cv_prog_cxx_98+y}
+if test ${ac_cv_prog_cxx_cxx98+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  ac_cv_prog_cxx_98=no
+  ac_cv_prog_cxx_cxx98=no
 ac_save_CXX=$CXX
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -19072,8 +19072,8 @@ printf "%s\n" "no" >&6; }
 fi
 
 pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for QT5" >&5
-printf %s "checking for QT5... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" >&5
+printf %s "checking for Qt5Widgets Qt5Gui Qt5Core >= 5.0.0... " >&6; }
 
 if test -n "$QT5_CFLAGS"; then
     pkg_cv_QT5_CFLAGS="$QT5_CFLAGS"
@@ -19113,7 +19113,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -19122,12 +19122,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        QT5_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
+                QT5_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
         else
-	        QT5_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
+                QT5_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "Qt5Widgets Qt5Gui Qt5Core >= 5.0.0" 2>&1`
         fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$QT5_PKG_ERRORS" >&5
+        # Put the nasty error message in config.log where it belongs
+        echo "$QT5_PKG_ERRORS" >&5
 
 
 
@@ -19138,7 +19138,7 @@ printf "%s\n" "$as_me: WARNING: Cannot find Qt5 files - unable to build xcwcp" >
 
 
 elif test $pkg_failed = untried; then
-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 
 
@@ -19149,8 +19149,8 @@ printf "%s\n" "$as_me: WARNING: Cannot find Qt5 files - unable to build xcwcp" >
 
 
 else
-	QT5_CFLAGS=$pkg_cv_QT5_CFLAGS
-	QT5_LIBS=$pkg_cv_QT5_LIBS
+        QT5_CFLAGS=$pkg_cv_QT5_CFLAGS
+        QT5_LIBS=$pkg_cv_QT5_LIBS
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 
