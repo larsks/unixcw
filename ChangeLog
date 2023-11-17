@@ -89,7 +89,7 @@
 	A bit less code to maintain, a bit less logic to understand.
 
 2015-08-31 Kamil Ignacak
-	* xcwcp: beginning of review of the the code, refactoring,
+	* xcwcp: beginning of review of the code, refactoring,
 	updating comments.
 
 2015-08-30 Kamil Ignacak

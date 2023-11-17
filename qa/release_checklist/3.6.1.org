@@ -238,7 +238,7 @@ in this development cycle, but you didn't notice it.
 
 Read the list of opened tickets, find the tickets that describe already fixed
 bug or already implemented feature, and close them.
-* TODO Review descriptions of changes
+* SKIPPED Review descriptions of changes
 
 Review information about what was changed in current releases:
  - NEWS file
@@ -251,7 +251,10 @@ Make sure that:
  - the sentences and paragraphs are logically correct.
  - the structures of documents are valid.
 
-* TODO Run a spell check on documentation
+acerion 2023.11.17: I'm marking this item as SKIPPED because I have reviewed
+only changes made since 3.6.1.
+
+* DONE Run a spell check on documentation
 
 Spell-check user-facing files:
  - NEWS
@@ -259,7 +262,7 @@ Spell-check user-facing files:
  - ChangeLog
  - man page files (there are several man pages, check them all)
 
-* TODO Localization
+* SKIPPED Localization
 
 If you use gettext or any other tool to facilitate localization of your
 application then generate new file with strings intended for translation,
@@ -274,6 +277,8 @@ invokes xgettext, the script is:
 
 All translatable strings are called by "gettext_noop()" or "_()" functions
 ("_()" is just an alias for "gettext()").
+
+acerion 2023.11.17: skipped: localization is not a priority for me now.
 
 * TODO Update your website files
 
