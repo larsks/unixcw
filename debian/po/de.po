@@ -1,5 +1,5 @@
 # Translation of the debconf template unixcw to German.
-# Copyright (C) 2001-2006  Simon Baldwin, 2011-2012  Kamil Ignacak.
+# Copyright (C) 2001-2006  Simon Baldwin, 2011-2023  Kamil Ignacak.
 # This file is distributed under the same license as the unixcw package.
 # Copyright (C) of this file 2012 Chris Leick.
 #

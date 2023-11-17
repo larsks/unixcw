@@ -7,7 +7,7 @@ Comment: This package was originally debianized by Joop Stakenborg
 
 Files: *
 Copyright: Copyright (C) 2001-2006  Simon Baldwin <simon_baldwin@yahoo.com>
-           Copyright (C) 2011-2014  Kamil Ignacak <acerion@wp.pl>
+           Copyright (C) 2011-2023  Kamil Ignacak <acerion@wp.pl>
 License: GPL-2+
 
 Files: debian/*
