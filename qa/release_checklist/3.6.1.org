@@ -345,18 +345,18 @@ fixed bugs be still open in your bug tracking system.
 2023.11.18 acerion: skipped on purpose. I want to look at the tickets in next
 release.
 
-* STARTED Publish your release archive with your program
+* DONE Publish your release archive with your program
 
 Whether you are using sourceforge.net, tigris.org, Alioth, your own website,
 or any other means of publishing archive with your program, publish an
 archive file with source code of your software.
 
-* TODO Update your website
+* DONE Update your website
 
 Now that archive with program is available, you can publish your updated
 website as well. Test the website to make sure that all pages are accessible.
 
-* TODO Tag release in SCM repository
+* DONE Tag release in SCM repository
 
 If your source code management repository supports tags, you may want to tag
 this specific snapshot with name of release. If you are SCM wizard, you
