@@ -295,34 +295,35 @@ convenient.
 
 * TODO Make final test using code from release archive
 
-  1. extract the archive in some temporary directory, outside of your regular
-     development directory;
+  1. Extract the archive in some temporary directory, outside of your regular
+     development directory.
 
-  2. make a standard build using extracted source code tree, just as any
-     regular user would do;
+  2. Make a standard build using extracted source code tree, just as any
+     regular user would do.
 
-  3. if your program has any unit tests that can be run by user, run them and
-     make sure that all tests are passed;
+  3. Run "make check" to execute tests. Make sure that all tests are a PASS.
 
-  4. run the program that you have just built, check that program starts
-     correctly, that all basic functions are running as expected, that there
-     is no crash or error that would discourage user who is checking your
-     program;
+  4. Run unixcw's programs from the location in which you have built the
+     package. Check that programs start correctly, that all basic functions
+     are running as expected, that there is no crash or error that would
+     discourage user who is trying to use unixcw.
 
 * TODO Make final sanity check test using code from repository
 
-  1. do an anonymous checkout of full source code tree from source code
+  1. Do an anonymous checkout of full source code tree from source code
      management (SCM) repository. This is to check if your SCM repository is
      accessible to regular users.
 
-  2. make a standard build using checked out source code tree, just as any
+	 git clone git://git.code.sf.net/p/unixcw/code unixcw-code
+	 git clone https://git.code.sf.net/p/unixcw/code unixcw-code
+
+  2. Make a standard build using checked out source code tree, just as any
      regular user would do. This is to make sure that build process will be
      successful: that there are no source code files or build system files
      missing in repository.
 
   You don't have to run tests or run the software and check if it works
-  correctly here. You have already did this in point 12, and code in SCM
-  should be the same as in your release archive.
+  correctly here. You have already did this in previous point.
 
 * TODO Update statuses of issues in issue tracker
 
@@ -348,8 +349,22 @@ If your source code management repository supports tags, you may want to tag
 this specific snapshot with name of release. If you are SCM wizard, you
 should know what to do in such situations anyway :)
 
+Use git's annotated tag:
+   git tag -a <tag-name> -m <tagging message>
+   e.g.
+   git tag -a v.3.6.1 -m "Tagging release v3.6.1"
+
+
+Don't forget to push the tag to remote:
+   git push origin <tag-name>
+   or
+   git push origin --tags
+
 This is a bit of a chicken-and-egg situation: if you tag first and then mark
 this item as DONE, then the tagged commit won't represent a fully closed
 release. But if you change this item to DONE and only then tag a commit, you
 will claim that an item is DONE before it's done :)
+
+The decision on how to solve the issue is: first mark this item as DONE, then
+commit the change, and then tag the commit.
 
